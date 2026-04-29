@@ -1,0 +1,663 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>GestionPièces — Patron</title>
+<link href="https://fonts.googleapis.com/css2?family=Outfit:wght@400;600;700;800&display=swap" rel="stylesheet">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
+<style>
+:root{--g:#1a472a;--g2:#2d6a4f;--g3:#40916c;--gl:#d8f3dc;--o:#e85d04;--ol:#fff0e6;--r:#c62828;--rl:#ffebee;--y:#f9a825;--yl:#fffde7;--b:#0d47a1;--bl:#e3f2fd;--bg:#f0f4f0;--tx:#1b2e1f;--tx2:#4a6350;--bd:#c8e6c9}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Outfit',sans-serif;background:var(--bg);color:var(--tx)}
+.hdr{background:linear-gradient(135deg,#1a472a,#0d3320);color:#fff;padding:14px 18px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.hdr-top{display:flex;justify-content:space-between;align-items:center}
+.hdr h1{font-size:1.1rem;font-weight:800}
+.hdr p{font-size:.7rem;opacity:.8}
+.rb{background:#f9a825;color:#1b2e1f;font-size:.68rem;padding:3px 10px;border-radius:20px;font-weight:700}
+.sb{font-size:.68rem;padding:3px 9px;border-radius:20px;font-weight:600}
+.son{background:#69f0ae;color:#1b2e1f}.sof{background:#ffab40;color:#1b2e1f}
+.tabs{display:flex;background:#fff;border-bottom:2px solid var(--bd);overflow-x:auto;scrollbar-width:none;position:sticky;top:66px;z-index:99}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:58px;padding:10px 4px;text-align:center;font-size:.63rem;font-weight:600;color:var(--tx2);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap}
+.tab.active{color:var(--g);border-bottom-color:var(--g)}
+.ti{font-size:1rem;display:block;margin-bottom:2px}
+.pg{display:none;padding:14px 14px 80px}.pg.active{display:block}
+.card{background:#fff;border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:0 2px 10px rgba(26,71,42,.08);border:1px solid var(--bd)}
+.ct{font-size:.75rem;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.4px;margin-bottom:10px}
+.kgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.kpi{border-radius:12px;padding:12px 10px}
+.kl{font-size:.62rem;font-weight:600;opacity:.85}
+.kv{font-size:1.1rem;font-weight:800;margin-top:3px}
+.ks{font-size:.58rem;opacity:.7;margin-top:1px}
+.kg{background:var(--gl);color:var(--g)}.ko{background:var(--ol);color:var(--o)}
+.kb{background:var(--bl);color:var(--b)}.kr{background:var(--rl);color:var(--r)}
+.ky{background:#fff8e1;color:#e65100}.kp{background:#f3e5f5;color:#6a1b9a}
+.psel{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.psel::-webkit-scrollbar{display:none}
+.pbtn{padding:6px 12px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;font-family:'Outfit',sans-serif;font-size:.7rem;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--tx2)}
+.pbtn.active{background:var(--g);color:#fff;border-color:var(--g)}
+.chc{position:relative;height:170px;margin:8px 0}
+table{width:100%;border-collapse:collapse;font-size:.72rem}
+th{background:var(--g);color:#fff;padding:7px 5px;text-align:left;font-weight:700}
+td{padding:6px 5px;border-bottom:1px solid var(--bd)}
+tr:nth-child(even) td{background:#f8fdf8}
+.pp{color:var(--g);font-weight:700}.pn{color:var(--r);font-weight:700}
+.fg{margin-bottom:11px}
+.fg label{font-size:.73rem;font-weight:600;color:var(--tx2);display:block;margin-bottom:4px}
+.fg input,.fg select,.fg textarea{width:100%;padding:10px 13px;border:1.5px solid var(--bd);border-radius:10px;font-family:'Outfit',sans-serif;font-size:.88rem;color:var(--tx);background:#fff;outline:none;transition:border-color .2s}
+.fg input:focus,.fg select:focus{border-color:var(--g3)}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{width:100%;padding:12px;border:none;border-radius:11px;font-family:'Outfit',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer}
+.bg{background:var(--g);color:#fff}.bo{background:var(--o);color:#fff}
+.bsm{width:auto;padding:5px 12px;font-size:.7rem;border-radius:8px}
+.pi{background:#fff;border-radius:11px;padding:11px;margin-bottom:7px;border:1.5px solid var(--bd);display:flex;justify-content:space-between;align-items:flex-start}
+.pnm{font-weight:700;font-size:.85rem;margin-bottom:2px}.pm{font-size:.68rem;color:var(--tx2)}
+.mb2{font-size:.67rem;font-weight:700;padding:2px 7px;border-radius:20px;display:inline-block;margin-bottom:3px}
+.mgg{background:var(--gl);color:var(--g)}.mgo{background:var(--yl);color:#6d5500}.mgr{background:var(--rl);color:var(--r)}
+.stb{font-size:.65rem;padding:2px 7px;border-radius:20px;font-weight:600;display:inline-block}
+.sok{background:var(--gl);color:var(--g)}.slw{background:var(--yl);color:#6d5500}.sout{background:var(--rl);color:var(--r)}
+.hi{background:#fff;border-radius:11px;padding:10px;margin-bottom:7px;border-left:4px solid var(--g3);box-shadow:0 1px 4px rgba(0,0,0,.05)}
+.hi.sv{border-left-color:var(--o)}
+.hh{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px}
+.hn{font-weight:700;font-size:.82rem}.ha{font-weight:800;font-size:.88rem}
+.hae{color:var(--g)}.has{color:var(--o)}.hm{font-size:.67rem;color:var(--tx2)}
+.ptg{font-size:.65rem;font-weight:700;padding:2px 7px;border-radius:10px;background:var(--gl);color:var(--g)}
+.toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:var(--g);color:#fff;padding:9px 18px;border-radius:20px;font-size:.82rem;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none}
+.toast.show{opacity:1}.toast.err{background:var(--r)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.5);z-index:200;display:none;align-items:flex-end}
+.ov.show{display:flex}
+.modal{background:#fff;border-radius:22px 22px 0 0;padding:18px;width:100%;max-height:90vh;overflow-y:auto}
+.mt2{font-size:1rem;font-weight:800;margin-bottom:14px;color:var(--g)}
+.mc{float:right;font-size:1.4rem;cursor:pointer;color:var(--tx2)}
+.stitle{font-size:.88rem;font-weight:800;color:var(--g);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
+.empty{text-align:center;padding:24px 14px;color:var(--tx2)}
+.ei{font-size:2rem;margin-bottom:6px}.empty p{font-size:.8rem}
+.rs{background:linear-gradient(135deg,var(--gl),#fff);border-radius:14px;padding:14px;margin-bottom:10px;border:1.5px solid var(--g3)}
+.rtitle{font-size:.82rem;font-weight:800;color:var(--g);margin-bottom:10px}
+.rrow{display:flex;justify-content:space-between;align-items:center;padding:5px 0;border-bottom:1px dashed var(--bd)}
+.rrow:last-child{border-bottom:none}
+.rl2{font-size:.75rem;color:var(--tx2)}.rv{font-size:.82rem;font-weight:700}
+.top{display:flex;justify-content:space-between;align-items:center;padding:8px 0;border-bottom:1px solid var(--bd)}
+.top:last-child{border-bottom:none}
+.trk{font-size:1rem;margin-right:8px}.tnm{font-weight:600;font-size:.82rem;flex:1}.tvl{font-weight:800;font-size:.82rem;color:var(--g)}
+.m6{margin-top:6px}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-top">
+    <div><h1>👑 GestionPièces</h1><p>Alpha Oumar — Patron</p></div>
+    <div style="display:flex;flex-direction:column;align-items:flex-end;gap:4px">
+      <span class="rb">👑 Patron</span>
+      <span class="sb son" id="sb">🟢 En ligne</span>
+    </div>
+  </div>
+</div>
+
+<div class="tabs">
+  <div class="tab active" id="tab0"><span class="ti">📊</span>Dashboard</div>
+  <div class="tab" id="tab1"><span class="ti">📈</span>Rapports</div>
+  <div class="tab" id="tab2"><span class="ti">🔧</span>Produits</div>
+  <div class="tab" id="tab3"><span class="ti">💳</span>Transact.</div>
+  <div class="tab" id="tab4"><span class="ti">🏧</span>Caisse</div>
+</div>
+
+<!-- DASHBOARD -->
+<div class="pg active" id="pg0">
+  <div class="kgrid">
+    <div class="kpi kg"><div class="kl">💰 Ventes totales</div><div class="kv" id="k1">0</div><div class="ks">FG</div></div>
+    <div class="kpi ko"><div class="kl">📈 Bénéfice net</div><div class="kv" id="k2">0</div><div class="ks">FG</div></div>
+    <div class="kpi kb"><div class="kl">🛒 Achats total</div><div class="kv" id="k3">0</div><div class="ks">FG</div></div>
+    <div class="kpi ky"><div class="kl">📊 Marge moyenne</div><div class="kv" id="k4">0%</div><div class="ks">sur ventes</div></div>
+    <div class="kpi kp"><div class="kl">💰 Ventes auj.</div><div class="kv" id="k5">0</div><div class="ks">FG</div></div>
+    <div class="kpi kr"><div class="kl">🔴 Ruptures</div><div class="kv" id="k6">0</div><div class="ks">produits</div></div>
+    <div class="kpi kg"><div class="kl">📦 Qté stock</div><div class="kv" id="k7">0</div><div class="ks">unités</div></div>
+    <div class="kpi ko"><div class="kl">💎 Valeur stock</div><div class="kv" id="k8">0</div><div class="ks">FG vente</div></div>
+  </div>
+  <div class="card"><div class="ct">🏆 Top 5 produits rentables</div><div id="top5"><div class="empty"><div class="ei">🏆</div><p>Pas de données</p></div></div></div>
+  <div class="card"><div class="ct">📊 Ventes 7 derniers jours</div><div class="chc"><canvas id="ch1"></canvas></div></div>
+  <div class="card"><div class="ct">⚠️ Alertes stock</div><div id="alerts"><div class="empty"><div class="ei">✅</div><p>Stocks OK</p></div></div></div>
+</div>
+
+<!-- RAPPORTS -->
+<div class="pg" id="pg1">
+  <div class="psel" id="prdbtns">
+    <button class="pbtn active" data-prd="j">Aujourd'hui</button>
+    <button class="pbtn" data-prd="s">Semaine</button>
+    <button class="pbtn" data-prd="m">Ce mois</button>
+    <button class="pbtn" data-prd="a">Année</button>
+    <button class="pbtn" data-prd="t">Tout</button>
+  </div>
+  <div class="rs">
+    <div class="rtitle">💰 Rapport financier</div>
+    <div class="rrow"><span class="rl2">Ventes totales</span><span class="rv" id="rv1">0 FG</span></div>
+    <div class="rrow"><span class="rl2">Coût achats</span><span class="rv" id="rv2">0 FG</span></div>
+    <div class="rrow"><span class="rl2">Autres dépenses</span><span class="rv" id="rv3">0 FG</span></div>
+    <div class="rrow"><span class="rl2">🟢 BÉNÉFICE NET</span><span class="rv" id="rv4">0 FG</span></div>
+  </div>
+  <div class="card"><div class="ct">📊 Bénéfice mensuel</div><div class="chc"><canvas id="ch2"></canvas></div></div>
+  <div class="card"><div class="ct">📋 Détail ventes</div><div style="overflow-x:auto"><table><thead><tr><th>Date</th><th>Produit</th><th>Qté</th><th>Montant</th><th>Bénéfice</th></tr></thead><tbody id="tb1"></tbody></table></div></div>
+</div>
+
+<!-- PRODUITS -->
+<div class="pg" id="pg2">
+  <div class="stitle">Catalogue<button class="btn bg bsm" id="btnAddProd">+ Ajouter</button></div>
+  <div style="position:relative;margin-bottom:8px">
+    <input type="text" id="srch" placeholder="🔍 Rechercher par nom, catégorie..." style="width:100%;padding:11px 13px;border:2px solid var(--g3);border-radius:11px;font-family:Outfit,sans-serif;font-size:.88rem;outline:none">
+  </div>
+  <div class="psel" id="catbtns">
+    <button class="pbtn active" data-cat="">Tous</button>
+    <button class="pbtn" data-cat="Freinage">🛑 Freinage</button>
+    <button class="pbtn" data-cat="Filtration">🔵 Filtration</button>
+    <button class="pbtn" data-cat="Moteur">⚙️ Moteur</button>
+    <button class="pbtn" data-cat="Électrique">⚡ Électric.</button>
+    <button class="pbtn" data-cat="Suspension">🔩 Suspens.</button>
+    <button class="pbtn" data-cat="Allumage">🔥 Allumage</button>
+    <button class="pbtn" data-cat="Autre">📦 Autre</button>
+  </div>
+  <div id="ss" style="font-size:.72rem;color:var(--tx2);margin-bottom:7px;font-weight:600"></div>
+  <div id="lstProd"><div class="empty"><div class="ei">🔧</div><p>Aucun produit</p></div></div>
+</div>
+
+<!-- TRANSACTIONS -->
+<div class="pg" id="pg3">
+  <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:10px">
+    <span style="font-size:.88rem;font-weight:800;color:var(--g)">Transactions</span>
+    <button class="btn bo bsm" id="btnAddVnt">+ Vente</button>
+  </div>
+  <div class="psel" id="fltbtns">
+    <button class="pbtn active" data-flt="a">Toutes</button>
+    <button class="pbtn" data-flt="e">📦 Entrées</button>
+    <button class="pbtn" data-flt="v">💰 Ventes</button>
+  </div>
+  <div id="lstTrans"><div class="empty"><div class="ei">💳</div><p>Aucune transaction</p></div></div>
+</div>
+
+<!-- CAISSE -->
+<div class="pg" id="pg4">
+  <div style="background:linear-gradient(135deg,#1a472a,#40916c);border-radius:16px;padding:18px;color:#fff;text-align:center;margin-bottom:12px">
+    <div style="font-size:.78rem;opacity:.8">Ventes aujourd'hui</div>
+    <div style="font-size:1.8rem;font-weight:800" id="ctd">0 FG</div>
+    <div style="font-size:.7rem;opacity:.7;margin-top:3px" id="cdl">—</div>
+  </div>
+  <div class="card">
+    <div class="ct">📝 Enregistrer la journée</div>
+    <div class="fg"><label>Date</label><input type="date" id="cDate"></div>
+    <div class="fr">
+      <div class="fg"><label>Caisse début (FG)</label><input type="number" id="cDeb" placeholder="0"></div>
+      <div class="fg"><label>Dépenses (FG)</label><input type="number" id="cDep" placeholder="0"></div>
+    </div>
+    <div class="fg"><label>Notes</label><textarea id="cNote" rows="2" placeholder="Remarques..."></textarea></div>
+    <button class="btn bg" id="btnSaveCaisse">💾 Enregistrer</button>
+  </div>
+  <div class="card"><div class="ct">📊 Historique</div><div id="lstCaisse"><div class="empty"><div class="ei">📅</div><p>Aucune journée</p></div></div></div>
+</div>
+
+<!-- MODAL PRODUIT -->
+<div class="ov" id="ovProd">
+  <div class="modal">
+    <span class="mc" id="mcProd">✕</span>
+    <div class="mt2">🔧 Nouveau produit</div>
+    <div class="fg"><label>Nom *</label><input type="text" id="pNom" placeholder="Ex: Filtre à huile Toyota"></div>
+    <div class="fr">
+      <div class="fg"><label>Catégorie</label><select id="pCat"><option>Filtration</option><option>Freinage</option><option>Moteur</option><option>Suspension</option><option>Électrique</option><option>Allumage</option><option>Lubrification</option><option>Refroidissement</option><option>Autre</option></select></div>
+      <div class="fg"><label>Qualité</label><select id="pQual"><option value="1">⭐ Basique</option><option value="2" selected>⭐⭐ Standard</option><option value="3">⭐⭐⭐ Premium</option></select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Prix achat (FG) *</label><input type="number" id="pAch" placeholder="0"></div>
+      <div class="fg"><label>Prix vente (FG) *</label><input type="number" id="pVnt" placeholder="0"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Stock actuel</label><input type="number" id="pStk" placeholder="0"></div>
+      <div class="fg"><label>Stock minimum</label><input type="number" id="pMin" placeholder="5"></div>
+    </div>
+    <button class="btn bg" id="btnSaveProd">✅ Enregistrer</button>
+  </div>
+</div>
+
+<!-- MODAL MODIFIER -->
+<div class="ov" id="ovEdit">
+  <div class="modal">
+    <span class="mc" id="mcEdit">✕</span>
+    <div class="mt2">✏️ Modifier le produit</div>
+    <input type="hidden" id="editId">
+    <div class="fg"><label>Nom *</label><input type="text" id="editNom" placeholder="Nom du produit"></div>
+    <div class="fr">
+      <div class="fg"><label>Catégorie</label><select id="editCat"><option>Filtration</option><option>Freinage</option><option>Moteur</option><option>Suspension</option><option>Électrique</option><option>Allumage</option><option>Lubrification</option><option>Refroidissement</option><option>Autre</option></select></div>
+      <div class="fg"><label>Qualité</label><select id="editQual"><option value="1">⭐ Basique</option><option value="2">⭐⭐ Standard</option><option value="3">⭐⭐⭐ Premium</option></select></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Prix achat (FG)</label><input type="number" id="editAch" placeholder="0"></div>
+      <div class="fg"><label>Prix vente (FG)</label><input type="number" id="editVnt" placeholder="0"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Stock actuel</label><input type="number" id="editStk" placeholder="0"></div>
+      <div class="fg"><label>Stock minimum</label><input type="number" id="editMin" placeholder="5"></div>
+    </div>
+    <button class="btn bg" id="btnUpdateProd" style="margin-bottom:10px">✅ Enregistrer</button>
+    <button class="btn" id="btnDelProd" style="background:#c62828;color:white">🗑️ Supprimer</button>
+  </div>
+</div>
+
+<!-- MODAL VENTE -->
+<div class="ov" id="ovVnt">
+  <div class="modal">
+    <span class="mc" id="mcVnt">✕</span>
+    <div class="mt2">💰 Nouvelle vente</div>
+    <div class="fg">
+      <label>Rechercher le produit</label>
+      <input type="text" id="vSrch" placeholder="🔍 Tapez le nom..." style="width:100%;padding:10px 13px;border:2px solid var(--g3);border-radius:10px;font-family:Outfit,sans-serif;font-size:.88rem;outline:none">
+    </div>
+    <div id="vRes" style="max-height:180px;overflow-y:auto;margin-bottom:8px"></div>
+    <div id="vSel" style="display:none;background:var(--gl);border-radius:10px;padding:10px;margin-bottom:10px">
+      <div style="font-weight:700;font-size:.85rem;color:var(--g)" id="vSelNm">—</div>
+      <div style="font-size:.72rem;color:var(--tx2)" id="vSelInfo">—</div>
+    </div>
+    <input type="hidden" id="vProdId">
+    <input type="hidden" id="vProdAch">
+    <div class="fg"><label>Client (optionnel)</label><input type="text" id="vClient" placeholder="Nom du client"></div>
+    <div class="fr">
+      <div class="fg"><label>Quantité *</label><input type="number" id="vQte" value="1" placeholder="1"></div>
+      <div class="fg"><label>Prix vente (FG) *</label><input type="number" id="vPrix" placeholder="0"></div>
+    </div>
+    <div id="vTotPrev" style="display:none;background:var(--ol);border-radius:10px;padding:10px;margin-bottom:10px">
+      <div style="font-size:.8rem;font-weight:700;color:var(--o)">💰 Total: <span id="vTot">0 FG</span></div>
+      <div style="font-size:.75rem;color:var(--g);font-weight:700">📈 Bénéfice: <span id="vBen">0 FG</span></div>
+    </div>
+    <button class="btn bo" id="btnSaveVnt">✅ Enregistrer la vente</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+function fmt(n){return Math.round(n||0).toLocaleString('fr-FR');}
+function showToast(msg,err){
+  var t=document.getElementById('toast');
+  t.textContent=msg;t.className='toast show'+(err?' err':'');
+  setTimeout(function(){t.className='toast';},3000);
+}
+function openOv(id){document.getElementById(id).classList.add('show');}
+function closeOv(id){document.getElementById(id).classList.remove('show');}
+
+var prods=[],sorties=[],entrees=[],caisseData=[];
+var period='j',flt='a',catFlt='';
+var ch1=null,ch2=null;
+
+// TABS
+['tab0','tab1','tab2','tab3','tab4'].forEach(function(tid,i){
+  document.getElementById(tid).addEventListener('click',function(){
+    ['tab0','tab1','tab2','tab3','tab4'].forEach(function(t){document.getElementById(t).classList.remove('active');});
+    ['pg0','pg1','pg2','pg3','pg4'].forEach(function(p){document.getElementById(p).classList.remove('active');});
+    document.getElementById(tid).classList.add('active');
+    document.getElementById('pg'+i).classList.add('active');
+  });
+});
+
+// MODALS
+document.getElementById('btnAddProd').addEventListener('click',function(){openOv('ovProd');});
+document.getElementById('btnAddVnt').addEventListener('click',function(){openOv('ovVnt');});
+['mcProd','mcEdit','mcVnt'].forEach(function(id){
+  document.getElementById(id).addEventListener('click',function(){
+    closeOv(this.id.replace('mc','ov'));
+  });
+});
+['ovProd','ovEdit','ovVnt'].forEach(function(id){
+  document.getElementById(id).addEventListener('click',function(e){if(e.target===this)closeOv(id);});
+});
+
+// PERIODE
+document.getElementById('prdbtns').addEventListener('click',function(e){
+  var btn=e.target.closest('.pbtn');
+  if(!btn)return;
+  document.querySelectorAll('#prdbtns .pbtn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  period=btn.getAttribute('data-prd');
+  afficherRapports();
+});
+
+// FILTRE TRANSACTIONS
+document.getElementById('fltbtns').addEventListener('click',function(e){
+  var btn=e.target.closest('.pbtn');
+  if(!btn)return;
+  document.querySelectorAll('#fltbtns .pbtn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  flt=btn.getAttribute('data-flt');
+  afficherTransactions();
+});
+
+// FILTRE CATEGORIES
+document.getElementById('catbtns').addEventListener('click',function(e){
+  var btn=e.target.closest('.pbtn');
+  if(!btn)return;
+  document.querySelectorAll('#catbtns .pbtn').forEach(function(b){b.classList.remove('active');});
+  btn.classList.add('active');
+  catFlt=btn.getAttribute('data-cat')||'';
+  afficherProduits();
+});
+document.getElementById('srch').addEventListener('input',afficherProduits);
+
+// VENTE RECHERCHE
+document.getElementById('vSrch').addEventListener('input',function(){
+  var s=this.value.toLowerCase().trim();
+  var res=document.getElementById('vRes');
+  if(!s){res.innerHTML='';return;}
+  var found=prods.filter(function(p){return p.nom&&p.nom.toLowerCase().indexOf(s)>=0;});
+  if(!found.length){res.innerHTML='<div style="text-align:center;padding:10px;color:var(--tx2);font-size:.8rem">Aucun résultat</div>';return;}
+  res.innerHTML=found.map(function(p){
+    var clr=p.stock<=0?'#c62828':p.stock<=(p.stockMin||5)?'#f9a825':'#1a472a';
+    return '<div class="vp-row" data-id="'+p.id+'" data-pv="'+(p.prixVente||0)+'" data-pa="'+(p.prixAchat||0)+'" data-stk="'+(p.stock||0)+'" data-cat="'+(p.categorie||'')+'" data-nom="'+p.nom.replace(/"/g,'&quot;')+'" style="padding:10px;border-radius:10px;border:1.5px solid var(--bd);margin-bottom:6px;cursor:pointer;background:white"><div style="font-weight:700;font-size:.85rem">'+p.nom+'</div><div style="font-size:.7rem;color:var(--tx2)">'+p.categorie+' • Prix: <b>'+fmt(p.prixVente)+' FG</b> • <span style="color:'+clr+'">Stock: '+p.stock+'</span></div></div>';
+  }).join('');
+  res.querySelectorAll('.vp-row').forEach(function(row){
+    row.addEventListener('click',function(){
+      document.getElementById('vProdId').value=this.dataset.id;
+      document.getElementById('vProdAch').value=this.dataset.pa;
+      document.getElementById('vPrix').value=this.dataset.pv;
+      document.getElementById('vSelNm').textContent=this.dataset.nom;
+      document.getElementById('vSelInfo').textContent=this.dataset.cat+' • Stock: '+this.dataset.stk+' • Prix: '+fmt(this.dataset.pv)+' FG';
+      document.getElementById('vSel').style.display='block';
+      document.getElementById('vRes').innerHTML='';
+      document.getElementById('vSrch').value=this.dataset.nom;
+      calcVTot();
+    });
+  });
+});
+
+function calcVTot(){
+  var q=parseInt(document.getElementById('vQte').value)||0;
+  var p=parseFloat(document.getElementById('vPrix').value)||0;
+  var pa=parseFloat(document.getElementById('vProdAch').value)||0;
+  if(q>0&&p>0){
+    document.getElementById('vTot').textContent=fmt(q*p)+' FG';
+    document.getElementById('vBen').textContent=fmt((p-pa)*q)+' FG';
+    document.getElementById('vTotPrev').style.display='block';
+  } else document.getElementById('vTotPrev').style.display='none';
+}
+document.getElementById('vQte').addEventListener('input',calcVTot);
+document.getElementById('vPrix').addEventListener('input',calcVTot);
+
+// FILTRER PAR PERIODE
+function filtrerPrd(data){
+  var now=new Date();
+  return data.filter(function(d){
+    if(!d.date||!d.date.toDate)return period==='t';
+    var dd=d.date.toDate();
+    if(period==='j')return dd.toDateString()===now.toDateString();
+    if(period==='s'){var w=new Date(now);w.setDate(now.getDate()-7);return dd>=w;}
+    if(period==='m')return dd.getMonth()===now.getMonth()&&dd.getFullYear()===now.getFullYear();
+    if(period==='a')return dd.getFullYear()===now.getFullYear();
+    return true;
+  });
+}
+
+// AFFICHER DASHBOARD
+function afficherDashboard(){
+  var tv=sorties.reduce(function(s,v){return s+(v.montantTotal||0);},0);
+  var tb=sorties.reduce(function(s,v){return s+(v.benefice||0);},0);
+  var ta=entrees.reduce(function(s,e){return s+(e.montantTotal||0);},0);
+  var mg=tv>0?Math.round(tb/tv*100):0;
+  var rup=prods.filter(function(p){return p.stock<=0;}).length;
+  var tod=new Date().toDateString();
+  var tv2=sorties.filter(function(s){return s.date&&s.date.toDate&&s.date.toDate().toDateString()===tod;}).reduce(function(s,v){return s+(v.montantTotal||0);},0);
+  var qtot=prods.reduce(function(s,p){return s+(p.stock||0);},0);
+  var vtot=prods.reduce(function(s,p){return s+((p.stock||0)*(p.prixVente||0));},0);
+  document.getElementById('k1').textContent=fmt(tv);
+  document.getElementById('k2').textContent=fmt(tb);
+  document.getElementById('k3').textContent=fmt(ta);
+  document.getElementById('k4').textContent=mg+'%';
+  document.getElementById('k5').textContent=fmt(tv2);
+  document.getElementById('k6').textContent=rup;
+  document.getElementById('k7').textContent=fmt(qtot);
+  document.getElementById('k8').textContent=fmt(vtot);
+  document.getElementById('ctd').textContent=fmt(tv2)+' FG';
+  document.getElementById('cdl').textContent=new Date().toLocaleDateString('fr-FR',{weekday:'long',day:'numeric',month:'long'});
+
+  var pb={};
+  sorties.forEach(function(s){pb[s.produitNom]=(pb[s.produitNom]||0)+(s.benefice||0);});
+  var top=Object.entries(pb).sort(function(a,b){return b[1]-a[1];}).slice(0,5);
+  var md=['🥇','🥈','🥉','4️⃣','5️⃣'];
+  var tel=document.getElementById('top5');
+  tel.innerHTML=top.length?top.map(function(t,i){return '<div class="top"><span class="trk">'+md[i]+'</span><span class="tnm">'+t[0]+'</span><span class="tvl">+'+fmt(t[1])+' FG</span></div>';}).join(''):'<div class="empty"><div class="ei">🏆</div><p>Pas de données</p></div>';
+
+  var ap=prods.filter(function(p){return p.stock<=(p.stockMin||5);});
+  var ael=document.getElementById('alerts');
+  ael.innerHTML=ap.length?ap.map(function(p){return '<div class="pi"><div><div class="pnm">'+p.nom+'</div><div class="pm">Stock: '+p.stock+' | Min: '+(p.stockMin||5)+'</div></div><span class="stb '+(p.stock<=0?'sout':'slw')+'">'+(p.stock<=0?'🔴 RUPTURE':'🟡 FAIBLE')+'</span></div>';}).join(''):'<div class="empty"><div class="ei">✅</div><p>Stocks OK</p></div>';
+
+  var d7=[],l7=[];
+  for(var i=6;i>=0;i--){var d=new Date();d.setDate(d.getDate()-i);l7.push(d.toLocaleDateString('fr-FR',{weekday:'short',day:'numeric'}));d7.push(d.toDateString());}
+  var v7=d7.map(function(dd){return sorties.filter(function(s){return s.date&&s.date.toDate&&s.date.toDate().toDateString()===dd;}).reduce(function(s,v){return s+(v.montantTotal||0);},0);});
+  var b7=d7.map(function(dd){return sorties.filter(function(s){return s.date&&s.date.toDate&&s.date.toDate().toDateString()===dd;}).reduce(function(s,v){return s+(v.benefice||0);},0);});
+  if(ch1)ch1.destroy();
+  ch1=new Chart(document.getElementById('ch1'),{type:'bar',data:{labels:l7,datasets:[{label:'Ventes',data:v7,backgroundColor:'rgba(26,71,42,.7)',borderRadius:5},{label:'Bénéfice',data:b7,backgroundColor:'rgba(232,93,4,.7)',borderRadius:5}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:9},boxWidth:10}}},scales:{y:{ticks:{font:{size:9},callback:function(v){return fmt(v);}},grid:{color:'rgba(0,0,0,.05)'}},x:{ticks:{font:{size:9}}}}}});
+}
+
+// AFFICHER RAPPORTS
+function afficherRapports(){
+  var fs=filtrerPrd(sorties);
+  var fe=filtrerPrd(entrees);
+  var tv=fs.reduce(function(s,v){return s+(v.montantTotal||0);},0);
+  var ta=fe.reduce(function(s,e){return s+(e.montantTotal||0);},0);
+  var cFilt=caisseData.filter(function(c){
+    var now=new Date();var dd=new Date(c.date);
+    if(period==='j')return dd.toDateString()===now.toDateString();
+    if(period==='s'){var w=new Date(now);w.setDate(now.getDate()-7);return dd>=w;}
+    if(period==='m')return dd.getMonth()===now.getMonth()&&dd.getFullYear()===now.getFullYear();
+    if(period==='a')return dd.getFullYear()===now.getFullYear();
+    return true;
+  });
+  var td=cFilt.reduce(function(s,c){return s+(c.autresDepenses||0);},0);
+  var tb=fs.reduce(function(s,v){return s+(v.benefice||0);},0)-td;
+  document.getElementById('rv1').textContent=fmt(tv)+' FG';
+  document.getElementById('rv2').textContent=fmt(ta)+' FG';
+  document.getElementById('rv3').textContent=fmt(td)+' FG';
+  var rv4=document.getElementById('rv4');rv4.textContent=fmt(tb)+' FG';rv4.className='rv '+(tb>=0?'pp':'pn');
+
+  var mn=['Jan','Fév','Mar','Avr','Mai','Jun','Jul','Aoû','Sep','Oct','Nov','Déc'];
+  var yr=new Date().getFullYear();
+  var mv=Array(12).fill(0),mb=Array(12).fill(0);
+  sorties.forEach(function(s){if(s.date&&s.date.toDate){var d=s.date.toDate();if(d.getFullYear()===yr){mv[d.getMonth()]+=(s.montantTotal||0);mb[d.getMonth()]+=(s.benefice||0);}}});
+  if(ch2)ch2.destroy();
+  ch2=new Chart(document.getElementById('ch2'),{type:'line',data:{labels:mn,datasets:[{label:'Ventes',data:mv,borderColor:'#1a472a',backgroundColor:'rgba(26,71,42,.1)',fill:true,tension:.4,pointRadius:3},{label:'Bénéfice',data:mb,borderColor:'#e85d04',backgroundColor:'rgba(232,93,4,.1)',fill:true,tension:.4,pointRadius:3}]},options:{responsive:true,maintainAspectRatio:false,plugins:{legend:{labels:{font:{size:9},boxWidth:10}}},scales:{y:{ticks:{font:{size:9},callback:function(v){return fmt(v);}},grid:{color:'rgba(0,0,0,.05)'}},x:{ticks:{font:{size:9}}}}}});
+
+  var tb1=document.getElementById('tb1');
+  var sorted=[].concat(fs).sort(function(a,b){return (b.date?b.date.seconds:0)-(a.date?a.date.seconds:0);});
+  tb1.innerHTML=sorted.length?sorted.map(function(s){var d=s.date&&s.date.toDate?s.date.toDate().toLocaleDateString('fr-FR'):'—';return '<tr><td>'+d+'</td><td>'+s.produitNom+'</td><td>'+s.quantite+'</td><td>'+fmt(s.montantTotal)+'</td><td class="'+(( s.benefice||0)>=0?'pp':'pn')+'">+'+fmt(s.benefice)+'</td></tr>';}).join(''):'<tr><td colspan="5" style="text-align:center;color:#888">Aucune vente</td></tr>';
+}
+
+// AFFICHER PRODUITS
+function afficherProduits(){
+  var el=document.getElementById('lstProd');
+  var s=document.getElementById('srch').value.toLowerCase();
+  var f=prods.filter(function(p){
+    var ms=!s||(p.nom&&p.nom.toLowerCase().indexOf(s)>=0)||(p.categorie&&p.categorie.toLowerCase().indexOf(s)>=0);
+    var mc=!catFlt||p.categorie===catFlt;
+    return ms&&mc;
+  });
+  document.getElementById('ss').textContent=(s||catFlt)?f.length+' résultat(s) sur '+prods.length:prods.length+' produit(s) en catalogue';
+  if(!prods.length){el.innerHTML='<div class="empty"><div class="ei">🔧</div><p>Aucun produit</p></div>';return;}
+  if(!f.length){el.innerHTML='<div class="empty"><div class="ei">🔍</div><p>Aucun résultat</p></div>';return;}
+  el.innerHTML=f.map(function(p){
+    var mg2=p.prixAchat>0?Math.round((p.prixVente-p.prixAchat)/p.prixAchat*100):0;
+    var mc=mg2>=40?'mgg':mg2>=20?'mgo':'mgr';
+    var sc=p.stock<=0?'sout':p.stock<=(p.stockMin||5)?'slw':'sok';
+    var sl=p.stock<=0?'🔴 Rupture':p.stock<=(p.stockMin||5)?'🟡 Faible':'🟢 OK';
+    return '<div class="pi"><div style="flex:1"><div class="pnm">'+p.nom+'</div><div class="pm">'+p.categorie+' • '+'⭐'.repeat(p.qualite||1)+'</div><div class="pm">Achat: '+fmt(p.prixAchat||0)+' | Vente: '+fmt(p.prixVente)+' FG</div><div class="pm">Stock: '+p.stock+' unités</div></div><div style="text-align:right;display:flex;flex-direction:column;align-items:flex-end;gap:4px"><div class="mb2 '+mc+'">+'+mg2+'%</div><span class="stb '+sc+'">'+sl+'</span><button class="edit-btn" data-id="'+p.id+'" style="padding:4px 10px;border:none;border-radius:8px;background:#1a472a;color:white;font-size:.68rem;font-weight:700;cursor:pointer;margin-top:2px">✏️ Modifier</button></div></div>';
+  }).join('');
+  el.querySelectorAll('.edit-btn').forEach(function(btn){
+    btn.addEventListener('click',function(){ouvrirEdit(this.dataset.id);});
+  });
+}
+
+// AFFICHER TRANSACTIONS
+function afficherTransactions(){
+  var el=document.getElementById('lstTrans');
+  var all=[];
+  if(flt==='a'||flt==='v')all=all.concat(sorties.map(function(s){return Object.assign({},s,{tp:'v'});}));
+  if(flt==='a'||flt==='e')all=all.concat(entrees.map(function(e){return Object.assign({},e,{tp:'e'});}));
+  all.sort(function(a,b){return (b.date?b.date.seconds:0)-(a.date?a.date.seconds:0);});
+  if(!all.length){el.innerHTML='<div class="empty"><div class="ei">💳</div><p>Aucune transaction</p></div>';return;}
+  el.innerHTML=all.map(function(t){
+    var d=t.date&&t.date.toDate?t.date.toDate().toLocaleDateString('fr-FR'):'—';
+    var iv=t.tp==='v';
+    return '<div class="hi '+(iv?'sv':'')+'"><div class="hh"><span class="hn">'+(iv?'💰':'📦')+' '+t.produitNom+'</span><span class="ha '+(iv?'has':'hae')+'">'+fmt(t.montantTotal)+' FG</span></div><div class="hm">'+d+' • Qté:'+t.quantite+(iv?' • '+(t.client||'Anonyme'):'  • '+(t.fournisseur||'—'))+'</div>'+(iv?'<div class="m6"><span class="ptg">Bénéfice: +'+fmt(t.benefice)+' FG</span></div>':'')+'</div>';
+  }).join('');
+}
+
+// AFFICHER CAISSE
+function afficherCaisse(){
+  var el=document.getElementById('lstCaisse');
+  if(!caisseData.length){el.innerHTML='<div class="empty"><div class="ei">📅</div><p>Aucune journée</p></div>';return;}
+  el.innerHTML=[].concat(caisseData).sort(function(a,b){return b.date>a.date?1:-1;}).map(function(c){
+    var vj=sorties.filter(function(s){return s.date&&s.date.toDate&&s.date.toDate().toISOString().split('T')[0]===c.date;}).reduce(function(s,v){return s+(v.montantTotal||0);},0);
+    var bj=sorties.filter(function(s){return s.date&&s.date.toDate&&s.date.toDate().toISOString().split('T')[0]===c.date;}).reduce(function(s,v){return s+(v.benefice||0);},0);
+    return '<div class="hi"><div class="hh"><span class="hn">📅 '+c.date+'</span><span class="ha hae">'+fmt(vj)+' FG</span></div><div class="hm">Début: '+fmt(c.caisseDebut)+' FG • Dép: '+fmt(c.autresDepenses)+' FG</div><div class="m6"><span class="ptg">Bénéfice: +'+fmt(bj)+' FG</span></div>'+(c.notes?'<div class="hm" style="margin-top:3px">📝 '+c.notes+'</div>':'')+'</div>';
+  }).join('');
+}
+
+// OUVRIR MODIFIER
+function ouvrirEdit(id){
+  var p=prods.find(function(x){return x.id===id;});
+  if(!p)return;
+  document.getElementById('editId').value=id;
+  document.getElementById('editNom').value=p.nom||'';
+  document.getElementById('editAch').value=p.prixAchat||0;
+  document.getElementById('editVnt').value=p.prixVente||0;
+  document.getElementById('editStk').value=p.stock||0;
+  document.getElementById('editMin').value=p.stockMin||5;
+  var cs=document.getElementById('editCat');
+  for(var i=0;i<cs.options.length;i++){if(cs.options[i].text===p.categorie)cs.selectedIndex=i;}
+  var qs=document.getElementById('editQual');
+  for(var j=0;j<qs.options.length;j++){if(parseInt(qs.options[j].value)===(p.qualite||2))qs.selectedIndex=j;}
+  openOv('ovEdit');
+}
+
+// SAUVEGARDE PRODUIT
+document.getElementById('btnSaveProd').addEventListener('click',function(){
+  var nom=document.getElementById('pNom').value.trim();
+  var pv=parseFloat(document.getElementById('pVnt').value)||0;
+  if(!nom){showToast('⚠️ Le nom est obligatoire',true);return;}
+  if(!pv){showToast('⚠️ Le prix de vente est obligatoire',true);return;}
+  var btn=this;btn.disabled=true;btn.textContent='⏳ Enregistrement...';
+  db.collection('produits').add({
+    nom:nom,categorie:document.getElementById('pCat').value,
+    qualite:parseInt(document.getElementById('pQual').value)||2,
+    prixAchat:parseFloat(document.getElementById('pAch').value)||0,
+    prixVente:pv,
+    stock:parseInt(document.getElementById('pStk').value)||0,
+    stockMin:parseInt(document.getElementById('pMin').value)||5,
+    createdAt:firebase.firestore.Timestamp.now()
+  }).then(function(){
+    closeOv('ovProd');
+    ['pNom','pAch','pVnt','pStk','pMin'].forEach(function(id){document.getElementById(id).value='';});
+    showToast('✅ Produit ajouté !');
+    btn.disabled=false;btn.textContent='✅ Enregistrer';
+  }).catch(function(e){showToast('❌ Erreur: '+e.message,true);btn.disabled=false;btn.textContent='✅ Enregistrer';});
+});
+
+// MODIFIER PRODUIT
+document.getElementById('btnUpdateProd').addEventListener('click',function(){
+  var id=document.getElementById('editId').value;
+  var nom=document.getElementById('editNom').value.trim();
+  var pv=parseFloat(document.getElementById('editVnt').value)||0;
+  if(!nom||!pv){showToast('⚠️ Champs obligatoires',true);return;}
+  var btn=this;btn.disabled=true;btn.textContent='⏳...';
+  db.collection('produits').doc(id).update({
+    nom:nom,categorie:document.getElementById('editCat').value,
+    qualite:parseInt(document.getElementById('editQual').value)||2,
+    prixAchat:parseFloat(document.getElementById('editAch').value)||0,
+    prixVente:pv,
+    stock:parseInt(document.getElementById('editStk').value)||0,
+    stockMin:parseInt(document.getElementById('editMin').value)||5
+  }).then(function(){
+    closeOv('ovEdit');showToast('✅ Produit modifié !');
+    btn.disabled=false;btn.textContent='✅ Enregistrer';
+  }).catch(function(e){showToast('❌ '+e.message,true);btn.disabled=false;btn.textContent='✅ Enregistrer';});
+});
+
+// SUPPRIMER PRODUIT
+document.getElementById('btnDelProd').addEventListener('click',function(){
+  var id=document.getElementById('editId').value;
+  var nom=document.getElementById('editNom').value;
+  if(!confirm('Supprimer "'+nom+'" ?'))return;
+  db.collection('produits').doc(id).delete().then(function(){
+    closeOv('ovEdit');showToast('🗑️ Produit supprimé !');
+  }).catch(function(e){showToast('❌ '+e.message,true);});
+});
+
+// SAUVEGARDE VENTE
+document.getElementById('btnSaveVnt').addEventListener('click',function(){
+  var pid=document.getElementById('vProdId').value;
+  var q=parseInt(document.getElementById('vQte').value)||0;
+  var px=parseFloat(document.getElementById('vPrix').value)||0;
+  if(!pid){showToast('⚠️ Sélectionnez un produit',true);return;}
+  if(!q||!px){showToast('⚠️ Quantité et prix obligatoires',true);return;}
+  var p=prods.find(function(x){return x.id===pid;});
+  if(p&&p.stock<q){showToast('⚠️ Stock insuffisant: '+p.stock,true);return;}
+  var pa=parseFloat(document.getElementById('vProdAch').value)||0;
+  var ben=(px-pa)*q;
+  var btn=this;btn.disabled=true;btn.textContent='⏳ Enregistrement...';
+  db.collection('sorties').add({
+    produitId:pid,produitNom:p?p.nom:'',
+    client:document.getElementById('vClient').value,
+    quantite:q,prixVente:px,montantTotal:q*px,
+    coutAchat:pa*q,benefice:ben,
+    ajoutePar:'patron',date:firebase.firestore.Timestamp.now()
+  }).then(function(){
+    return db.collection('produits').doc(pid).update({stock:firebase.firestore.FieldValue.increment(-q)});
+  }).then(function(){
+    closeOv('ovVnt');
+    ['vClient','vQte','vPrix'].forEach(function(id){document.getElementById(id).value='';});
+    document.getElementById('vQte').value='1';
+    document.getElementById('vProdId').value='';document.getElementById('vProdAch').value='';
+    document.getElementById('vSrch').value='';document.getElementById('vSel').style.display='none';
+    document.getElementById('vRes').innerHTML='';document.getElementById('vTotPrev').style.display='none';
+    showToast('✅ Vente ! Bénéfice: +'+fmt(ben)+' FG');
+    btn.disabled=false;btn.textContent='✅ Enregistrer la vente';
+  }).catch(function(e){showToast('❌ '+e.message,true);btn.disabled=false;btn.textContent='✅ Enregistrer la vente';});
+});
+
+// SAUVEGARDE CAISSE
+document.getElementById('btnSaveCaisse').addEventListener('click',function(){
+  var d=document.getElementById('cDate').value;
+  if(!d){showToast('⚠️ Choisissez une date',true);return;}
+  var btn=this;btn.disabled=true;btn.textContent='⏳...';
+  db.collection('caisse').add({
+    date:d,
+    caisseDebut:parseFloat(document.getElementById('cDeb').value)||0,
+    autresDepenses:parseFloat(document.getElementById('cDep').value)||0,
+    notes:document.getElementById('cNote').value,
+    createdAt:firebase.firestore.Timestamp.now()
+  }).then(function(){
+    ['cDeb','cDep','cNote'].forEach(function(id){document.getElementById(id).value='';});
+    showToast('✅ Journée enregistrée !');
+    btn.disabled=false;btn.textContent='💾 Enregistrer';
+  }).catch(function(e){showToast('❌ '+e.message,true);btn.disabled=false;btn.textContent='💾 Enregistrer';});
+});
+
+document.getElementById('cDate').value=new Date().toISOString().split('T')[0];
+window.addEventListener('online',function(){document.getElementById('sb').className='sb son';document.getElementById('sb').textContent='🟢 En ligne';});
+window.addEventListener('offline',function(){document.getElementById('sb').className='sb sof';document.getElementById('sb').textContent='🔴 Hors ligne';});
+</script>
+
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyDWF-Q3S2M-btrRBHBYzd9dVbY6iEg_fNk",
+  authDomain:"gestionpieces-74559.firebaseapp.com",
+  projectId:"gestionpieces-74559",
+  storageBucket:"gestionpieces-74559.firebasestorage.app",
+  messagingSenderId:"392970031226",
+  appId:"1:392970031226:web:68bb9966b4440576a2ebc3"
+});
+window.db=firebase.firestore();
+db.enablePersistence().catch(function(e){console.log(e.code);});
+db.collection('produits').onSnapshot(function(snap){prods=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});afficherProduits();afficherDashboard();afficherRapports();});
+db.collection('entrees').onSnapshot(function(snap){entrees=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});afficherTransactions();afficherDashboard();afficherRapports();});
+db.collection('sorties').onSnapshot(function(snap){sorties=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});afficherTransactions();afficherDashboard();afficherRapports();afficherCaisse();});
+db.collection('caisse').onSnapshot(function(snap){caisseData=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});afficherCaisse();afficherRapports();});
+</script>
+</body>
+</html>
