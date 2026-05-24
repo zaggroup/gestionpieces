@@ -1,0 +1,1344 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>ZAG GROUP — Gestion</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script>
+firebase.initializeApp({
+  apiKey:"AIzaSyDWF-Q3S2M-btrRBHBYzd9dVbY6iEg_fNk",
+  authDomain:"gestionpieces-74559.firebaseapp.com",
+  projectId:"gestionpieces-74559",
+  storageBucket:"gestionpieces-74559.firebasestorage.app",
+  messagingSenderId:"392970031226",
+  appId:"1:392970031226:web:68bb9966b4440576a2ebc3"
+});
+var db = firebase.firestore();
+db.enablePersistence().catch(function(){});
+</script>
+<style>
+:root{
+  --g:#1a472a;--g2:#2d6a4f;--g3:#40916c;--gl:#d8f3dc;--g4:#b7e4c7;
+  --o:#e85d04;--ol:#fff0e6;--o2:#ff6b2b;
+  --om:#ff6600;--oml:#fff3e6;
+  --r:#c62828;--rl:#ffebee;
+  --y:#f9a825;--yl:#fffde7;
+  --b:#0d47a1;--bl:#e3f2fd;
+  --bg:#f0f4f0;--tx:#1b2e1f;--tx2:#4a6350;--bd:#c8e6c9;
+  --card:#fff;--shadow:0 2px 12px rgba(26,71,42,.09);
+}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+
+/* ÉCRAN CONNEXION */
+.login-screen{position:fixed;inset:0;background:linear-gradient(145deg,#1a472a,#2d6a4f,#40916c);display:flex;flex-direction:column;align-items:center;justify-content:center;z-index:1000;padding:24px}
+.login-screen.hidden{display:none}
+.login-logo{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;color:#fff;margin-bottom:6px;letter-spacing:-1px}
+.login-sub{font-size:.85rem;color:rgba(255,255,255,.7);margin-bottom:36px}
+.login-card{background:#fff;border-radius:20px;padding:24px;width:100%;max-width:340px;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+.login-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700;color:var(--g);margin-bottom:18px}
+.login-field{margin-bottom:14px}
+.login-field label{font-size:.75rem;font-weight:600;color:var(--tx2);display:block;margin-bottom:5px}
+.login-field input{width:100%;padding:11px 14px;border:2px solid var(--bd);border-radius:11px;font-family:'DM Sans',sans-serif;font-size:.95rem;color:var(--tx);outline:none;transition:border-color .2s}
+.login-field input:focus{border-color:var(--g3)}
+.login-btn{width:100%;padding:13px;background:linear-gradient(135deg,var(--g2),var(--g3));color:#fff;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:1rem;font-weight:700;cursor:pointer;letter-spacing:.3px}
+.login-btn:active{transform:scale(.98)}
+
+/* HEADER */
+.hdr{background:linear-gradient(135deg,#1a472a,#2d6a4f);color:#fff;padding:13px 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.25)}
+.hdr-top{display:flex;justify-content:space-between;align-items:center}
+.hdr-left h1{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;letter-spacing:-.3px}
+.hdr-left p{font-size:.68rem;opacity:.75;margin-top:1px}
+.hdr-right{display:flex;flex-direction:column;align-items:flex-end;gap:4px}
+.badge{font-size:.65rem;padding:3px 9px;border-radius:20px;font-weight:700}
+.badge-role{background:#69f0ae;color:#1b2e1f}
+.badge-status{font-size:.63rem;padding:2px 8px;border-radius:20px;font-weight:600}
+.online{background:#69f0ae;color:#1b2e1f}.offline{background:#ffab40;color:#1b2e1f}
+.session-info{font-size:.62rem;opacity:.65;margin-top:3px}
+
+/* TABS */
+.tabs{display:flex;background:#fff;border-bottom:2px solid var(--bd);position:sticky;top:62px;z-index:99;overflow-x:auto;scrollbar-width:none}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;min-width:56px;padding:10px 4px;text-align:center;font-size:.62rem;font-weight:600;color:var(--tx2);cursor:pointer;border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}
+.tab.active{color:var(--g);border-bottom-color:var(--g);background:#f8fcf8}
+.tab-icon{font-size:1rem;display:block;margin-bottom:2px}
+
+/* PAGES */
+.pg{display:none;padding:14px 14px 90px}.pg.active{display:block}
+
+/* CARDS */
+.card{background:var(--card);border-radius:14px;padding:14px;margin-bottom:10px;box-shadow:var(--shadow);border:1px solid var(--bd)}
+.card-title{font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;color:var(--tx2);text-transform:uppercase;letter-spacing:.5px;margin-bottom:10px}
+
+/* STATS GRID */
+.sgrid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.sgrid-3{grid-template-columns:1fr 1fr 1fr}
+.stat{border-radius:12px;padding:12px 10px;text-align:center}
+.stat-label{font-size:.62rem;font-weight:600;opacity:.8;margin-bottom:3px}
+.stat-val{font-family:'Syne',sans-serif;font-size:1.15rem;font-weight:800}
+.sg{background:var(--gl);color:var(--g)}
+.sb2{background:var(--bl);color:var(--b)}
+.sr{background:var(--rl);color:var(--r)}
+.sy{background:var(--yl);color:#6d5500}
+.som{background:var(--oml);color:var(--om)}
+
+/* FORM */
+.fg{margin-bottom:11px}
+.fg label{font-size:.73rem;font-weight:600;color:var(--tx2);display:block;margin-bottom:4px}
+.fg input,.fg select,.fg textarea{width:100%;padding:10px 13px;border:1.5px solid var(--bd);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;color:var(--tx);background:#fff;outline:none;transition:border-color .2s}
+.fg input:focus,.fg select:focus,.fg textarea:focus{border-color:var(--g3)}
+.fg textarea{resize:vertical;min-height:60px}
+.fr{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.fr3{grid-template-columns:1fr 1fr 1fr}
+
+/* BUTTONS */
+.btn{width:100%;padding:12px;border:none;border-radius:11px;font-family:'Syne',sans-serif;font-size:.9rem;font-weight:700;cursor:pointer;transition:all .2s;letter-spacing:.2px}
+.btn:active{transform:scale(.98)}
+.btn-g{background:linear-gradient(135deg,var(--g2),var(--g3));color:#fff}
+.btn-o{background:linear-gradient(135deg,#e85d04,#ff6b2b);color:#fff}
+.btn-om{background:linear-gradient(135deg,#ff6600,#ff8c00);color:#fff}
+.btn-sm{width:auto;padding:6px 13px;font-size:.7rem;border-radius:8px}
+.btn-outline{background:transparent;border:2px solid var(--g3);color:var(--g);font-family:'Syne',sans-serif;font-size:.78rem;font-weight:700;border-radius:10px;padding:8px 14px;cursor:pointer}
+
+/* PRODUIT ITEM */
+.pi{background:#fff;border-radius:12px;padding:11px;margin-bottom:7px;border:1.5px solid var(--bd);display:flex;gap:10px;align-items:flex-start;box-shadow:0 1px 6px rgba(26,71,42,.06)}
+.pi-photo{width:46px;height:46px;border-radius:9px;object-fit:cover;flex-shrink:0;border:1.5px solid var(--bd)}
+.pi-ph{width:46px;height:46px;border-radius:9px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:1.3rem;flex-shrink:0}
+.pi-info{flex:1;min-width:0}
+.pi-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;margin-bottom:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.pi-meta{font-size:.68rem;color:var(--tx2);margin-bottom:2px}
+.stb{font-size:.63rem;padding:2px 8px;border-radius:20px;font-weight:700;display:inline-block;flex-shrink:0}
+.sok{background:var(--gl);color:var(--g)}.slw{background:var(--yl);color:#6d5500}.sout{background:var(--rl);color:var(--r)}
+
+/* HISTORIQUE ITEM */
+.hi{background:#fff;border-radius:11px;padding:10px 12px;margin-bottom:7px;border-left:4px solid var(--g3);box-shadow:0 1px 5px rgba(26,71,42,.06)}
+.hi.vente{border-left-color:var(--o)}
+.hi.depense{border-left-color:var(--r)}
+.hi.om-depot{border-left-color:var(--om)}
+.hi.om-retrait{border-left-color:#e65c00}
+.hi.om-achat{border-left-color:#c75000}
+.hi.om-transfert{border-left-color:#b34600}
+.hi-top{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:3px}
+.hi-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.82rem}
+.hi-amount{font-family:'Syne',sans-serif;font-weight:800;font-size:.88rem}
+.hi-amount.plus{color:var(--g)}.hi-amount.minus{color:var(--r)}
+.hi-meta{font-size:.67rem;color:var(--tx2)}
+
+/* CAISSE CARD */
+.caisse-solde{border-radius:16px;padding:18px;margin-bottom:10px;text-align:center}
+.caisse-solde.especes{background:linear-gradient(135deg,#1a472a,#2d6a4f);color:#fff}
+.caisse-solde.om{background:linear-gradient(135deg,#e65c00,#ff8c00);color:#fff}
+.cs-label{font-size:.75rem;font-weight:600;opacity:.8;margin-bottom:4px}
+.cs-val{font-family:'Syne',sans-serif;font-size:2rem;font-weight:800;letter-spacing:-1px}
+.cs-sub{font-size:.7rem;opacity:.7;margin-top:4px}
+
+/* CALCUL BOX */
+.calc-box{background:var(--gl);border-radius:12px;padding:12px;margin-bottom:10px}
+.calc-row{display:flex;justify-content:space-between;font-size:.8rem;padding:3px 0;color:var(--tx)}
+.calc-row.total{border-top:1.5px solid var(--g4);margin-top:6px;padding-top:8px;font-family:'Syne',sans-serif;font-weight:800;font-size:.9rem;color:var(--g)}
+.calc-row.ecart-ok{color:var(--g);font-weight:700}
+.calc-row.ecart-bad{color:var(--r);font-weight:700}
+
+/* SECTION TITLE */
+.stitle{font-family:'Syne',sans-serif;font-size:.88rem;font-weight:800;color:var(--g);margin-bottom:11px;display:flex;justify-content:space-between;align-items:center}
+
+/* FILTRES CATEGORIE */
+.psel{display:flex;gap:6px;margin-bottom:10px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px}
+.psel::-webkit-scrollbar{display:none}
+.pbtn{padding:5px 11px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--tx2);transition:all .2s}
+.pbtn.active{background:var(--g);color:#fff;border-color:var(--g)}
+
+/* PHOTO */
+.photo-preview{width:100%;height:140px;border-radius:12px;object-fit:cover;margin-bottom:8px;display:none;border:2px solid var(--bd)}
+.photo-preview.visible{display:block}
+.photo-placeholder{width:100%;height:75px;border-radius:12px;border:2px dashed var(--bd);display:flex;align-items:center;justify-content:center;color:var(--tx2);font-size:.8rem;font-weight:600;margin-bottom:8px;cursor:pointer;background:#f9fbf9;gap:8px}
+.photo-placeholder:hover{border-color:var(--g3);background:var(--gl)}
+.photo-btns{display:flex;gap:8px;margin-bottom:10px}
+.btn-photo{flex:1;padding:9px;border:1.5px solid var(--g3);border-radius:10px;background:white;font-family:'Syne',sans-serif;font-size:.75rem;font-weight:700;cursor:pointer;color:var(--g);display:flex;align-items:center;justify-content:center;gap:5px}
+
+/* MODAL */
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:200;display:none;align-items:flex-end}
+.ov.show{display:flex}
+.modal{background:#fff;border-radius:22px 22px 0 0;padding:20px;width:100%;max-height:92vh;overflow-y:auto}
+.modal-title{font-family:'Syne',sans-serif;font-size:1rem;font-weight:800;margin-bottom:16px;color:var(--g)}
+.modal-close{float:right;font-size:1.4rem;cursor:pointer;color:var(--tx2);line-height:1}
+
+/* RECU */
+.recu-badge{background:var(--gl);border:1.5px solid var(--g4);border-radius:10px;padding:8px 12px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center}
+.recu-num{font-family:'Syne',sans-serif;font-size:.8rem;font-weight:800;color:var(--g)}
+.recu-date{font-size:.68rem;color:var(--tx2)}
+
+/* TOTAL PREVIEW */
+.total-preview{border-radius:10px;padding:10px;margin-bottom:10px;font-size:.82rem;font-weight:700;display:none}
+.total-preview.show{display:block}
+.tp-especes{background:var(--ol);color:var(--o)}
+.tp-om{background:var(--oml);color:var(--om)}
+
+/* VENTE SEARCH */
+.vrow{padding:10px;border-radius:10px;border:1.5px solid var(--bd);margin-bottom:6px;cursor:pointer;background:white;transition:border-color .15s}
+.vrow:active{border-color:var(--g3);background:var(--gl)}
+.vrow-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem}
+.vrow-meta{font-size:.7rem;color:var(--tx2);margin-top:2px}
+.vsel-box{background:var(--gl);border-radius:10px;padding:10px;margin-bottom:10px;display:none}
+.vsel-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:var(--g)}
+.vsel-meta{font-size:.72rem;color:var(--tx2)}
+
+/* TOAST */
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%);background:var(--g);color:#fff;padding:10px 20px;border-radius:22px;font-size:.82rem;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;white-space:nowrap;pointer-events:none;box-shadow:0 4px 20px rgba(0,0,0,.25)}
+.toast.show{opacity:1}.toast.err{background:var(--r)}
+
+/* EMPTY */
+.empty{text-align:center;padding:28px 14px;color:var(--tx2)}
+.empty-icon{font-size:2.2rem;margin-bottom:8px}
+.empty p{font-size:.8rem}
+
+/* DIVIDER */
+.divider{border:none;border-top:1.5px solid var(--bd);margin:12px 0}
+
+/* SIGNALEMENT */
+.signal-btn{background:var(--rl);border:none;border-radius:9px;padding:6px 12px;font-family:'DM Sans',sans-serif;font-size:.68rem;font-weight:700;color:var(--r);cursor:pointer}
+
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+.pg.active{animation:fadeIn .25s ease}
+</style>
+</head>
+<body>
+
+<!-- ÉCRAN CONNEXION -->
+<div class="login-screen" id="loginScreen">
+  <div class="login-logo" style="display:flex;align-items:center;justify-content:center;gap:10px"><img src="data:image/png;base64,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" alt="ZAG GROUP" style="height:52px;width:auto;filter:drop-shadow(0 2px 8px rgba(0,0,0,.3))"><span>ZAG GROUP</span></div>
+  <div class="login-sub">Interface Gestionnaire — Kindia, Guinée</div>
+  <div class="login-card">
+    <div class="login-title">Interface Gestionnaire</div>
+    <div class="login-field">
+      <label>Votre prénom *</label>
+      <input type="text" id="loginNom" placeholder="Ex: Mamadou" autocomplete="off">
+    </div>
+    <div class="login-field">
+      <label>Code d&#39;accès *</label>
+      <input type="password" id="loginCode" placeholder="••••" inputmode="numeric">
+    </div>
+    <div style="color:var(--r);font-size:.75rem;font-weight:600;min-height:18px;margin-bottom:8px;text-align:center" id="loginErr"></div>
+    <button class="login-btn" id="loginBtn">&#9654; Accéder</button>
+  </div>
+</div>
+
+<!-- HEADER -->
+<div class="hdr">
+  <div class="hdr-top">
+    <div class="hdr-left" style="display:flex;align-items:center;gap:9px">
+      <img src="data:image/png;base64,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" alt="ZAG GROUP" style="height:38px;width:auto;border-radius:6px">
+      <div><div style="font-family:'Syne',sans-serif;font-size:.95rem;font-weight:800;letter-spacing:-.3px">ZAG GROUP</div><div style="font-size:.65rem;opacity:.7">Interface Gestion</div></div>
+    </div>
+    <div class="hdr-right">
+      <span class="badge badge-role">⚙️ Gestion</span>
+      <span class="badge-status online" id="statusBadge">🟢 En ligne</span>
+      <div class="session-info" id="sessionInfo"></div>
+      <div style="display:flex;gap:5px;margin-top:3px">
+        <button onclick="window.location.href='zaggroup-11.html'" style="background:rgba(255,255,255,.15);border:1px solid rgba(255,255,255,.3);border-radius:6px;color:#fff;font-size:.6rem;font-weight:700;padding:3px 7px;cursor:pointer">🏠 Accueil</button>
+        <button onclick="deconnecter()" style="background:rgba(255,0,0,.25);border:1px solid rgba(255,100,100,.4);border-radius:6px;color:#fff;font-size:.6rem;font-weight:700;padding:3px 7px;cursor:pointer">🔌 Quitter</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" id="tab0"><span class="tab-icon">🏠</span>Accueil</div>
+  <div class="tab" id="tab1"><span class="tab-icon">🔧</span>Produits</div>
+  <div class="tab" id="tab2"><span class="tab-icon">📦</span>Entrées</div>
+  <div class="tab" id="tab3"><span class="tab-icon">💰</span>Ventes</div>
+  <div class="tab" id="tab4"><span class="tab-icon">🏦</span>Caisse</div>
+</div>
+
+<!-- PAGE ACCUEIL -->
+<div class="pg active" id="pg0">
+  <div class="sgrid sgrid-3" style="margin-bottom:10px">
+    <div class="stat sg"><div class="stat-label">📦 Produits</div><div class="stat-val" id="s1">0</div></div>
+    <div class="stat sb2"><div class="stat-label">🛒 Ventes auj.</div><div class="stat-val" id="s2">0</div></div>
+    <div class="stat sr"><div class="stat-label">🔴 Ruptures</div><div class="stat-val" id="s3">0</div></div>
+  </div>
+  <!-- CLOTURE JOURNEE -->
+  <div style="background:linear-gradient(135deg,#1a472a,#40916c);border-radius:14px;padding:14px;margin-bottom:10px;display:flex;justify-content:space-between;align-items:center">
+    <div>
+      <div style="font-family:Syne,sans-serif;font-weight:800;font-size:.9rem;color:#fff">Cloture journee</div>
+      <div style="font-size:.7rem;color:rgba(255,255,255,.7);margin-top:2px">Signaler la fin de journee au patron</div>
+    </div>
+    <button onclick="ouvrirCloture()" style="background:#fff;border:none;border-radius:10px;padding:9px 14px;font-family:Syne,sans-serif;font-size:.78rem;font-weight:700;color:var(--g);cursor:pointer">Cloturer</button>
+  </div>
+
+  <div class="card">
+    <div class="card-title">🕐 Dernières actions</div>
+    <div id="recents"><div class="empty"><div class="empty-icon">📋</div><p>Aucune action</p></div></div>
+  </div>
+  <div class="card">
+    <div class="card-title">⚠️ Stocks à surveiller</div>
+    <div id="alertes"><div class="empty"><div class="empty-icon">✅</div><p>Tous les stocks sont OK</p></div></div>
+  </div>
+</div>
+
+<!-- PAGE PRODUITS -->
+<div class="pg" id="pg1">
+  <div class="stitle">Catalogue</div>
+  <input type="text" id="srch" placeholder="🔍 Rechercher un produit..." style="width:100%;padding:11px 13px;border:2px solid var(--g3);border-radius:11px;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;margin-bottom:8px;background:#fff">
+  <div class="psel" id="cats">
+    <button class="pbtn active" data-c="">Tous</button>
+    <button class="pbtn" data-c="Freinage">🛑 Freinage</button>
+    <button class="pbtn" data-c="Filtration">🔵 Filtration</button>
+    <button class="pbtn" data-c="Moteur">⚙️ Moteur</button>
+    <button class="pbtn" data-c="Électrique">⚡ Électric.</button>
+    <button class="pbtn" data-c="Suspension">🔩 Suspens.</button>
+    <button class="pbtn" data-c="Allumage">🔥 Allumage</button>
+    <button class="pbtn" data-c="Autre">📦 Autre</button>
+  </div>
+  <div id="prodCount" style="font-size:.72rem;color:var(--tx2);margin-bottom:7px;font-weight:600"></div>
+  <div id="lstP"><div class="empty"><div class="empty-icon">🔧</div><p>Aucun produit</p></div></div>
+</div>
+
+<!-- PAGE ENTRÉES -->
+<div class="pg" id="pg2">
+  <div class="stitle">Entrées stock <button class="btn btn-g btn-sm" id="btnAE">+ Entrée</button></div>
+  <div id="lstE"><div class="empty"><div class="empty-icon">📦</div><p>Aucune entrée</p></div></div>
+</div>
+
+<!-- PAGE VENTES -->
+<div class="pg" id="pg3">
+  <div class="stitle">Ventes <button class="btn btn-o btn-sm" id="btnAV">+ Vente</button></div>
+
+  <!-- DECLARATION MONTANT DISPONIBLE -->
+  <div class="card" id="declCard">
+    <div class="card-title" style="margin-bottom:8px">💵 Montant disponible en caisse</div>
+    <div style="font-size:.75rem;color:var(--tx2);margin-bottom:10px">Après avoir enregistré vos ventes, saisissez le montant physique que vous avez en caisse.</div>
+    <div style="display:flex;gap:8px;align-items:center">
+      <input type="number" id="montantDispo" placeholder="0" style="flex:1;padding:11px 13px;border:2px solid var(--g3);border-radius:11px;font-size:1rem;font-family:Syne,sans-serif;font-weight:700;text-align:center;outline:none;background:#fff">
+      <button class="btn btn-g" id="btnDeclareMontant" style="width:auto;padding:11px 16px;font-size:.82rem">✅ Déclarer</button>
+    </div>
+    <div id="dernierDecl" style="font-size:.72rem;color:var(--tx2);margin-top:8px;text-align:center"></div>
+  </div>
+
+  <div id="lstV"><div class="empty"><div class="empty-icon">💰</div><p>Aucune vente</p></div></div>
+</div>
+
+<!-- PAGE CAISSE -->
+<div class="pg" id="pg4">
+
+  <!-- ESPÈCES -->
+  <div class="card">
+    <div class="card-title">💵 Caisse Espèces</div>
+    <div class="caisse-solde especes">
+      <div class="cs-label">Solde Espèces</div>
+      <div class="cs-val" id="soldeEspeces">0 FG</div>
+      <div class="cs-sub" id="soldeEspecesSub">Chargement...</div>
+    </div>
+
+    <div style="display:flex;gap:8px">
+      <button class="btn btn-g" style="flex:1" id="btnSoldeInit">🔄 Solde début</button>
+      <button class="btn btn-o" style="flex:1" id="btnDepense">➖ Dépense</button>
+    </div>
+  </div>
+
+  <!-- ORANGE MONEY -->
+  <div class="card">
+    <div class="card-title">📱 Orange Money</div>
+    <div class="caisse-solde om">
+      <div class="cs-label">Solde Orange Money</div>
+      <div class="cs-val" id="soldeOM">0 FG</div>
+      <div class="cs-sub" id="soldeOMSub">Chargement...</div>
+    </div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px">
+      <button class="btn btn-om" id="btnOMDepot">➕ Dépôt reçu</button>
+      <button class="btn btn-om" id="btnOMRetrait">➖ Retrait</button>
+      <button class="btn btn-om" id="btnOMActhat">🛍️ Achat march.</button>
+      <button class="btn btn-om" id="btnOMTransfert">🔁 Transfert</button>
+    </div>
+  </div>
+
+  <!-- HISTORIQUE CAISSE -->
+  <div class="card">
+    <div class="card-title">📋 Historique mouvements</div>
+    <div id="lstCaisse"><div class="empty"><div class="empty-icon">📋</div><p>Aucun mouvement</p></div></div>
+  </div>
+
+</div>
+
+<!-- ==================== MODALS ==================== -->
+
+<!-- MODAL PRODUIT -->
+<div class="ov" id="ovP">
+  <div class="modal">
+    <span class="modal-close" id="mcP">✕</span>
+    <div class="modal-title">🔧 Nouveau produit</div>
+    <div class="fg"><label>Nom *</label><input type="text" id="pN" placeholder="Ex: Filtre à huile Honda"></div>
+    <div class="fr">
+      <div class="fg"><label>Catégorie</label>
+        <select id="pC">
+          <option>Filtration</option><option>Freinage</option><option>Moteur</option>
+          <option>Suspension</option><option>Électrique</option><option>Allumage</option>
+          <option>Lubrification</option><option>Refroidissement</option><option>Autre</option>
+        </select>
+      </div>
+      <div class="fg"><label>Qualité</label>
+        <select id="pQ">
+          <option value="1">⭐ Basique</option>
+          <option value="2" selected>⭐⭐ Standard</option>
+          <option value="3">⭐⭐⭐ Premium</option>
+        </select>
+      </div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Prix vente (FG) *</label><input type="number" id="pV" placeholder="0"></div>
+      <div class="fg"><label>Stock initial</label><input type="number" id="pS" placeholder="0"></div>
+    </div>
+    <div class="fr">
+      <div class="fg"><label>Stock minimum alerte</label><input type="number" id="pM" placeholder="5"></div>
+    </div>
+    <div class="fg">
+      <label>📸 Photo du produit</label>
+      <img class="photo-preview" id="pPhotoPreview" src="" alt="">
+      <div class="photo-placeholder" id="pPhotoPlaceholder" onclick="document.getElementById('pPhotoFile').click()">📷 Cliquer pour ajouter une photo</div>
+      <div class="photo-btns">
+        <button type="button" class="btn-photo" onclick="document.getElementById('pPhotoFile').click()">📁 Galerie</button>
+        <button type="button" class="btn-photo" onclick="document.getElementById('pPhotoCamera').click()">📷 Caméra</button>
+      </div>
+      <input type="file" id="pPhotoFile" accept="image/*" style="display:none" onchange="handlePhoto(this)">
+      <input type="file" id="pPhotoCamera" accept="image/*" capture="environment" style="display:none" onchange="handlePhoto(this)">
+      <div id="pPhotoLoading" style="text-align:center;font-size:.75rem;color:var(--tx2);display:none">⏳ Compression...</div>
+    </div>
+    <button class="btn btn-g" id="btnSP">✅ Enregistrer le produit</button>
+  </div>
+</div>
+
+<!-- MODAL ENTRÉE -->
+<div class="ov" id="ovE">
+  <div class="modal">
+    <span class="modal-close" id="mcE">&#10005;</span>
+    <div class="modal-title">&#128230; Nouvelle entree stock</div>
+
+    <!-- Switch nouveau/existant -->
+    <div style="display:flex;gap:6px;margin-bottom:14px">
+      <button class="btn btn-g" id="btnProdExist" onclick="switchModeEntree(false)" style="flex:1;padding:9px;font-size:.78rem">Produit existant</button>
+      <button class="btn" id="btnProdNew" onclick="switchModeEntree(true)" style="flex:1;padding:9px;font-size:.78rem;background:#fff;border:2px solid var(--g3);color:var(--g)">+ Nouveau produit</button>
+    </div>
+
+    <!-- PRODUIT EXISTANT -->
+    <div id="sectExist">
+      <div class="fg">
+        <label>Rechercher un produit *</label>
+        <input type="text" id="ePSearch" placeholder="Tapez le nom du produit..." autocomplete="off"
+          style="width:100%;padding:10px 13px;border:2px solid var(--g3);border-radius:10px;font-size:.88rem;outline:none;background:#fff">
+        <div id="ePResults" style="max-height:180px;overflow-y:auto;border:1.5px solid var(--bd);border-radius:10px;margin-top:4px;display:none;background:#fff"></div>
+        <div id="ePSelected" style="display:none;background:var(--gl);border-radius:10px;padding:9px 12px;margin-top:6px">
+          <div style="font-family:Syne,sans-serif;font-weight:700;font-size:.85rem;color:var(--g)" id="ePSelName">---</div>
+          <div style="font-size:.7rem;color:var(--tx2)" id="ePSelMeta">---</div>
+        </div>
+        <input type="hidden" id="eP">
+      </div>
+    </div>
+
+    <!-- NOUVEAU PRODUIT -->
+    <div id="sectNew" style="display:none">
+      <div class="fg"><label>Nom du produit *</label><input type="text" id="eNomNew" placeholder="Ex: Filtre huile Honda"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+        <div class="fg"><label>Categorie</label>
+          <select id="eCatNew">
+            <option>Filtration</option><option>Freinage</option><option>Moteur</option>
+            <option>Suspension</option><option>Electrique</option><option>Allumage</option>
+            <option>Lubrification</option><option>Refroidissement</option><option>Autre</option>
+          </select>
+        </div>
+        <div class="fg"><label>Qualite</label>
+          <select id="eQualNew">
+            <option value="1">Basique</option><option value="2" selected>Standard</option><option value="3">Premium</option>
+          </select>
+        </div>
+      </div>
+      <div class="fg"><label>Prix de vente suggere (FG)</label><input type="number" id="ePvNew" placeholder="0"></div>
+      <div style="background:var(--yl);border-radius:10px;padding:9px;font-size:.72rem;color:#6d5500;margin-bottom:10px">
+        Le patron fixera le prix de vente definitif. Vous pouvez suggerer un prix.
+      </div>
+    </div>
+
+    <div class="fg"><label>Fournisseur</label><input type="text" id="eF" placeholder="Nom du fournisseur"></div>
+    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px">
+      <div class="fg"><label>Quantite *</label><input type="number" id="eQ" placeholder="0"></div>
+      <div class="fg"><label>Prix achat unitaire (FG) *</label><input type="number" id="eX" placeholder="0"></div>
+    </div>
+    <div class="total-preview tp-especes" id="eTotal">Total facture : <span id="eTotalV">0 FG</span></div>
+    <div class="fg"><label>N° facture / Notes</label><input type="text" id="eNotes" placeholder="Ex: Facture N°123"></div>
+    <button class="btn btn-g" id="btnSE">&#10003; Enregistrer l&#39;entree</button>
+  </div>
+</div>
+
+<!-- MODAL VENTE -->
+<div class="ov" id="ovV">
+  <div class="modal">
+    <span class="modal-close" id="mcV">✕</span>
+    <div class="modal-title">💰 Enregistrer une vente</div>
+    <input type="text" id="vSrch" placeholder="🔍 Rechercher le produit..." style="width:100%;padding:10px 13px;border:2px solid var(--g3);border-radius:10px;font-family:'DM Sans',sans-serif;font-size:.88rem;outline:none;margin-bottom:8px">
+    <div id="vResults" style="max-height:200px;overflow-y:auto;margin-bottom:8px"></div>
+    <div class="vsel-box" id="vSelBox">
+      <div class="vsel-name" id="vSelName">—</div>
+      <div class="vsel-meta" id="vSelMeta">—</div>
+    </div>
+    <input type="hidden" id="vId"><input type="hidden" id="vPxAchat">
+    <div class="fr">
+      <div class="fg"><label>Quantité *</label><input type="number" id="vQt" value="1" min="1"></div>
+      <div class="fg"><label>Prix vente (FG) *</label><input type="number" id="vPx" placeholder="0"></div>
+    </div>
+    <div class="total-preview tp-especes" id="vTotal">💰 Total : <span id="vTotalV">0 FG</span></div>
+    <button class="btn btn-o" id="btnSV">✅ Enregistrer la vente</button>
+  </div>
+</div>
+
+<!-- MODAL SIGNALEMENT -->
+<div class="ov" id="ovSignal">
+  <div class="modal">
+    <span class="modal-close" id="mcSignal">✕</span>
+    <div class="modal-title">🚨 Signaler une erreur</div>
+    <div class="fg"><label>Numéro du reçu concerné</label><input type="text" id="sigRecu" placeholder="Ex: ZAG-2026-0012"></div>
+    <div class="fg"><label>Description de l'erreur *</label><textarea id="sigDesc" placeholder="Décrivez l'erreur..."></textarea></div>
+    <button class="btn btn-o" id="btnSigEnvoi">📤 Envoyer au gestionnaire</button>
+  </div>
+</div>
+
+<!-- MODAL SOLDE INITIAL ESPÈCES -->
+<div class="ov" id="ovSoldeInit">
+  <div class="modal">
+    <span class="modal-close" id="mcSoldeInit">✕</span>
+    <div class="modal-title">🔄 Solde début de journée</div>
+    <div class="fg"><label>Montant espèces en caisse (FG) *</label><input type="number" id="soldeInitVal" placeholder="0"></div>
+    <div class="fg"><label>Notes (optionnel)</label><input type="text" id="soldeInitNotes" placeholder="Ex: Comptage 08h00"></div>
+    <button class="btn btn-g" id="btnSaveSoldeInit">✅ Enregistrer</button>
+  </div>
+</div>
+
+<!-- MODAL DÉPENSE -->
+<div class="ov" id="ovDepense">
+  <div class="modal">
+    <span class="modal-close" id="mcDepense">✕</span>
+    <div class="modal-title">➖ Dépense espèces</div>
+    <div class="fg"><label>Montant (FG) *</label><input type="number" id="depMontant" placeholder="0"></div>
+    <div class="fg"><label>Motif *</label><input type="text" id="depMotif" placeholder="Ex: Transport, fournitures..."></div>
+    <button class="btn btn-o" id="btnSaveDepense">✅ Enregistrer la dépense</button>
+  </div>
+</div>
+
+<!-- MODAL OM DÉPÔT -->
+<div class="ov" id="ovOMDepot">
+  <div class="modal">
+    <span class="modal-close" id="mcOMDepot">✕</span>
+    <div class="modal-title">➕ Dépôt Orange Money reçu</div>
+    <div class="fg"><label>Montant reçu (FG) *</label><input type="number" id="omDepotMontant" placeholder="0"></div>
+    <div class="fg"><label>Référence SMS / N° transaction</label><input type="text" id="omDepotRef" placeholder="Ex: TXN123456"></div>
+    <div class="fg"><label>Notes</label><input type="text" id="omDepotNotes" placeholder="Ex: Envoi depuis la boutique"></div>
+    <button class="btn btn-om" id="btnSaveOMDepot">✅ Enregistrer le dépôt</button>
+  </div>
+</div>
+
+<!-- MODAL OM RETRAIT -->
+<div class="ov" id="ovOMRetrait">
+  <div class="modal">
+    <span class="modal-close" id="mcOMRetrait">✕</span>
+    <div class="modal-title">➖ Retrait Orange Money</div>
+    <div class="fg"><label>Montant retiré (FG) *</label><input type="number" id="omRetraitMontant" placeholder="0"></div>
+    <div class="fg"><label>Référence SMS / N° transaction</label><input type="text" id="omRetraitRef" placeholder="Ex: TXN123456"></div>
+    <div class="fg"><label>Motif *</label><input type="text" id="omRetraitMotif" placeholder="Ex: Demande administrateur"></div>
+    <button class="btn btn-om" id="btnSaveOMRetrait">✅ Enregistrer le retrait</button>
+  </div>
+</div>
+
+<!-- MODAL OM ACHAT -->
+<div class="ov" id="ovOMActhat">
+  <div class="modal">
+    <span class="modal-close" id="mcOMActhat">✕</span>
+    <div class="modal-title">🛍️ Achat marchandise via OM</div>
+    <div class="fg"><label>Montant payé (FG) *</label><input type="number" id="omAchatMontant" placeholder="0"></div>
+    <div class="fg"><label>Fournisseur *</label><input type="text" id="omAchatFourn" placeholder="Nom du fournisseur"></div>
+    <div class="fg"><label>Référence SMS / N° transaction</label><input type="text" id="omAchatRef" placeholder="Ex: TXN123456"></div>
+    <div class="fg"><label>Notes</label><input type="text" id="omAchatNotes" placeholder="Description achat"></div>
+    <button class="btn btn-om" id="btnSaveOMActhat">✅ Enregistrer l'achat</button>
+  </div>
+</div>
+
+<!-- MODAL OM TRANSFERT -->
+<div class="ov" id="ovOMTransfert">
+  <div class="modal">
+    <span class="modal-close" id="mcOMTransfert">✕</span>
+    <div class="modal-title">🔁 Transfert Orange Money</div>
+    <div class="fg"><label>Montant (FG) *</label><input type="number" id="omTransfertMontant" placeholder="0"></div>
+    <div class="fg"><label>Destination / Motif *</label><input type="text" id="omTransfertMotif" placeholder="Ex: Ordre administrateur, N°..."></div>
+    <div class="fg"><label>Référence SMS</label><input type="text" id="omTransfertRef" placeholder="Ex: TXN123456"></div>
+    <button class="btn btn-om" id="btnSaveOMTransfert">✅ Enregistrer le transfert</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ===== ÉTAT =====
+var SESSION = { nom: '', code: '' };
+var prods = [], entrees = [], sorties = [], mouvements = [];
+var catF = '';
+var photoBase64 = '';
+
+// ===== UTILS =====
+function fmt(n){ return Math.round(n||0).toLocaleString('fr-FR'); }
+function fmtDate(ts){ return ts&&ts.toDate ? ts.toDate().toLocaleDateString('fr-FR',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'}) : '—'; }
+function genRecu(){ return 'ZAG-'+new Date().getFullYear()+'-'+String(Math.floor(Math.random()*9000)+1000); }
+function today(){ return new Date().toDateString(); }
+
+function showToast(msg, err){
+  var t = document.getElementById('toast');
+  t.textContent = msg;
+  t.className = 'toast show' + (err ? ' err' : '');
+  setTimeout(function(){ t.className = 'toast'; }, 3000);
+}
+function openOv(id){ document.getElementById(id).classList.add('show'); }
+function closeOv(id){ document.getElementById(id).classList.remove('show'); }
+
+// ===== LOGIN =====
+var GEST_CODE = '5678';
+var modeNouveauProd = false;
+
+// Switch mode entrée
+function switchModeEntree(isNew){
+  modeNouveauProd = isNew;
+  var btnE = document.getElementById('btnProdExist');
+  var btnN = document.getElementById('btnProdNew');
+  var sectE = document.getElementById('sectExist');
+  var sectN = document.getElementById('sectNew');
+  if(isNew){
+    btnN.style.background = 'linear-gradient(135deg,var(--g2),var(--g3))';
+    btnN.style.color = '#fff';
+    btnN.style.border = 'none';
+    btnE.style.background = '#fff';
+    btnE.style.color = 'var(--g)';
+    btnE.style.border = '2px solid var(--g3)';
+    sectE.style.display = 'none';
+    sectN.style.display = '';
+  } else {
+    btnE.style.background = 'linear-gradient(135deg,var(--g2),var(--g3))';
+    btnE.style.color = '#fff';
+    btnE.style.border = 'none';
+    btnN.style.background = '#fff';
+    btnN.style.color = 'var(--g)';
+    btnN.style.border = '2px solid var(--g3)';
+    sectE.style.display = '';
+    sectN.style.display = 'none';
+  }
+} // Code d'accès gestionnaire - à changer
+
+document.getElementById('loginBtn').addEventListener('click', function(){
+  var nom = document.getElementById('loginNom').value.trim();
+  var code = document.getElementById('loginCode').value.trim();
+  var errEl = document.getElementById('loginErr');
+  if(!nom){ errEl.textContent = 'Entrez votre prénom.'; return; }
+  if(!code){ errEl.textContent = 'Entrez le code d accès.'; return; }
+  if(code !== GEST_CODE){
+    errEl.textContent = 'Code incorrect. Réessayez.';
+    document.getElementById('loginCode').value = '';
+    setTimeout(function(){ errEl.textContent = ''; }, 1500);
+    return;
+  }
+  SESSION.nom = nom;
+  SESSION.code = code;
+  document.getElementById('loginScreen').classList.add('hidden');
+  document.getElementById('sessionInfo').textContent = '👤 ' + nom;
+  db.collection('sessions').add({
+    gestionnaire: nom,
+    action: 'connexion',
+    date: firebase.firestore.Timestamp.now()
+  });
+});
+document.getElementById('loginNom').addEventListener('keydown', function(e){ if(e.key==='Enter') document.getElementById('loginBtn').click(); });
+
+// ===== TABS =====
+['tab0','tab1','tab2','tab3','tab4'].forEach(function(tid, i){
+  document.getElementById(tid).addEventListener('click', function(){
+    document.querySelectorAll('.tab').forEach(function(t){ t.classList.remove('active'); });
+    document.querySelectorAll('.pg').forEach(function(p){ p.classList.remove('active'); });
+    document.getElementById(tid).classList.add('active');
+    document.getElementById('pg'+i).classList.add('active');
+  });
+});
+
+// ===== ONLINE/OFFLINE =====
+window.addEventListener('online', function(){ document.getElementById('statusBadge').className='badge-status online'; document.getElementById('statusBadge').textContent='🟢 En ligne'; });
+window.addEventListener('offline', function(){ document.getElementById('statusBadge').className='badge-status offline'; document.getElementById('statusBadge').textContent='🔴 Hors ligne'; });
+
+// ===== MODALS OPEN =====
+
+document.getElementById('btnAE').addEventListener('click', function(){
+  switchModeEntree(false);
+  document.getElementById('ePSearch').value = '';
+  document.getElementById('ePResults').style.display = 'none';
+  document.getElementById('ePSelected').style.display = 'none';
+  document.getElementById('eP').value = '';
+  openOv('ovE');
+});
+
+// Recherche produit dans entree
+document.getElementById('ePSearch').addEventListener('input', function(){
+  var s = this.value.toLowerCase().trim();
+  var res = document.getElementById('ePResults');
+  if(!s){ res.style.display='none'; return; }
+  var f = prods.filter(function(p){ return p.nom && p.nom.toLowerCase().indexOf(s)>=0; });
+  if(!f.length){ res.style.display='none'; return; }
+  res.innerHTML = '';
+  f.slice(0,8).forEach(function(p){
+    var item = document.createElement('div');
+    item.style.cssText = 'padding:10px 12px;border-bottom:1px solid var(--bd);cursor:pointer;font-size:.85rem;background:#fff';
+    var b = document.createElement('b'); b.textContent = p.nom; item.appendChild(b);
+    var sp = document.createElement('span');
+    sp.style.cssText = 'font-size:.7rem;color:var(--tx2);margin-left:8px';
+    sp.textContent = 'Stock: '+p.stock;
+    item.appendChild(sp);
+    item.addEventListener('click', (function(prod){ return function(){
+      document.getElementById('eP').value = prod.id;
+      document.getElementById('ePSearch').value = prod.nom;
+      document.getElementById('ePSelName').textContent = prod.nom;
+      document.getElementById('ePSelMeta').textContent = 'Stock: '+prod.stock+' | Prix achat: '+Math.round(prod.prixAchat||0).toLocaleString('fr-FR')+' FG';
+      document.getElementById('ePSelected').style.display = '';
+      document.getElementById('ePResults').style.display = 'none';
+      if(prod.prixAchat) document.getElementById('eX').value = prod.prixAchat;
+    };})(p));
+    res.appendChild(item);
+  });
+  res.style.display = '';
+});
+document.getElementById('btnAV').addEventListener('click', function(){ openOv('ovV'); });
+
+// DECLARATION MONTANT DISPONIBLE
+document.getElementById('btnDeclareMontant').addEventListener('click', function(){
+  var montant = parseFloat(document.getElementById('montantDispo').value);
+  if(!montant && montant !== 0){ showToast('Entrez le montant', true); return; }
+  var btn = this; btn.disabled=true; btn.textContent='...';
+  db.collection('mouvements_caisse').add({
+    type: 'declaration_montant',
+    montant: montant,
+    gestionnaire: SESSION.nom,
+    date: firebase.firestore.Timestamp.now()
+  }).then(function(){
+    document.getElementById('montantDispo').value = '';
+    document.getElementById('dernierDecl').textContent = 'Declare: ' + Math.round(montant).toLocaleString('fr-FR') + ' FG a ' + new Date().toLocaleTimeString('fr-FR', {hour:'2-digit',minute:'2-digit'});
+    showToast('Montant déclaré au patron !');
+    btn.disabled=false; btn.textContent='✅ Déclarer';
+  }).catch(function(e){ showToast(e.message, true); btn.disabled=false; btn.textContent='✅ Déclarer'; });
+});
+document.getElementById('btnSoldeInit').addEventListener('click', function(){ openOv('ovSoldeInit'); });
+document.getElementById('btnDepense').addEventListener('click', function(){ openOv('ovDepense'); });
+document.getElementById('btnOMDepot').addEventListener('click', function(){ openOv('ovOMDepot'); });
+document.getElementById('btnOMRetrait').addEventListener('click', function(){ openOv('ovOMRetrait'); });
+document.getElementById('btnOMActhat').addEventListener('click', function(){ openOv('ovOMActhat'); });
+document.getElementById('btnOMTransfert').addEventListener('click', function(){ openOv('ovOMTransfert'); });
+
+// MODALS CLOSE
+['P','E','V','Signal','SoldeInit','Depense','OMDepot','OMRetrait','OMActhat','OMTransfert'].forEach(function(id){
+  var mc = document.getElementById('mc'+id);
+  if(mc) mc.addEventListener('click', function(){ closeOv('ov'+id); });
+  var ov = document.getElementById('ov'+id);
+  if(ov) ov.addEventListener('click', function(e){ if(e.target===this) closeOv('ov'+id); });
+});
+
+// ===== PHOTO =====
+function handlePhoto(input){
+  var file = input.files[0]; if(!file) return;
+  document.getElementById('pPhotoLoading').style.display = 'block';
+  var canvas = document.createElement('canvas');
+  var ctx = canvas.getContext('2d');
+  var img = new Image();
+  var reader = new FileReader();
+  reader.onload = function(e){
+    img.onload = function(){
+      var max = 400, w = img.width, h = img.height;
+      if(w>h){ if(w>max){h=h*(max/w);w=max;} } else { if(h>max){w=w*(max/h);h=max;} }
+      canvas.width=Math.round(w); canvas.height=Math.round(h);
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      photoBase64 = canvas.toDataURL('image/jpeg',0.7);
+      var prev = document.getElementById('pPhotoPreview');
+      prev.src = photoBase64; prev.classList.add('visible');
+      document.getElementById('pPhotoPlaceholder').style.display = 'none';
+      document.getElementById('pPhotoLoading').style.display = 'none';
+    };
+    img.src = e.target.result;
+  };
+  reader.readAsDataURL(file);
+}
+function resetPhoto(){
+  photoBase64 = '';
+  var prev = document.getElementById('pPhotoPreview');
+  prev.src=''; prev.classList.remove('visible');
+  document.getElementById('pPhotoPlaceholder').style.display = '';
+  document.getElementById('pPhotoFile').value = '';
+  document.getElementById('pPhotoCamera').value = '';
+}
+
+// ===== ENTRÉE TOTAL =====
+function calcEntreeTotal(){
+  var q = parseInt(document.getElementById('eQ').value)||0;
+  var p = parseFloat(document.getElementById('eX').value)||0;
+  var el = document.getElementById('eTotal');
+  if(q>0&&p>0){ document.getElementById('eTotalV').textContent=fmt(q*p)+' FG'; el.classList.add('show'); }
+  else el.classList.remove('show');
+}
+document.getElementById('eQ').addEventListener('input', calcEntreeTotal);
+document.getElementById('eX').addEventListener('input', calcEntreeTotal);
+
+// ===== VENTE RECHERCHE =====
+document.getElementById('vSrch').addEventListener('input', function(){
+  var s = this.value.toLowerCase().trim();
+  var res = document.getElementById('vResults');
+  if(!s){ res.innerHTML=''; return; }
+  var f = prods.filter(function(p){ return p.nom&&p.nom.toLowerCase().indexOf(s)>=0; });
+  if(!f.length){ res.innerHTML='<div style="text-align:center;padding:10px;color:var(--tx2);font-size:.8rem">Aucun résultat</div>'; return; }
+  res.innerHTML = f.map(function(p){
+    var c = p.stock<=0?'var(--r)':p.stock<=(p.stockMin||5)?'var(--y)':'var(--g)';
+    return '<div class="vrow" data-id="'+p.id+'" data-pv="'+(p.prixVente||0)+'" data-pa="'+(p.prixAchat||0)+'" data-sk="'+(p.stock||0)+'" data-nm="'+p.nom.replace(/"/g,'&quot;')+'" data-ct="'+(p.categorie||'')+'">'
+      +'<div class="vrow-name">'+p.nom+'</div>'
+      +'<div class="vrow-meta">'+p.categorie+' • Prix: <b>'+fmt(p.prixVente)+' FG</b> • <span style="color:'+c+'">Stock: '+p.stock+'</span></div>'
+      +'</div>';
+  }).join('');
+  document.querySelectorAll('.vrow').forEach(function(r){
+    r.addEventListener('click', function(){
+      document.getElementById('vId').value = this.dataset.id;
+      document.getElementById('vPxAchat').value = this.dataset.pa;
+      document.getElementById('vPx').value = this.dataset.pv;
+      document.getElementById('vSelName').textContent = this.dataset.nm;
+      document.getElementById('vSelMeta').textContent = this.dataset.ct+' • Stock dispo: '+this.dataset.sk+' • Prix: '+fmt(this.dataset.pv)+' FG';
+      document.getElementById('vSelBox').style.display = 'block';
+      document.getElementById('vResults').innerHTML = '';
+      document.getElementById('vSrch').value = this.dataset.nm;
+      calcVenteTotal();
+    });
+  });
+});
+
+function calcVenteTotal(){
+  var q = parseInt(document.getElementById('vQt').value)||0;
+  var p = parseFloat(document.getElementById('vPx').value)||0;
+  var el = document.getElementById('vTotal');
+  if(q>0&&p>0){ document.getElementById('vTotalV').textContent=fmt(q*p)+' FG'; el.classList.add('show'); }
+  else el.classList.remove('show');
+}
+document.getElementById('vQt').addEventListener('input', calcVenteTotal);
+document.getElementById('vPx').addEventListener('input', calcVenteTotal);
+
+function chargerSelectProduits(){
+  var o = prods.map(function(p){ return '<option value="'+p.id+'">'+p.nom+' (stock: '+p.stock+')</option>'; }).join('');
+  document.getElementById('eP').innerHTML = '<option value="">-- Choisir --</option>' + o;
+}
+
+// ===== CATÉGORIES =====
+document.getElementById('cats').addEventListener('click', function(e){
+  var b = e.target.closest('.pbtn'); if(!b) return;
+  document.querySelectorAll('#cats .pbtn').forEach(function(x){ x.classList.remove('active'); });
+  b.classList.add('active'); catF = b.getAttribute('data-c')||'';
+  renderProduits();
+});
+document.getElementById('srch').addEventListener('input', renderProduits);
+
+// ===== RENDER PRODUITS =====
+function renderProduits(){
+  var el = document.getElementById('lstP');
+  var s = document.getElementById('srch').value.toLowerCase();
+  var f = prods.filter(function(p){
+    return (!s||(p.nom&&p.nom.toLowerCase().indexOf(s)>=0)||(p.categorie&&p.categorie.toLowerCase().indexOf(s)>=0))
+      && (!catF||p.categorie===catF);
+  });
+  document.getElementById('prodCount').textContent = (s||catF) ? f.length+' résultat(s) sur '+prods.length : prods.length+' produit(s) au catalogue';
+  if(!prods.length){ el.innerHTML='<div class="empty"><div class="empty-icon">🔧</div><p>Ajoutez votre premier produit</p></div>'; return; }
+  if(!f.length){ el.innerHTML='<div class="empty"><div class="empty-icon">🔍</div><p>Aucun résultat</p></div>'; return; }
+  el.innerHTML = f.map(function(p){
+    var sc = p.stock<=0?'sout':p.stock<=(p.stockMin||5)?'slw':'sok';
+    var sl = p.stock<=0?'🔴 Rupture':p.stock<=(p.stockMin||5)?'🟡 Faible':'🟢 OK';
+    var ph = p.photo ? '<img class="pi-photo" src="'+p.photo+'" alt="'+p.nom+'">' : '<div class="pi-ph">🔧</div>';
+    return '<div class="pi">'+ph+'<div class="pi-info">'
+      +'<div class="pi-name">'+p.nom+'</div>'
+      +'<div class="pi-meta">'+p.categorie+' • '+'⭐'.repeat(p.qualite||1)+'</div>'
+      +'<div class="pi-meta">Vente: <b>'+fmt(p.prixVente)+' FG</b> • Stock: '+p.stock+' unités</div>'
+      +'</div><span class="stb '+sc+'">'+sl+'</span></div>';
+  }).join('');
+}
+
+// ===== RENDER ENTRÉES =====
+function renderEntrees(){
+  var el = document.getElementById('lstE');
+  if(!entrees.length){ el.innerHTML='<div class="empty"><div class="empty-icon">📦</div><p>Aucune entrée</p></div>'; return; }
+  var sorted = [].concat(entrees).sort(function(a,b){ return (b.date?b.date.seconds:0)-(a.date?a.date.seconds:0); });
+  el.innerHTML = sorted.map(function(e){
+    return '<div class="hi">'
+      +'<div class="hi-top"><span class="hi-name">📦 '+e.produitNom+'</span><span class="hi-amount plus">+'+e.quantite+' unités</span></div>'
+      +'<div class="hi-meta">'+fmtDate(e.date)+' • '+(e.fournisseur||'—')+' • '+(e.notes||'')+'</div>'
+      +'<div class="hi-meta" style="margin-top:2px">Par: '+e.gestionnaire+' • Réf: '+e.recu+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// ===== RENDER VENTES =====
+function renderVentes(){
+  var el = document.getElementById('lstV');
+  if(!sorties.length){ el.innerHTML='<div class="empty"><div class="empty-icon">💰</div><p>Aucune vente</p></div>'; return; }
+  var sorted = [].concat(sorties).sort(function(a,b){ return (b.date?b.date.seconds:0)-(a.date?a.date.seconds:0); });
+  el.innerHTML = sorted.map(function(s){
+    return '<div class="hi vente">'
+      +'<div class="hi-top"><span class="hi-name">🛒 '+s.produitNom+'</span><span class="hi-amount plus">Qté: '+s.quantite+'</span></div>'
+      +'<div class="hi-meta" style="margin-top:2px;display:flex;justify-content:space-between;align-items:center">'
+      +'<span>'+fmtDate(s.date)+' | '+s.gestionnaire+' | Réf: '+s.recu+'</span>'
+      +'<button class="signal-btn" onclick="signalerVente(\''+s.recu+'\')">🚨 Erreur</button>'
+      +'</div>'
+      +'</div>';
+  }).join('');
+}
+
+function signalerVente(recu){
+  document.getElementById('sigRecu').value = recu;
+  openOv('ovSignal');
+}
+
+// ===== RENDER ACCUEIL =====
+function renderAccueil(){
+  var rup = prods.filter(function(p){ return p.stock<=0; }).length;
+  var todVentes = sorties.filter(function(s){ return s.date&&s.date.toDate&&s.date.toDate().toDateString()===today(); });
+  document.getElementById('s1').textContent = prods.length;
+  document.getElementById('s2').textContent = todVentes.length;
+  document.getElementById('s3').textContent = rup;
+
+  var all = [].concat(
+    sorties.map(function(s){ return {type:'v',nom:s.produitNom,val:s.montantTotal,qt:s.quantite,d:s.date}; }),
+    entrees.map(function(e){ return {type:'e',nom:e.produitNom,val:e.montantTotal,qt:e.quantite,d:e.date}; })
+  ).sort(function(a,b){ return (b.d?b.d.seconds:0)-(a.d?a.d.seconds:0); }).slice(0,5);
+
+  document.getElementById('recents').innerHTML = all.length ? all.map(function(t){
+    return '<div class="hi '+(t.type==="v"?'vente':'')+'">'
+      +'<div class="hi-top"><span class="hi-name">'+(t.type==="v"?'🛒':'📦')+' '+t.nom+'</span>'
+      +'<span class="hi-amount plus">'+( t.type==="v" ? 'Qté: '+t.qt : '+'+fmt(t.val)+' FG')+'</span></div>'
+      +'<div class="hi-meta">'+fmtDate(t.d)+' • Qté: '+t.qt+'</div>'
+      +'</div>';
+  }).join('') : '<div class="empty"><div class="empty-icon">📋</div><p>Aucune action récente</p></div>';
+
+  var alerte = prods.filter(function(p){ return p.stock<=(p.stockMin||5); });
+  document.getElementById('alertes').innerHTML = alerte.length ? alerte.map(function(p){
+    return '<div class="pi"><div class="pi-ph">🔧</div><div class="pi-info"><div class="pi-name">'+p.nom+'</div><div class="pi-meta">Stock: '+p.stock+' / min: '+(p.stockMin||5)+'</div></div>'
+      +'<span class="stb '+(p.stock<=0?'sout':'slw')+'">'+(p.stock<=0?'🔴 RUPTURE':'🟡 FAIBLE')+'</span></div>';
+  }).join('') : '<div class="empty"><div class="empty-icon">✅</div><p>Tous les stocks sont OK</p></div>';
+}
+
+// ===== RENDER CAISSE =====
+function renderCaisse(){
+  var todMouvs = mouvements.filter(function(m){ return m.date&&m.date.toDate&&m.date.toDate().toDateString()===today(); });
+
+  // Calcul espèces
+  var soldeInitM = todMouvs.filter(function(m){ return m.type==='solde_init'; });
+  var soldeInit = soldeInitM.length ? soldeInitM[soldeInitM.length-1].montant : 0;
+  var todVentes = sorties.filter(function(s){ return s.date&&s.date.toDate&&s.date.toDate().toDateString()===today(); });
+  var totalVentes = todVentes.reduce(function(a,s){ return a+s.montantTotal; }, 0);
+  var todDepenses = todMouvs.filter(function(m){ return m.type==='depense'; });
+  var totalDepenses = todDepenses.reduce(function(a,m){ return a+m.montant; }, 0);
+  var soldeTheoriqueEsp = soldeInit + totalVentes - totalDepenses;
+  document.getElementById('soldeEspeces').textContent = fmt(soldeTheoriqueEsp) + ' FG';
+  document.getElementById('soldeEspecesSub').textContent = 'Calculé automatiquement · ' + new Date().toLocaleDateString('fr-FR');
+  document.getElementById('ce1').textContent = fmt(soldeInit) + ' FG';
+  document.getElementById('ce2').textContent = fmt(totalVentes) + ' FG';
+  document.getElementById('ce3').textContent = fmt(totalDepenses) + ' FG';
+  document.getElementById('ce4').textContent = fmt(soldeTheoriqueEsp) + ' FG';
+
+  // Calcul Orange Money (tous les mouvements, pas juste aujourd'hui)
+  var soldeOM = 0;
+  mouvements.sort(function(a,b){ return (a.date?a.date.seconds:0)-(b.date?b.date.seconds:0); }).forEach(function(m){
+    if(m.type==='om_depot') soldeOM += m.montant;
+    if(m.type==='om_retrait') soldeOM -= m.montant;
+    if(m.type==='om_achat') soldeOM -= m.montant;
+    if(m.type==='om_transfert') soldeOM -= m.montant;
+  });
+  document.getElementById('soldeOM').textContent = fmt(soldeOM) + ' FG';
+  document.getElementById('soldeOMSub').textContent = 'Solde cumulé · Mis à jour en temps réel';
+
+  // Historique mouvements
+  var el = document.getElementById('lstCaisse');
+  var sorted = [].concat(mouvements).sort(function(a,b){ return (b.date?b.date.seconds:0)-(a.date?a.date.seconds:0); }).slice(0,20);
+  if(!sorted.length){ el.innerHTML='<div class="empty"><div class="empty-icon">📋</div><p>Aucun mouvement</p></div>'; return; }
+  var labels = {
+    'solde_init':'🔄 Solde initial','depense':'➖ Dépense','om_depot':'➕ Dépôt OM',
+    'om_retrait':'➖ Retrait OM','om_achat':'🛍️ Achat OM','om_transfert':'🔁 Transfert OM'
+  };
+  var classes = {
+    'solde_init':'','depense':'depense','om_depot':'om-depot',
+    'om_retrait':'om-retrait','om_achat':'om-achat','om_transfert':'om-transfert'
+  };
+  var signs = { 'solde_init':'+','depense':'-','om_depot':'+','om_retrait':'-','om_achat':'-','om_transfert':'-' };
+  el.innerHTML = sorted.map(function(m){
+    var s = signs[m.type]||'';
+    var cls = s==='+' ? 'plus' : 'minus';
+    return '<div class="hi '+(classes[m.type]||'')+'">'
+      +'<div class="hi-top"><span class="hi-name">'+(labels[m.type]||m.type)+'</span>'
+      +'<span class="hi-amount '+cls+'">'+s+fmt(m.montant)+' FG</span></div>'
+      +'<div class="hi-meta">'+fmtDate(m.date)+' • '+(m.motif||m.notes||m.ref||'—')+'</div>'
+      +'<div class="hi-meta">Par: '+(m.gestionnaire||'—')+'</div>'
+      +'</div>';
+  }).join('');
+}
+
+// ===== SAUVEGARDES =====
+
+// PRODUIT
+document.getElementById('btnSP').addEventListener('click', function(){
+  var nom = document.getElementById('pN').value.trim();
+  var pv = parseFloat(document.getElementById('pV').value)||0;
+  if(!nom){ showToast('⚠️ Le nom est obligatoire', true); return; }
+  if(!pv){ showToast('⚠️ Le prix de vente est obligatoire', true); return; }
+  var btn = this; btn.disabled=true; btn.textContent='⏳...';
+  db.collection('produits').add({
+    nom: nom,
+    categorie: document.getElementById('pC').value,
+    qualite: parseInt(document.getElementById('pQ').value)||2,
+    prixVente: pv,
+    stock: parseInt(document.getElementById('pS').value)||0,
+    stockMin: parseInt(document.getElementById('pM').value)||5,
+    photo: photoBase64 || '',
+    ajoutePar: SESSION.nom,
+    createdAt: firebase.firestore.Timestamp.now()
+  }).then(function(){
+    closeOv('ovP');
+    ['pN','pV','pS','pM'].forEach(function(id){ document.getElementById(id).value=''; });
+    resetPhoto();
+    showToast('✅ Produit ajouté !');
+    btn.disabled=false; btn.textContent='✅ Enregistrer le produit';
+  }).catch(function(e){ showToast('❌ '+e.message, true); btn.disabled=false; btn.textContent='✅ Enregistrer le produit'; });
+});
+
+// ENTRÉE
+document.getElementById('btnSE').addEventListener('click', function(){
+  var q = parseInt(document.getElementById('eQ').value)||0;
+  var px = parseFloat(document.getElementById('eX').value)||0;
+  if(!q){ showToast('Quantite obligatoire', true); return; }
+  if(!px){ showToast('Prix achat obligatoire', true); return; }
+  var btn = this; btn.disabled=true; btn.textContent='...';
+  var recu = genRecu();
+  var fourn = document.getElementById('eF').value;
+  var notes = document.getElementById('eNotes').value;
+
+  function resetEntreeForm(){
+    ['eF','eQ','eX','eNotes'].forEach(function(id){ document.getElementById(id).value=''; });
+    document.getElementById('eP').value='';
+    document.getElementById('eTotal').classList.remove('show');
+  }
+
+  if(modeNouveauProd) {
+    var nomNew = document.getElementById('eNomNew').value.trim();
+    if(!nomNew){ showToast('Nom du produit obligatoire', true); btn.disabled=false; btn.textContent='Enregistrer'; return; }
+    var pvSugg = parseFloat(document.getElementById('ePvNew').value)||Math.round(px*1.3);
+    var newProdRef;
+    db.collection('produits').add({
+      nom: nomNew,
+      categorie: document.getElementById('eCatNew').value,
+      qualite: parseInt(document.getElementById('eQualNew').value)||2,
+      prixAchat: px, prixVente: pvSugg,
+      stock: q, stockMin: 5, vedette: false, photo: '',
+      ajoutePar: SESSION.nom, prixVenteAValider: true,
+      createdAt: firebase.firestore.Timestamp.now()
+    }).then(function(ref){
+      newProdRef = ref;
+      return db.collection('entrees').add({
+        produitId: ref.id, produitNom: nomNew,
+        fournisseur: fourn, quantite: q, prixUnitaire: px, montantTotal: q*px,
+        notes: notes, recu: recu, gestionnaire: SESSION.nom,
+        date: firebase.firestore.Timestamp.now()
+      });
+    }).then(function(){
+      return db.collection('signalements').add({
+        type: 'nouveau_produit',
+        description: 'Nouveau produit: '+nomNew+' - Prix vente suggere: '+Math.round(pvSugg).toLocaleString('fr-FR')+' FG - A valider',
+        gestionnaire: SESSION.nom, statut: 'en attente',
+        recu: recu, date: firebase.firestore.Timestamp.now()
+      });
+    }).then(function(){
+      closeOv('ovE');
+      resetEntreeForm();
+      ['eNomNew','ePvNew'].forEach(function(id){ document.getElementById(id).value=''; });
+      showToast('Nouveau produit enregistre ! Ref: '+recu);
+      btn.disabled=false; btn.textContent='Enregistrer';
+    }).catch(function(e){ showToast(e.message, true); btn.disabled=false; btn.textContent='Enregistrer'; });
+
+  } else {
+    var pid = document.getElementById('eP').value;
+    if(!pid){ showToast('Choisissez un produit', true); btn.disabled=false; btn.textContent='Enregistrer'; return; }
+    var p = prods.find(function(x){ return x.id===pid; });
+    var prodNom = p ? p.nom : '';
+    var stockMin = p ? (p.stockMin||5) : 5;
+    var newStock = (p ? p.stock : 0) + q;
+    db.collection('entrees').add({
+      produitId: pid, produitNom: prodNom,
+      fournisseur: fourn, quantite: q, prixUnitaire: px, montantTotal: q*px,
+      notes: notes, recu: recu, gestionnaire: SESSION.nom,
+      date: firebase.firestore.Timestamp.now()
+    }).then(function(){
+      return db.collection('produits').doc(pid).update({
+        stock: firebase.firestore.FieldValue.increment(q), prixAchat: px
+      });
+    }).then(function(){
+      closeOv('ovE');
+      resetEntreeForm();
+      showToast('Entree enregistree ! Ref: '+recu);
+      btn.disabled=false; btn.textContent='Enregistrer';
+      // Alerte WhatsApp si stock encore bas
+      if(newStock <= stockMin){
+        checkAlerteWhatsApp(prodNom, newStock, stockMin);
+      }
+    }).catch(function(e){ showToast(e.message, true); btn.disabled=false; btn.textContent='Enregistrer'; });
+  }
+});
+
+// VENTE
+document.getElementById('btnSV').addEventListener('click', function(){
+  var pid = document.getElementById('vId').value;
+  var q = parseInt(document.getElementById('vQt').value)||0;
+  var px = parseFloat(document.getElementById('vPx').value)||0;
+  if(!pid){ showToast('⚠️ Sélectionnez un produit', true); return; }
+  if(!q||!px){ showToast('⚠️ Quantité et prix obligatoires', true); return; }
+  var p = prods.find(function(x){ return x.id===pid; });
+  if(p&&p.stock<q){ showToast('⚠️ Stock insuffisant: '+p.stock+' unités', true); return; }
+  var recu = genRecu();
+  var btn = this; btn.disabled=true; btn.textContent='⏳...';
+  db.collection('sorties').add({
+    produitId: pid, produitNom: p?p.nom:'',
+    quantite: q, prixVente: px, montantTotal: q*px,
+    recu: recu,
+    gestionnaire: SESSION.nom,
+    date: firebase.firestore.Timestamp.now()
+  }).then(function(){
+    return db.collection('produits').doc(pid).update({ stock: firebase.firestore.FieldValue.increment(-q) });
+  }).then(function(){
+    closeOv('ovV');
+    ['vQt'].forEach(function(id){ document.getElementById(id).value='1'; });
+    ['vId','vPxAchat','vPx'].forEach(function(id){ document.getElementById(id).value=''; });
+    document.getElementById('vSrch').value='';
+    document.getElementById('vSelBox').style.display='none';
+    document.getElementById('vResults').innerHTML='';
+    document.getElementById('vTotal').classList.remove('show');
+    showToast('✅ Vente enregistrée ! Réf: '+recu);
+    btn.disabled=false; btn.textContent='✅ Enregistrer la vente';
+  }).catch(function(e){ showToast('❌ '+e.message, true); btn.disabled=false; btn.textContent='✅ Enregistrer la vente'; });
+});
+
+// SIGNALEMENT
+document.getElementById('btnSigEnvoi').addEventListener('click', function(){
+  var desc = document.getElementById('sigDesc').value.trim();
+  if(!desc){ showToast('⚠️ Décrivez l\'erreur', true); return; }
+  var btn = this; btn.disabled=true; btn.textContent='⏳...';
+  db.collection('signalements').add({
+    recu: document.getElementById('sigRecu').value,
+    description: desc,
+    gestionnaire: SESSION.nom,
+    statut: 'en attente',
+    date: firebase.firestore.Timestamp.now()
+  }).then(function(){
+    closeOv('ovSignal');
+    document.getElementById('sigRecu').value='';
+    document.getElementById('sigDesc').value='';
+    showToast('✅ Signalement envoyé !');
+    btn.disabled=false; btn.textContent='📤 Envoyer';
+  }).catch(function(e){ showToast('❌ '+e.message, true); btn.disabled=false; btn.textContent='📤 Envoyer'; });
+});
+
+// SOLDE INITIAL
+document.getElementById('btnSaveSoldeInit').addEventListener('click', function(){
+  var val = parseFloat(document.getElementById('soldeInitVal').value)||0;
+  if(!val){ showToast('⚠️ Entrez le montant', true); return; }
+  var btn = this; btn.disabled=true; btn.textContent='⏳...';
+  db.collection('mouvements_caisse').add({
+    type: 'solde_init', montant: val,
+    notes: document.getElementById('soldeInitNotes').value,
+    gestionnaire: SESSION.nom,
+    date: firebase.firestore.Timestamp.now()
+  }).then(function(){
+    closeOv('ovSoldeInit');
+    document.getElementById('soldeInitVal').value='';
+    document.getElementById('soldeInitNotes').value='';
+    showToast('✅ Solde initial enregistré !');
+    btn.disabled=false; btn.textContent='✅ Enregistrer';
+  }).catch(function(e){ showToast('❌ '+e.message, true); btn.disabled=false; btn.textContent='✅ Enregistrer'; });
+});
+
+// DÉPENSE
+document.getElementById('btnSaveDepense').addEventListener('click', function(){
+  var montant = parseFloat(document.getElementById('depMontant').value)||0;
+  var motif = document.getElementById('depMotif').value.trim();
+  if(!montant){ showToast('⚠️ Entrez le montant', true); return; }
+  if(!motif){ showToast('⚠️ Motif obligatoire', true); return; }
+  var btn = this; btn.disabled=true; btn.textContent='⏳...';
+  db.collection('mouvements_caisse').add({
+    type: 'depense', montant: montant, motif: motif,
+    gestionnaire: SESSION.nom,
+    date: firebase.firestore.Timestamp.now()
+  }).then(function(){
+    closeOv('ovDepense');
+    document.getElementById('depMontant').value='';
+    document.getElementById('depMotif').value='';
+    showToast('✅ Dépense enregistrée !');
+    btn.disabled=false; btn.textContent='✅ Enregistrer la dépense';
+  }).catch(function(e){ showToast('❌ '+e.message, true); btn.disabled=false; btn.textContent='✅ Enregistrer la dépense'; });
+});
+
+// OM DÉPÔT
+document.getElementById('btnSaveOMDepot').addEventListener('click', function(){
+  var montant = parseFloat(document.getElementById('omDepotMontant').value)||0;
+  if(!montant){ showToast('⚠️ Entrez le montant', true); return; }
+  var btn = this; btn.disabled=true; btn.textContent='⏳...';
+  db.collection('mouvements_caisse').add({
+    type: 'om_depot', montant: montant,
+    ref: document.getElementById('omDepotRef').value,
+    notes: document.getElementById('omDepotNotes').value,
+    gestionnaire: SESSION.nom,
+    date: firebase.firestore.Timestamp.now()
+  }).then(function(){
+    closeOv('ovOMDepot');
+    ['omDepotMontant','omDepotRef','omDepotNotes'].forEach(function(id){ document.getElementById(id).value=''; });
+    showToast('✅ Dépôt OM enregistré !');
+    btn.disabled=false; btn.textContent='✅ Enregistrer le dépôt';
+  }).catch(function(e){ showToast('❌ '+e.message, true); btn.disabled=false; btn.textContent='✅ Enregistrer le dépôt'; });
+});
+
+// OM RETRAIT
+document.getElementById('btnSaveOMRetrait').addEventListener('click', function(){
+  var montant = parseFloat(document.getElementById('omRetraitMontant').value)||0;
+  var motif = document.getElementById('omRetraitMotif').value.trim();
+  if(!montant||!motif){ showToast('⚠️ Montant et motif obligatoires', true); return; }
+  var btn = this; btn.disabled=true; btn.textContent='⏳...';
+  db.collection('mouvements_caisse').add({
+    type: 'om_retrait', montant: montant, motif: motif,
+    ref: document.getElementById('omRetraitRef').value,
+    gestionnaire: SESSION.nom,
+    date: firebase.firestore.Timestamp.now()
+  }).then(function(){
+    closeOv('ovOMRetrait');
+    ['omRetraitMontant','omRetraitRef','omRetraitMotif'].forEach(function(id){ document.getElementById(id).value=''; });
+    showToast('✅ Retrait OM enregistré !');
+    btn.disabled=false; btn.textContent='✅ Enregistrer le retrait';
+  }).catch(function(e){ showToast('❌ '+e.message, true); btn.disabled=false; btn.textContent='✅ Enregistrer le retrait'; });
+});
+
+// OM ACHAT
+document.getElementById('btnSaveOMActhat').addEventListener('click', function(){
+  var montant = parseFloat(document.getElementById('omAchatMontant').value)||0;
+  var fourn = document.getElementById('omAchatFourn').value.trim();
+  if(!montant||!fourn){ showToast('⚠️ Montant et fournisseur obligatoires', true); return; }
+  var btn = this; btn.disabled=true; btn.textContent='⏳...';
+  db.collection('mouvements_caisse').add({
+    type: 'om_achat', montant: montant, motif: fourn,
+    ref: document.getElementById('omAchatRef').value,
+    notes: document.getElementById('omAchatNotes').value,
+    gestionnaire: SESSION.nom,
+    date: firebase.firestore.Timestamp.now()
+  }).then(function(){
+    closeOv('ovOMActhat');
+    ['omAchatMontant','omAchatFourn','omAchatRef','omAchatNotes'].forEach(function(id){ document.getElementById(id).value=''; });
+    showToast('✅ Achat OM enregistré !');
+    btn.disabled=false; btn.textContent='✅ Enregistrer l\'achat';
+  }).catch(function(e){ showToast('❌ '+e.message, true); btn.disabled=false; btn.textContent='✅ Enregistrer l\'achat'; });
+});
+
+// OM TRANSFERT
+document.getElementById('btnSaveOMTransfert').addEventListener('click', function(){
+  var montant = parseFloat(document.getElementById('omTransfertMontant').value)||0;
+  var motif = document.getElementById('omTransfertMotif').value.trim();
+  if(!montant||!motif){ showToast('⚠️ Montant et motif obligatoires', true); return; }
+  var btn = this; btn.disabled=true; btn.textContent='⏳...';
+  db.collection('mouvements_caisse').add({
+    type: 'om_transfert', montant: montant, motif: motif,
+    ref: document.getElementById('omTransfertRef').value,
+    gestionnaire: SESSION.nom,
+    date: firebase.firestore.Timestamp.now()
+  }).then(function(){
+    closeOv('ovOMTransfert');
+    ['omTransfertMontant','omTransfertMotif','omTransfertRef'].forEach(function(id){ document.getElementById(id).value=''; });
+    showToast('✅ Transfert OM enregistré !');
+    btn.disabled=false; btn.textContent='✅ Enregistrer le transfert';
+  }).catch(function(e){ showToast('❌ '+e.message, true); btn.disabled=false; btn.textContent='✅ Enregistrer le transfert'; });
+});
+
+// ===== ALERTE WHATSAPP RUPTURE =====
+function checkAlerteWhatsApp(prodNom, newStock, stockMin){
+  if(newStock <= 0){
+    var msg = 'ALERTE RUPTURE ZAG GROUP\nProduit: '+prodNom+'\nStock: 0 unite\nReapprovisionner immediatement !\nKindia, Guinee';
+    // Enregistrer alerte dans Firebase
+    db.collection('alertes_stock').add({
+      produit: prodNom, stock: newStock, type: 'rupture',
+      gestionnaire: SESSION.nom, date: firebase.firestore.Timestamp.now(), lu: false
+    });
+    // Ouvrir WhatsApp avec message
+    setTimeout(function(){
+      if(confirm('RUPTURE: '+prodNom+' - Envoyer alerte WhatsApp au patron ?')){
+        window.open('https://wa.me/224626207646?text='+encodeURIComponent(msg), '_blank');
+      }
+    }, 500);
+  } else if(newStock <= stockMin){
+    db.collection('alertes_stock').add({
+      produit: prodNom, stock: newStock, type: 'faible',
+      gestionnaire: SESSION.nom, date: firebase.firestore.Timestamp.now(), lu: false
+    });
+  }
+}
+
+// Vérifier alertes lors du chargement produits
+function verifierAlertes(produitsListe){
+  produitsListe.forEach(function(p){
+    if(p.stock <= 0){
+      db.collection('alertes_stock').where('produit','==',p.nom).where('lu','==',false).get().then(function(snap){
+        if(snap.empty){
+          db.collection('alertes_stock').add({
+            produit: p.nom, stock: p.stock, type: 'rupture',
+            gestionnaire: 'systeme', date: firebase.firestore.Timestamp.now(), lu: false
+          });
+        }
+      });
+    }
+  });
+}
+
+// ===== CLOTURE JOURNALIERE =====
+function ouvrirCloture(){
+  var todVentes = sorties.filter(function(s){ return s.date&&s.date.toDate&&s.date.toDate().toDateString()===new Date().toDateString(); });
+  var nbVentes = todVentes.length;
+  if(confirm('Cloturer la journee ?\n'+nbVentes+' vente(s) enregistree(s)\n\nCela enverra un resume au patron.')){
+    db.collection('clotures').add({
+      gestionnaire: SESSION.nom,
+      nbVentes: nbVentes,
+      date: firebase.firestore.Timestamp.now(),
+      statut: 'cloture'
+    }).then(function(){
+      showToast('Journee cloturee ! Resume envoye.');
+    }).catch(function(e){ showToast(e.message, true); });
+  }
+}
+
+// ===== DÉCONNEXION =====
+function deconnecter(){
+  if(confirm('Se déconnecter et retourner à l accueil ?')){
+    window.location.href = 'zaggroup-11.html';
+  }
+}
+
+// ===== FIREBASE LISTENERS =====
+db.collection('produits').onSnapshot(function(snap){
+  prods = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+  renderProduits(); renderAccueil();
+  verifierAlertes(prods);
+});
+db.collection('entrees').onSnapshot(function(snap){
+  entrees = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+  renderEntrees(); renderAccueil();
+});
+db.collection('sorties').onSnapshot(function(snap){
+  sorties = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+  renderVentes(); renderAccueil(); renderCaisse();
+});
+db.collection('mouvements_caisse').onSnapshot(function(snap){
+  mouvements = snap.docs.map(function(d){ return Object.assign({id:d.id}, d.data()); });
+  renderCaisse();
+});
+</script>
+</body>
+</html>
