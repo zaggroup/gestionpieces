@@ -1,0 +1,278 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,user-scalable=no">
+<meta name="theme-color" content="#1a472a">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="ZAG GROUP">
+<title>ZAG GROUP</title>
+<link rel="manifest" href="manifest.json">
+<link rel="apple-touch-icon" href="icône-192-1.png">
+<style>
+/* Polices de secours si Google Fonts non disponible */
+body { font-family: Arial, sans-serif; }
+.logo span, .btn, .pin-title, .pin-submit { font-family: Arial, sans-serif; }
+</style>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<script>
+// ===== ZAGGROUP-11 : FONCTIONNE 100% HORS-LIGNE =====
+// Firebase est optionnel - les codes viennent du localStorage
+var FIREBASE_OK = false;
+var db = null;
+
+// Charger Firebase EN ARRIÈRE-PLAN seulement si internet disponible
+if(navigator.onLine){
+  (function(){
+    var s1 = document.createElement('script');
+    s1.src = 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
+    s1.onload = function(){
+      var s2 = document.createElement('script');
+      s2.src = 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js';
+      s2.onload = function(){
+        try {
+          if(!firebase.apps.length){
+            firebase.initializeApp({
+              apiKey:"AIzaSyDWF-Q3S2M-btrRBHBYzd9dVbY6iEg_fNk",
+              authDomain:"gestionpieces-74559.firebaseapp.com",
+              projectId:"gestionpieces-74559",
+              storageBucket:"gestionpieces-74559.firebasestorage.app",
+              messagingSenderId:"392970031226",
+              appId:"1:392970031226:web:68bb9966b4440576a2ebc3"
+            });
+          }
+          db = firebase.firestore();
+          FIREBASE_OK = true;
+          chargerCodes();
+        } catch(e){}
+      };
+      document.head.appendChild(s2);
+    };
+    document.head.appendChild(s1);
+  })();
+}
+</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Inter",sans-serif;background:linear-gradient(145deg,#0d2b1a,#1a472a,#2d6a4f);min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;color:#fff}
+
+.logo{display:flex;align-items:center;gap:14px;margin-bottom:8px}
+.logo img{height:52px;width:auto;border-radius:8px}
+.logo span{font-family:"Exo 2",sans-serif;font-size:2rem;font-weight:900;letter-spacing:-1px}
+.sub{font-size:.82rem;color:rgba(255,255,255,.6);margin-bottom:44px;text-align:center}
+
+.btns{display:flex;flex-direction:column;gap:14px;width:100%;max-width:340px}
+.btn{padding:18px 20px;border:none;border-radius:18px;font-family:"Exo 2",sans-serif;font-size:1rem;font-weight:800;cursor:pointer;display:flex;align-items:center;gap:14px;transition:transform .12s}
+.btn:active{transform:scale(.96)}
+.btn-g{background:#fff;color:#1a472a}
+.btn-a{background:rgba(255,255,255,.12);border:2px solid rgba(255,255,255,.35);color:#fff}
+.btn-icon{font-size:1.6rem;flex-shrink:0}
+.btn-text{text-align:left}
+.btn-title{display:block;font-size:.95rem}
+.btn-desc{display:block;font-size:.68rem;font-weight:400;opacity:.65;margin-top:2px}
+
+/* PIN SCREEN */
+.pin-screen{position:fixed;inset:0;background:linear-gradient(145deg,#0d2b1a,#1a472a,#2d6a4f);display:none;flex-direction:column;align-items:center;justify-content:center;padding:24px;z-index:100}
+.pin-screen.show{display:flex}
+.pin-card{background:#fff;border-radius:22px;padding:24px;width:100%;max-width:340px;color:#1a472a}
+.pin-title{font-family:"Exo 2",sans-serif;font-size:1rem;font-weight:800;margin-bottom:16px}
+.pin-field{margin-bottom:12px}
+.pin-field label{font-size:.72rem;font-weight:600;color:#4a6350;display:block;margin-bottom:4px}
+.pin-field input{width:100%;padding:12px;border:2px solid #c8e6c9;border-radius:12px;font-family:"Inter",sans-serif;font-size:1rem;outline:none}
+.pin-field input:focus{border-color:#40916c}
+.pin-code{font-size:1.4rem;letter-spacing:8px;text-align:center}
+.pin-err{color:#c62828;font-size:.75rem;font-weight:600;min-height:18px;text-align:center;margin-bottom:8px}
+.pin-submit{width:100%;padding:13px;background:linear-gradient(135deg,#2d6a4f,#40916c);color:#fff;border:none;border-radius:12px;font-family:"Exo 2",sans-serif;font-size:1rem;font-weight:700;cursor:pointer}
+.pin-back{background:transparent;border:none;color:rgba(255,255,255,.6);font-size:.82rem;margin-top:16px;cursor:pointer;font-family:"Inter",sans-serif}
+
+/* INSTALL BANNER */
+.install-banner{position:fixed;bottom:0;left:0;right:0;background:linear-gradient(135deg,#1a472a,#40916c);color:#fff;padding:12px 16px;display:none;align-items:center;gap:10px;box-shadow:0 -2px 20px rgba(0,0,0,.3);z-index:50}
+.install-banner.show{display:flex}
+.install-banner p{flex:1;font-size:.78rem;font-weight:600}
+.install-btn{background:#fff;color:#1a472a;border:none;border-radius:8px;padding:7px 14px;font-family:"Exo 2",sans-serif;font-size:.75rem;font-weight:700;cursor:pointer}
+.install-close{background:transparent;color:rgba(255,255,255,.6);border:none;font-size:1.1rem;cursor:pointer;padding:0 4px}
+
+.footer{position:fixed;bottom:24px;font-size:.65rem;color:rgba(255,255,255,.35)}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.shake{animation:shake .3s}
+</style>
+</head>
+<body>
+
+<!-- ACCUEIL -->
+<div id="homeScreen">
+  <div class="logo">
+    <img src="data:image/png;base64,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" alt="ZAG GROUP">
+    <span>ZAG GROUP</span>
+  </div>
+  <div class="sub">Kindia, Guin&#233;e &#8212; Gestion de pi&#232;ces moto</div>
+  <div class="btns">
+    <button class="btn btn-g" onclick="openPin('gest')">
+      <span class="btn-icon">&#9881;&#65039;</span>
+      <span class="btn-text">
+        <span class="btn-title">Gestionnaire</span>
+        <span class="btn-desc">Ventes, entr&#233;es stock, caisse</span>
+      </span>
+    </button>
+    <button class="btn btn-a" onclick="openPin('admin')">
+      <span class="btn-icon">&#128737;&#65039;</span>
+      <span class="btn-text">
+        <span class="btn-title">Administrateur</span>
+        <span class="btn-desc">Dashboard, rapports, contr&#244;le</span>
+      </span>
+    </button>
+  </div>
+</div>
+
+<!-- PIN -->
+<div class="pin-screen" id="pinScreen">
+  <div class="logo" style="margin-bottom:6px">
+    <img src="data:image/png;base64,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" alt="ZAG GROUP" style="height:40px">
+    <span style="font-size:1.3rem">ZAG GROUP</span>
+  </div>
+  <div id="pinRole" style="font-size:.78rem;color:rgba(255,255,255,.65);margin-bottom:24px">Gestionnaire</div>
+  <div class="pin-card">
+    <div class="pin-title" id="pinTitle">Acc&#232;s Gestionnaire</div>
+    <div class="pin-field" id="nomField">
+      <label>Votre pr&#233;nom *</label>
+      <input type="text" id="pinNom" placeholder="Ex: Mamadou" autocomplete="off">
+    </div>
+    <div class="pin-field">
+      <label>Code secret *</label>
+      <input type="password" id="pinCode" class="pin-code" placeholder="&#9679;&#9679;&#9679;&#9679;" autocomplete="off" inputmode="numeric">
+    </div>
+    <div class="pin-err" id="pinErr"></div>
+    <button class="pin-submit" id="pinSubmit">&#9654; Entrer</button>
+  </div>
+  <button class="pin-back" onclick="closePin()">&#8592; Changer de r&#244;le</button>
+</div>
+
+<!-- INSTALL -->
+<div class="install-banner" id="installBanner">
+  <p>&#128640; Installer l'app ZAG GROUP sur votre écran d'accueil</p>
+  <button class="install-btn" id="installBtn">Installer</button>
+  <button class="install-close" id="installClose">&#10005;</button>
+</div>
+
+<div class="footer">ZAG GROUP &#169; 2026 &#8212; Propuls&#233; par Firebase</div>
+
+<script>
+var currentRole = null;
+var CODES = { gest: '5678', admin: '1234' };
+var CODES_PRETS = false;
+
+// Charger codes locaux immédiatement
+try {
+  var codesLocaux = JSON.parse(localStorage.getItem('zag_codes') || '{}');
+  if(codesLocaux.gest) CODES.gest = codesLocaux.gest;
+  if(codesLocaux.admin) CODES.admin = codesLocaux.admin;
+  CODES_PRETS = true; // Toujours prêt avec codes locaux
+} catch(e){ CODES_PRETS = true; }
+
+function chargerCodes(){
+  if(!db || !FIREBASE_OK){ return; }
+  db.collection('app_config').doc('codes').get().then(function(doc){
+    if(doc.exists){
+      var d = doc.data();
+      if(d.gest) CODES.gest = d.gest;
+      if(d.admin) CODES.admin = d.admin;
+      try { localStorage.setItem('zag_codes', JSON.stringify({gest:CODES.gest, admin:CODES.admin})); } catch(e){}
+    }
+  }).catch(function(){});
+}
+
+function openPin(role){
+  currentRole = role;
+  var isAdmin = role === 'admin';
+  document.getElementById('pinRole').textContent = isAdmin ? 'Administrateur' : 'Gestionnaire';
+  document.getElementById('pinTitle').textContent = isAdmin ? 'Acc\u00e8s Administrateur' : 'Acc\u00e8s Gestionnaire';
+  document.getElementById('nomField').style.display = isAdmin ? 'none' : '';
+  document.getElementById('pinCode').value = '';
+  document.getElementById('pinNom').value = '';
+  document.getElementById('pinErr').textContent = '';
+  document.getElementById('pinScreen').classList.add('show');
+  setTimeout(function(){
+    (isAdmin ? document.getElementById('pinCode') : document.getElementById('pinNom')).focus();
+  }, 300);
+}
+
+function closePin(){
+  document.getElementById('pinScreen').classList.remove('show');
+  currentRole = null;
+}
+
+document.getElementById('pinSubmit').addEventListener('click', function(){
+  if(this.dataset.busy) return;
+  this.dataset.busy = '1';
+  var self = this;
+  setTimeout(function(){ delete self.dataset.busy; }, 2000);
+  var code = document.getElementById('pinCode').value;
+  var nom = document.getElementById('pinNom').value.trim();
+  var errEl = document.getElementById('pinErr');
+
+  if(!code){ errEl.textContent = 'Entrez votre code.'; return; }
+  if(currentRole === 'gest' && !nom){ errEl.textContent = 'Entrez votre prenom.'; return; }
+
+  if(!CODES_PRETS){
+    errEl.textContent = 'Chargement en cours, réessayez...';
+    setTimeout(function(){ errEl.textContent = ''; }, 1500);
+    if(document.getElementById('pinSubmit').dataset) delete document.getElementById('pinSubmit').dataset.busy;
+    return;
+  }
+  var expected = currentRole === 'admin' ? CODES.admin : CODES.gest;
+  if(code !== expected){
+    errEl.textContent = 'Code incorrect.';
+    document.getElementById('pinCode').value = '';
+    document.getElementById('pinCode').classList.add('shake');
+    setTimeout(function(){
+      errEl.textContent = '';
+      document.getElementById('pinCode').classList.remove('shake');
+    }, 1500);
+    return;
+  }
+
+  // Rediriger vers la bonne interface
+  if(currentRole === 'gest'){
+    // Sauvegarder le nom pour le gestionnaire
+    try { sessionStorage.setItem('zagNom', nom); } catch(e){}
+    window.location.href = 'gestionnaire_new-2-7.html';
+  } else {
+    try { sessionStorage.setItem('zagAdmin','1'); } catch(e){}
+    window.location.href = 'patron-19.html';
+  }
+});
+
+document.getElementById('pinCode').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') document.getElementById('pinSubmit').click();
+});
+document.getElementById('pinNom').addEventListener('keydown', function(e){
+  if(e.key === 'Enter') document.getElementById('pinCode').focus();
+});
+
+// PWA Installation
+var deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', function(e){
+  e.preventDefault(); deferredPrompt = e;
+  document.getElementById('installBanner').classList.add('show');
+});
+document.getElementById('installBtn').addEventListener('click', function(){
+  if(deferredPrompt){
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(function(){ deferredPrompt = null; document.getElementById('installBanner').classList.remove('show'); });
+  }
+});
+document.getElementById('installClose').addEventListener('click', function(){
+  document.getElementById('installBanner').classList.remove('show');
+});
+
+// Service Worker
+if('serviceWorker' in navigator){
+  window.addEventListener('load', function(){
+    navigator.serviceWorker.register('sw.js').catch(function(){});
+  });
+}
+</script>
+</body>
+</html>
