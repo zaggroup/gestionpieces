@@ -1,0 +1,412 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="theme-color" content="#1a472a">
+<title>ZAG GROUP - Pieces Moto Kindia</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<script>
+var db = null;
+var FIREBASE_OK = false;
+
+function initFirebase(){
+  if(typeof firebase !== 'undefined'){
+    try {
+      if(!firebase.apps.length){
+        firebase.initializeApp({
+          apiKey:"AIzaSyDWF-Q3S2M-btrRBHBYzd9dVbY6iEg_fNk",
+          authDomain:"gestionpieces-74559.firebaseapp.com",
+          projectId:"gestionpieces-74559",
+          storageBucket:"gestionpieces-74559.firebasestorage.app",
+          messagingSenderId:"392970031226",
+          appId:"1:392970031226:web:68bb9966b4440576a2ebc3"
+        });
+      }
+      db = firebase.firestore();
+      db.enablePersistence().catch(function(){});
+      FIREBASE_OK = true;
+    } catch(e){}
+  }
+  demarrerVitrine();
+}
+
+(function(){
+  var s1 = document.createElement('script');
+  s1.src = 'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
+  s1.onload = function(){
+    var s2 = document.createElement('script');
+    s2.src = 'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js';
+    s2.onload = function(){ initFirebase(); };
+    s2.onerror = function(){ demarrerVitrine(); };
+    document.head.appendChild(s2);
+  };
+  s1.onerror = function(){ demarrerVitrine(); };
+  document.head.appendChild(s1);
+  setTimeout(function(){ if(!FIREBASE_OK) demarrerVitrine(); }, 5000);
+})();
+</script>
+<style>
+:root{--g:#1a472a;--g2:#2d6a4f;--g3:#40916c;--gl:#d8f3dc;--g4:#b7e4c7;--o:#e85d04;--ol:#fff0e6;--r:#c62828;--rl:#ffebee;--y:#f9a825;--yl:#fffde7;--b:#0d47a1;--bl:#e3f2fd;--bg:#f4f9f4;--tx:#0d1f12;--tx2:#3d5c42;--bd:#c8e6c9;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--tx);min-height:100vh}
+.hdr{background:linear-gradient(135deg,#0d2b1a,#1a472a);padding:13px 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.hdr-inner{display:flex;justify-content:space-between;align-items:center}
+.hdr-logo{display:flex;align-items:center;gap:10px}
+.hdr-logo img{height:36px;width:auto;border-radius:5px}
+.hdr-title{font-family:"Exo 2",sans-serif;font-size:.95rem;font-weight:800;color:#fff}
+.hdr-sub{font-size:.62rem;color:rgba(255,255,255,.65);margin-top:1px}
+.cart-btn{background:var(--o);border:none;border-radius:14px;padding:11px 18px;color:#fff;font-family:"Exo 2",sans-serif;font-size:.88rem;font-weight:800;cursor:pointer;position:relative;box-shadow:0 3px 12px rgba(232,93,4,.4)}
+.cart-badge{background:#fff;color:var(--o);font-size:.6rem;font-weight:800;border-radius:50%;width:16px;height:16px;display:flex;align-items:center;justify-content:center;position:absolute;top:-4px;right:-4px}
+.search-bar{padding:10px 14px;background:#fff;border-bottom:1px solid var(--bd);position:sticky;top:62px;z-index:99}
+.search-input{width:100%;padding:10px 14px;border:2px solid var(--g3);border-radius:12px;font-family:"Inter",sans-serif;font-size:.88rem;outline:none}
+.cats-scroll{display:flex;gap:6px;overflow-x:auto;scrollbar-width:none;padding:8px 14px 0;background:#fff;position:sticky;top:112px;z-index:98}
+.cats-scroll::-webkit-scrollbar{display:none}
+.cat-btn{padding:5px 13px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;font-family:"Inter",sans-serif;font-size:.72rem;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--tx2);flex-shrink:0}
+.cat-btn.active{background:var(--g);color:#fff;border-color:var(--g)}
+.sort-bar{display:flex;gap:6px;padding:7px 12px;background:#fff;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--bd);position:sticky;top:152px;z-index:97}
+.sort-bar::-webkit-scrollbar{display:none}
+.sort-btn{padding:4px 11px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;font-size:.7rem;font-weight:600;cursor:pointer;white-space:nowrap;color:var(--tx2);font-family:"Inter",sans-serif}
+.sort-btn.active{background:var(--g3);color:#fff;border-color:var(--g3)}
+.stats-banner{background:var(--gl);padding:7px 14px;display:flex;gap:14px;font-size:.72rem;color:var(--g);font-weight:600;border-bottom:1px solid var(--g4);position:sticky;top:190px;z-index:96}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:12px 12px 100px}
+.prod-card{background:#fff;border-radius:14px;overflow:hidden;box-shadow:0 2px 10px rgba(26,71,42,.08);border:1.5px solid var(--bd);cursor:pointer;position:relative}
+.prod-card.oos{opacity:.6}
+.prod-img{width:100%;height:110px;object-fit:cover}
+.prod-ph{width:100%;height:110px;background:linear-gradient(135deg,var(--gl),#b7e4c7);display:flex;align-items:center;justify-content:center;font-size:2rem}
+.prod-body{padding:9px}
+.prod-name{font-family:"Exo 2",sans-serif;font-weight:700;font-size:.82rem;margin-bottom:2px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;line-height:1.2}
+.prod-cat{font-size:.65rem;color:var(--tx2);margin-bottom:5px}
+.prod-price{font-family:"Exo 2",sans-serif;font-weight:800;font-size:.92rem;color:var(--g)}
+.prod-footer{display:flex;justify-content:space-between;align-items:center;margin-top:6px}
+.stk{font-size:.6rem;padding:2px 7px;border-radius:20px;font-weight:700}
+.stk-ok{background:var(--gl);color:var(--g)}.stk-lw{background:var(--yl);color:#6d5500}.stk-out{background:var(--rl);color:var(--r)}
+.add-btn{background:var(--g);border:none;border-radius:8px;width:28px;height:28px;color:#fff;font-size:1.1rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.add-btn:disabled{background:var(--bd);cursor:not-allowed}
+.ved-badge{position:absolute;top:7px;left:7px;background:var(--y);color:#1a2e00;font-size:.6rem;padding:2px 7px;border-radius:20px;font-weight:700}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:none;align-items:flex-end}
+.ov.show{display:flex}
+.modal{background:#fff;border-radius:22px 22px 0 0;width:100%;max-height:88vh;overflow-y:auto}
+.fiche-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.4);border:none;border-radius:50%;width:30px;height:30px;color:#fff;font-size:.9rem;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.fiche-img{width:100%;height:200px;object-fit:cover}
+.fiche-ph{width:100%;height:160px;background:linear-gradient(135deg,var(--gl),#b7e4c7);display:flex;align-items:center;justify-content:center;font-size:3.5rem}
+.fiche-body{padding:16px}
+.fiche-name{font-family:"Exo 2",sans-serif;font-weight:800;font-size:1.05rem;margin-bottom:3px}
+.fiche-cat{font-size:.73rem;color:var(--tx2);margin-bottom:8px}
+.fiche-price{font-family:"Exo 2",sans-serif;font-weight:800;font-size:1.5rem;color:var(--g);margin-bottom:12px}
+.cart-modal{padding:20px}
+.cart-title{font-family:"Exo 2",sans-serif;font-size:1rem;font-weight:800;color:var(--g);margin-bottom:16px;display:flex;justify-content:space-between;align-items:center}
+.ci{display:flex;gap:10px;align-items:center;padding:10px 0;border-bottom:1px solid var(--bd)}
+.ci:last-child{border-bottom:none}
+.ci-img{width:44px;height:44px;border-radius:9px;object-fit:cover;border:1.5px solid var(--bd);flex-shrink:0}
+.ci-ph{width:44px;height:44px;border-radius:9px;background:var(--gl);display:flex;align-items:center;justify-content:center;font-size:1.2rem;flex-shrink:0}
+.ci-info{flex:1}
+.ci-name{font-family:"Exo 2",sans-serif;font-weight:700;font-size:.82rem}
+.ci-price{font-size:.7rem;color:var(--tx2)}
+.qty-row{display:flex;align-items:center;gap:6px;margin-top:4px}
+.qty-btn{background:var(--gl);border:none;border-radius:6px;width:24px;height:24px;font-size:.9rem;cursor:pointer;font-weight:700;color:var(--g)}
+.cart-total{background:var(--gl);border-radius:12px;padding:11px;margin:12px 0;display:flex;justify-content:space-between;align-items:center}
+.demande{background:linear-gradient(135deg,#0d2b1a,#1a472a);border-radius:14px;padding:14px;margin:0 12px 12px;color:#fff;text-align:center}
+.demande-title{font-family:"Exo 2",sans-serif;font-weight:800;font-size:.88rem;margin-bottom:5px}
+.demande-sub{font-size:.72rem;opacity:.8;margin-bottom:10px}
+.about{background:#fff;margin:0 12px 20px;border-radius:14px;padding:14px;border:1.5px solid var(--bd)}
+.about-title{font-family:"Exo 2",sans-serif;font-weight:800;font-size:.85rem;color:var(--g);margin-bottom:7px}
+.about-links{display:flex;gap:7px;margin-top:9px;flex-wrap:wrap}
+.alink{padding:7px 12px;border-radius:10px;font-family:"Exo 2",sans-serif;font-size:.72rem;font-weight:700;cursor:pointer;border:none;text-decoration:none;display:inline-flex;align-items:center;gap:5px}
+.aw{background:#25D366;color:#fff}.af{background:#1877F2;color:#fff}.at{background:var(--g);color:#fff}
+.btn{width:100%;padding:12px;border:none;border-radius:12px;font-family:"Exo 2",sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;margin-bottom:6px}
+.btn-g{background:linear-gradient(135deg,#2d6a4f,#40916c);color:#fff}
+.btn-o{background:linear-gradient(135deg,#e85d04,#ff6b2b);color:#fff}
+.btn-wa{background:#25D366;color:#fff}
+.btn-out{background:transparent;border:2px solid #fff;color:#fff;font-family:"Exo 2",sans-serif;font-size:.82rem;font-weight:700;border-radius:10px;padding:9px;cursor:pointer;width:100%;margin-bottom:6px}
+.btn-sm{width:auto;padding:7px 13px;font-size:.75rem;border-radius:9px;border:none;cursor:pointer}
+.empty-g{grid-column:1/-1;text-align:center;padding:40px 16px;color:var(--tx2)}
+.toast{position:fixed;bottom:18px;left:50%;transform:translateX(-50%);background:var(--g);color:#fff;padding:9px 18px;border-radius:22px;font-size:.8rem;font-weight:600;z-index:999;opacity:0;transition:opacity .3s;pointer-events:none;white-space:nowrap}
+.toast.show{opacity:1}.toast.err{background:var(--r)}
+.visitor{text-align:center;padding:8px;font-size:.7rem;color:var(--tx2)}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-logo">
+      <img src="data:image/png;base64,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" alt="ZAG GROUP">
+      <div><div class="hdr-title">ZAG GROUP</div><div class="hdr-sub">Pi&egrave;ces moto &mdash; Kindia</div></div>
+    </div>
+    <button class="cart-btn" id="btnCart">&#128722; Panier<span class="cart-badge" id="cartBadge" style="display:none">0</span></button>
+  </div>
+</div>
+<div class="search-bar"><input type="text" class="search-input" id="srch" placeholder="&#128269; Rechercher une pi&egrave;ce..."></div>
+<div class="cats-scroll" id="cats">
+  <button class="cat-btn active" data-c="">Toutes</button>
+  <button class="cat-btn" data-c="Filtration">Filtration</button>
+  <button class="cat-btn" data-c="Freinage">Freinage</button>
+  <button class="cat-btn" data-c="Moteur">Moteur</button>
+  <button class="cat-btn" data-c="Electrique">Electrique</button>
+  <button class="cat-btn" data-c="Suspension">Suspension</button>
+  <button class="cat-btn" data-c="Allumage">Allumage</button>
+  <button class="cat-btn" data-c="Autre">Autre</button>
+</div>
+<div class="sort-bar">
+  <button class="sort-btn active" data-s="default">Par d&eacute;faut</button>
+  <button class="sort-btn" data-s="price-asc">Prix &#8593;</button>
+  <button class="sort-btn" data-s="price-desc">Prix &#8595;</button>
+  <button class="sort-btn" data-s="vedette">&#11088; Vedette</button>
+  <button class="sort-btn" data-s="dispo">Disponibles</button>
+</div>
+<div class="stats-banner">
+  <span>&#128230; <b id="nbP">0</b> pi&egrave;ces</span>
+  <span>&#128994; <b id="nbD">0</b> en stock</span>
+  <span>&#128064; <b id="nbV">---</b> visiteurs</span>
+</div>
+<div class="grid" id="grid"><div class="empty-g"><div style="font-size:2rem">&#128295;</div><p>Chargement...</p></div></div>
+<div class="demande" style="position:sticky;bottom:0;z-index:95;margin:0;border-radius:0">
+  <div class="demande-title">Vous ne trouvez pas votre pi&egrave;ce ?</div>
+  <div class="demande-sub">Envoyez votre demande, nous nous occupons du reste !</div>
+  <div style="display:flex;gap:8px">
+    <button class="btn-out" onclick="demandeWA()">&#128241; WhatsApp</button>
+    <button class="btn-out" onclick="window.open('tel:+224626207646')">&#128222; Appeler</button>
+  </div>
+</div>
+<div class="about">
+  <div class="about-title">&#128295; ZAG GROUP &mdash; Kindia, Guin&eacute;e</div>
+  <div style="font-size:.78rem;color:var(--tx2);line-height:1.5">Votre sp&eacute;cialiste en pi&egrave;ces d&eacute;tach&eacute;es moto &agrave; Kindia. Qualit&eacute; garantie, prix comp&eacute;titifs.</div>
+  <div class="about-links">
+    <a class="alink aw" href="https://wa.me/224626207646">&#128241; WhatsApp</a>
+    <a class="alink af" href="https://www.facebook.com/share/1BUotNZjtC/" target="_blank">&#128100; Facebook</a>
+    <a class="alink at" href="tel:+224626207646">&#128222; Appeler</a>
+  </div>
+</div>
+<div class="visitor" id="vis"></div>
+
+<!-- FICHE -->
+<div class="ov" id="ficheOv"><div class="modal" style="position:relative">
+  <button class="fiche-close" id="ficheClose">&#10005;</button>
+  <div id="ficheContent"></div>
+</div></div>
+
+<!-- PANIER -->
+<div class="ov" id="cartOv"><div class="modal cart-modal">
+  <div class="cart-title"><span>&#128722; Mon panier</span><span id="cartClose" style="cursor:pointer;font-size:1.3rem;color:var(--tx2)">&#10005;</span></div>
+  <div id="cartItems"><div style="text-align:center;padding:20px;color:var(--tx2)">Panier vide</div></div>
+  <div class="cart-total" id="cartTotBox" style="display:none"><span style="font-family:Exo 2,sans-serif;font-weight:600;color:var(--g)">Total</span><span style="font-family:Exo 2,sans-serif;font-weight:800;font-size:1.1rem;color:var(--g)" id="cartTotVal">0 FG</span></div>
+  <div id="cartActs" style="display:none">
+    <button class="btn btn-wa" id="btnWAOrder">&#128241; Commander via WhatsApp</button>
+    <button class="btn btn-o" id="btnFBShare">&#128100; Partager Facebook</button>
+  </div>
+</div></div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+var prods=[], panier=[], catF="", sortF="default", srchF="";
+
+window.addEventListener("load", function(){ demarrerVitrine(); });
+
+function fmt(n){ return Math.round(n||0).toLocaleString("fr-FR"); }
+function toast(msg,err){
+  var t=document.getElementById("toast");
+  t.textContent=msg;t.className="toast show"+(err?" err":"");
+  setTimeout(function(){t.className="toast";},2500);
+}
+function openOv(id){document.getElementById(id).classList.add("show");document.body.style.overflow="hidden";}
+function closeOv(id){document.getElementById(id).classList.remove("show");document.body.style.overflow="";}
+
+function demarrerVitrine(){
+  if(!FIREBASE_OK){
+    document.getElementById("grid").innerHTML='<div class="empty-g"><div style="font-size:2rem">📶</div><p>Connexion requise pour afficher les produits</p></div>';
+    return;
+  }
+
+  // Visiteurs
+  db.collection("vitrine_stats").doc("compteur").get().then(function(doc){
+    var n=doc.exists?(doc.data().count||0)+1:1;
+    db.collection("vitrine_stats").doc("compteur").set({count:n});
+    document.getElementById("nbV").textContent=n.toLocaleString("fr-FR");
+    document.getElementById("vis").textContent=n.toLocaleString("fr-FR")+" visiteurs depuis l'ouverture";
+  }).catch(function(){});
+
+  // SYNCHRO TEMPS REEL
+  db.collection("produits").onSnapshot(function(snap){
+    prods=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    render();
+    var dispo=prods.filter(function(p){return p.stock>0;}).length;
+    document.getElementById("nbP").textContent=prods.length;
+    document.getElementById("nbD").textContent=dispo;
+  }, function(){
+    document.getElementById("grid").innerHTML='<div class="empty-g"><div style="font-size:2rem">⚠️</div><p>Erreur de chargement. Vérifiez votre connexion.</p></div>';
+  });
+}
+
+// FILTRES
+document.getElementById("cats").addEventListener("click",function(e){
+  var b=e.target.closest(".cat-btn");if(!b)return;
+  document.querySelectorAll(".cat-btn").forEach(function(x){x.classList.remove("active");});
+  b.classList.add("active");catF=b.getAttribute("data-c")||"";render();
+});
+document.querySelector(".sort-bar").addEventListener("click",function(e){
+  var b=e.target.closest(".sort-btn");if(!b)return;
+  document.querySelectorAll(".sort-btn").forEach(function(x){x.classList.remove("active");});
+  b.classList.add("active");sortF=b.getAttribute("data-s")||"default";render();
+});
+document.getElementById("srch").addEventListener("input",function(){srchF=this.value.toLowerCase();render();});
+
+// RENDER
+function render(){
+  var el=document.getElementById("grid");
+  var f=prods.filter(function(p){
+    if(srchF&&!(p.nom&&p.nom.toLowerCase().indexOf(srchF)>=0)&&!(p.categorie&&p.categorie.toLowerCase().indexOf(srchF)>=0)) return false;
+    if(catF&&p.categorie!==catF) return false;
+    if(sortF==="dispo"&&p.stock<=0) return false;
+    return true;
+  });
+  if(sortF==="price-asc") f.sort(function(a,b){return (a.prixVente||0)-(b.prixVente||0);});
+  else if(sortF==="price-desc") f.sort(function(a,b){return (b.prixVente||0)-(a.prixVente||0);});
+  else if(sortF==="vedette") f.sort(function(a,b){return (b.vedette?1:0)-(a.vedette?1:0);});
+  else f.sort(function(a,b){
+    if(a.vedette&&!b.vedette)return -1;if(!a.vedette&&b.vedette)return 1;
+    if(a.stock>0&&b.stock<=0)return -1;if(a.stock<=0&&b.stock>0)return 1;return 0;
+  });
+  if(!f.length){el.innerHTML="<div class=\"empty-g\"><div style=\"font-size:2rem\">🔍</div><p>Aucun produit</p></div>";return;}
+  var frag=document.createDocumentFragment();
+  f.forEach(function(p){
+    var card=document.createElement("div");
+    card.className="prod-card"+(p.stock<=0?" oos":"");
+    if(p.photo){var img=document.createElement("img");img.className="prod-img";img.src=p.photo;img.alt=p.nom||"";card.appendChild(img);}
+    else{var ph=document.createElement("div");ph.className="prod-ph";ph.textContent="🔧";card.appendChild(ph);}
+    if(p.vedette){var vb=document.createElement("div");vb.className="ved-badge";vb.textContent="⭐ Vedette";card.appendChild(vb);}
+    var body=document.createElement("div");body.className="prod-body";
+    var nm=document.createElement("div");nm.className="prod-name";nm.textContent=p.nom||"";body.appendChild(nm);
+    var ct=document.createElement("div");ct.className="prod-cat";ct.textContent=p.categorie||"";body.appendChild(ct);
+    var pr=document.createElement("div");pr.className="prod-price";pr.textContent=fmt(p.prixVente)+" FG";body.appendChild(pr);
+    var ft=document.createElement("div");ft.className="prod-footer";
+    var sb=document.createElement("span");
+    if(p.stock<=0){sb.className="stk stk-out";sb.textContent="Rupture";}
+    else if(p.stock<=(p.stockMin||5)){sb.className="stk stk-lw";sb.textContent="Stock limité";}
+    else{sb.className="stk stk-ok";sb.textContent="Disponible";}
+    ft.appendChild(sb);
+    var ab=document.createElement("button");ab.className="add-btn";ab.textContent="+";ab.disabled=(p.stock<=0);
+    ab.addEventListener("click",(function(prod){return function(e){e.stopPropagation();ajouterPanier(prod);};})(p));
+    ft.appendChild(ab);body.appendChild(ft);card.appendChild(body);
+    card.addEventListener("click",(function(prod){return function(){ouvrirFiche(prod);};})(p));
+    frag.appendChild(card);
+  });
+  el.innerHTML="";el.appendChild(frag);
+}
+
+// FICHE
+var ficheActuelle=null;
+function ouvrirFiche(p){
+  ficheActuelle=p;
+  var c=document.getElementById("ficheContent");
+  var html="";
+  if(p.photo)html+="<img class=\"fiche-img\" src=\""+p.photo+"\" alt=\""+( p.nom||"")+"\">";
+  else html+="<div class=\"fiche-ph\">🔧</div>";
+  html+="<div class=\"fiche-body\">";
+  if(p.vedette)html+="<span class=\"stk stk-ok\" style=\"margin-bottom:8px;display:inline-block\">⭐ Vedette</span>";
+  html+="<div class=\"fiche-name\">"+(p.nom||"")+"</div>";
+  html+="<div class=\"fiche-cat\">"+(p.categorie||"")+"</div>";
+  html+="<div class=\"fiche-price\">"+fmt(p.prixVente)+" FG</div>";
+  if(p.stock<=0){html+="<div style=\"background:var(--rl);border-radius:10px;padding:10px;text-align:center;color:var(--r);font-weight:700;margin-bottom:12px\">Rupture de stock</div>";}
+  else{
+    html+="<button class=\"btn btn-g\" id=\"ficheAdd\">+ Ajouter au panier</button>";
+    html+="<button class=\"btn btn-wa\" id=\"ficheWA\">📱 Commander WhatsApp</button>";
+  }
+  html+="<button class=\"btn btn-o\" style=\"margin-top:4px\" id=\"ficheShare\">Partager</button>";
+  html+="</div>";
+  c.innerHTML=html;
+  var fa=document.getElementById("ficheAdd");
+  if(fa) fa.addEventListener("click",function(){ajouterPanier(ficheActuelle);closeOv("ficheOv");});
+  var fw=document.getElementById("ficheWA");
+  if(fw) fw.addEventListener("click",function(){
+    var msg="Bonjour ZAG GROUP ! Je voudrais commander: "+(p.nom||"")+" ("+fmt(p.prixVente)+" FG). Disponible ?";
+    window.open("https://wa.me/224626207646?text="+encodeURIComponent(msg),"_blank");
+  });
+  var fs=document.getElementById("ficheShare");
+  if(fs) fs.addEventListener("click",function(){
+    var msg="ZAG GROUP Kindia - "+(p.nom||"")+" disponible a "+fmt(p.prixVente)+" FG ! +224 626 20 76 46";
+    window.open("https://wa.me/?text="+encodeURIComponent(msg),"_blank");
+  });
+  openOv("ficheOv");
+}
+document.getElementById("ficheClose").addEventListener("click",function(){closeOv("ficheOv");});
+document.getElementById("ficheOv").addEventListener("click",function(e){if(e.target===this)closeOv("ficheOv");});
+
+// PANIER
+function ajouterPanier(p){
+  if(p.stock<=0){toast("Produit en rupture !",true);return;}
+  var ex=panier.find(function(x){return x.id===p.id;});
+  if(ex){if(ex.qty>=p.stock){toast("Stock insuffisant !",true);return;}ex.qty++;}
+  else panier.push(Object.assign({},p,{qty:1}));
+  updateBadge();
+  toast(p.nom+" ajoute au panier !");
+}
+function updateBadge(){
+  var n=panier.reduce(function(a,x){return a+x.qty;},0);
+  var b=document.getElementById("cartBadge");
+  b.style.display=n>0?"flex":"none";b.textContent=n;
+}
+document.getElementById("btnCart").addEventListener("click",ouvrirPanier);
+document.getElementById("cartClose").addEventListener("click",function(){closeOv("cartOv");});
+document.getElementById("cartOv").addEventListener("click",function(e){if(e.target===this)closeOv("cartOv");});
+
+function ouvrirPanier(){
+  var el=document.getElementById("cartItems");
+  var tb=document.getElementById("cartTotBox");
+  var acts=document.getElementById("cartActs");
+  if(!panier.length){
+    el.innerHTML="<div style=\"text-align:center;padding:20px;color:var(--tx2)\">Panier vide</div>";
+    tb.style.display="none";acts.style.display="none";
+    openOv("cartOv");return;
+  }
+  var frag=document.createDocumentFragment();
+  var total=0;
+  panier.forEach(function(item){
+    total+=item.prixVente*item.qty;
+    var row=document.createElement("div");row.className="ci";
+    if(item.photo){var img=document.createElement("img");img.className="ci-img";img.src=item.photo;img.alt="";row.appendChild(img);}
+    else{var ph=document.createElement("div");ph.className="ci-ph";ph.textContent="🔧";row.appendChild(ph);}
+    var info=document.createElement("div");info.className="ci-info";
+    var nm=document.createElement("div");nm.className="ci-name";nm.textContent=item.nom;info.appendChild(nm);
+    var pr=document.createElement("div");pr.className="ci-price";pr.textContent=fmt(item.prixVente)+" FG/unite";info.appendChild(pr);
+    var qr=document.createElement("div");qr.className="qty-row";
+    var bm=document.createElement("button");bm.className="qty-btn";bm.textContent="-";
+    bm.addEventListener("click",(function(id){return function(){
+      var it=panier.find(function(x){return x.id===id;});
+      if(it){it.qty--;if(it.qty<=0)panier=panier.filter(function(x){return x.id!==id;});}
+      updateBadge();ouvrirPanier();
+    };})(item.id));
+    var qn=document.createElement("span");qn.style.cssText="font-family:Exo 2,sans-serif;font-weight:700;font-size:.9rem;min-width:20px;text-align:center";qn.textContent=item.qty;
+    var bp=document.createElement("button");bp.className="qty-btn";bp.textContent="+";
+    bp.addEventListener("click",(function(it2){return function(){
+      if(it2.qty<it2.stock){it2.qty++;updateBadge();ouvrirPanier();}else toast("Stock max !",true);
+    };})(item));
+    qr.appendChild(bm);qr.appendChild(qn);qr.appendChild(bp);info.appendChild(qr);row.appendChild(info);
+    var sub=document.createElement("div");sub.style.cssText="font-family:Exo 2,sans-serif;font-weight:800;font-size:.85rem;color:var(--g);flex-shrink:0";
+    sub.textContent=fmt(item.prixVente*item.qty)+" FG";row.appendChild(sub);
+    frag.appendChild(row);
+  });
+  el.innerHTML="";el.appendChild(frag);
+  document.getElementById("cartTotVal").textContent=fmt(total)+" FG";
+  tb.style.display="flex";acts.style.display="block";
+  openOv("cartOv");
+}
+
+document.getElementById("btnWAOrder").addEventListener("click",function(){
+  var lines=panier.map(function(x){return "- "+x.nom+" x"+x.qty+" = "+fmt(x.prixVente*x.qty)+" FG";});
+  var total=panier.reduce(function(a,x){return a+x.prixVente*x.qty;},0);
+  var msg="Bonjour ZAG GROUP !\nCommande:\n\n"+lines.join("\n")+"\n\nTOTAL: "+fmt(total)+" FG\n\nMerci !";
+  window.open("https://wa.me/224626207646?text="+encodeURIComponent(msg),"_blank");
+});
+document.getElementById("btnFBShare").addEventListener("click",function(){
+  window.open("https://www.facebook.com/share/1BUotNZjtC/","_blank");
+});
+
+function demandeWA(){
+  var msg="Bonjour ZAG GROUP ! Je cherche une piece moto introuvable dans votre catalogue. Pouvez-vous m aide ?";
+  window.open("https://wa.me/224626207646?text="+encodeURIComponent(msg),"_blank");
+}
+</script>
+</body>
+</html>
