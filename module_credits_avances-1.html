@@ -1,0 +1,851 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1.0">
+<meta name="theme-color" content="#1a472a">
+<title>ZAG GROUP &mdash; Crédits &amp; Avances</title>
+<link href="https://fonts.googleapis.com/css2?family=Exo+2:wght@400;600;700;800;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<style>body{font-family:Arial,sans-serif}</style>
+<style>
+
+:root{--g:#1a472a;--g2:#2d6a4f;--g3:#40916c;--gl:#d8f3dc;--g4:#b7e4c7;--o:#e85d04;--ol:#fff0e6;--b:#0d47a1;--bl:#e3f2fd;--r:#c62828;--rl:#ffebee;--y:#f9a825;--yl:#fffde7;--bg:#f4f9f4;--tx:#0d1f12;--tx2:#3d5c42;--bd:#c8e6c9;}
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:"Inter",sans-serif;background:var(--bg);color:var(--tx);min-height:100vh;padding-bottom:80px}
+.hdr{background:linear-gradient(135deg,#0d2b1a,#1a472a);padding:13px 16px;position:sticky;top:0;z-index:100;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.hdr-inner{display:flex;justify-content:space-between;align-items:center}
+.hdr-logo{display:flex;align-items:center;gap:10px}
+.hdr-logo img{height:38px;width:auto;border-radius:6px}
+.hdr-title{font-family:"Exo 2",sans-serif;font-size:.88rem;font-weight:800;color:#fff}
+.hdr-sub{font-size:.58rem;color:rgba(255,255,255,.55);margin-top:1px}
+.hdr-role{padding:4px 10px;border-radius:20px;font-family:"Exo 2",sans-serif;font-size:.65rem;font-weight:800}
+.role-gest{background:var(--g3);color:#fff}
+.role-admin{background:var(--o);color:#fff}
+.tabs{display:flex;background:#fff;border-bottom:2px solid var(--bd);overflow-x:auto;scrollbar-width:none;position:sticky;top:65px;z-index:99}
+.tabs::-webkit-scrollbar{display:none}
+.tab{flex:1;padding:13px 8px;border:none;background:none;font-family:"Exo 2",sans-serif;font-size:.8rem;font-weight:700;cursor:pointer;color:var(--tx2);border-bottom:3px solid transparent;white-space:nowrap;transition:all .2s}
+.tab.active{color:var(--g);border-bottom-color:var(--o)}
+.tab-content{display:none;padding:14px}
+.tab-content.active{display:block}
+.section-title{font-family:"Exo 2",sans-serif;font-weight:800;font-size:.95rem;color:var(--tx);margin-bottom:14px;display:flex;align-items:center;gap:8px}
+.card{background:#fff;border-radius:14px;padding:14px;border:1.5px solid var(--bd);margin-bottom:12px;box-shadow:0 2px 8px rgba(26,71,42,.06)}
+.field{margin-bottom:11px}
+.field label{font-size:.73rem;font-weight:600;color:var(--tx);display:block;margin-bottom:4px}
+.field input,.field select,.field textarea{width:100%;padding:10px 12px;border:2px solid var(--bd);border-radius:10px;font-family:"Inter",sans-serif;font-size:.85rem;outline:none;transition:border-color .2s}
+.field input:focus,.field select:focus,.field textarea:focus{border-color:var(--g3)}
+.field textarea{resize:none;min-height:65px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.btn{width:100%;padding:12px;border:none;border-radius:12px;font-family:"Exo 2",sans-serif;font-size:.88rem;font-weight:700;cursor:pointer;margin-bottom:6px;transition:opacity .2s}
+.btn:hover{opacity:.9}
+.btn-g{background:linear-gradient(135deg,#2d6a4f,#40916c);color:#fff}
+.btn-o{background:linear-gradient(135deg,#e85d04,#ff6b2b);color:#fff}
+.btn-b{background:linear-gradient(135deg,#0d47a1,#1565c0);color:#fff}
+.btn-ghost{background:none;border:1.5px solid var(--bd);color:var(--tx2)}
+.btn-red{background:var(--r);color:#fff}
+.stat-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:14px}
+.stat-card{background:#fff;border-radius:12px;padding:12px;border:1.5px solid var(--bd);text-align:center}
+.stat-card.danger{border-color:var(--r);background:var(--rl)}
+.stat-card.warn{border-color:var(--y);background:var(--yl)}
+.stat-card.ok{border-color:var(--g3);background:var(--gl)}
+.stat-card.info{border-color:var(--b);background:var(--bl)}
+.stat-num{font-family:"Exo 2",sans-serif;font-size:1.3rem;font-weight:900;color:var(--tx)}
+.stat-label{font-size:.65rem;color:var(--tx2);margin-top:3px;font-weight:600;text-transform:uppercase;letter-spacing:.3px}
+.credit-item{background:#fff;border-radius:12px;padding:12px;border:1.5px solid var(--bd);margin-bottom:10px;cursor:pointer;transition:border-color .2s}
+.credit-item:hover{border-color:var(--g3)}
+.credit-item.retard{border-color:var(--r);background:var(--rl)}
+.credit-item.solde{border-color:var(--g3);opacity:.75}
+.credit-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:6px}
+.credit-client{font-family:"Exo 2",sans-serif;font-weight:800;font-size:.88rem}
+.credit-date{font-size:.65rem;color:var(--tx2)}
+.credit-amounts{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:6px}
+.credit-badge{font-size:.6rem;font-weight:700;padding:2px 8px;border-radius:20px}
+.badge-restant{background:var(--rl);color:var(--r)}
+.badge-solde{background:var(--gl);color:var(--g)}
+.badge-total{background:#e3f2fd;color:#0d47a1}
+.badge-retard{background:var(--rl);color:var(--r);border:1px solid var(--r)}
+.credit-desc{font-size:.72rem;color:var(--tx2);margin-bottom:8px}
+.credit-prog{height:5px;background:#e0e0e0;border-radius:3px;overflow:hidden;margin-bottom:8px}
+.credit-prog-fill{height:100%;background:var(--g3);border-radius:3px;transition:width .4s}
+.credit-actions{display:flex;gap:6px}
+.action-btn{flex:1;padding:7px;border:none;border-radius:8px;font-family:"Exo 2",sans-serif;font-size:.7rem;font-weight:700;cursor:pointer;transition:opacity .2s}
+.action-btn:hover{opacity:.88}
+.btn-payer{background:var(--g);color:#fff}
+.btn-detail{background:var(--bl);color:var(--b)}
+.btn-wa-sm{background:#25D366;color:#fff}
+.avance-item{background:#fff;border-radius:12px;padding:12px;border:1.5px solid var(--bd);margin-bottom:10px}
+.avance-item.attente{border-color:var(--y);background:var(--yl)}
+.avance-item.approuve{border-color:var(--b);background:var(--bl)}
+.avance-item.rembourse{border-color:var(--g3);opacity:.75}
+.avance-item.refuse{border-color:var(--r);background:var(--rl);opacity:.7}
+.avance-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px}
+.avance-emp{font-family:"Exo 2",sans-serif;font-weight:800;font-size:.88rem}
+.avance-montant{font-family:"Exo 2",sans-serif;font-weight:900;font-size:1rem;color:var(--b)}
+.avance-motif{font-size:.72rem;color:var(--tx2);margin-bottom:8px}
+.avance-actions{display:flex;gap:6px}
+.status-pill{font-size:.62rem;font-weight:800;padding:3px 9px;border-radius:20px;display:inline-block}
+.s-attente{background:var(--yl);color:#6d5500}
+.s-approuve{background:var(--bl);color:var(--b)}
+.s-rembourse{background:var(--gl);color:var(--g)}
+.s-refuse{background:var(--rl);color:var(--r)}
+.s-cours{background:#fff3e0;color:#e65100}
+.s-retard{background:var(--rl);color:var(--r)}
+.s-solde{background:var(--gl);color:var(--g)}
+.ov{position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:300;display:none;align-items:center;justify-content:center;padding:16px;backdrop-filter:blur(2px)}
+.ov.show{display:flex}
+.modal{background:#fff;border-radius:18px;width:100%;max-width:420px;max-height:90vh;overflow-y:auto;padding:20px}
+.modal-title{font-family:"Exo 2",sans-serif;font-weight:800;font-size:1rem;margin-bottom:4px;color:var(--g)}
+.modal-sub{font-size:.75rem;color:var(--tx2);margin-bottom:16px}
+.modal-close{float:right;background:none;border:none;font-size:1.3rem;cursor:pointer;color:var(--tx2);margin-top:-4px}
+.pmt-list{margin-bottom:12px}
+.pmt-row{display:flex;justify-content:space-between;align-items:center;padding:6px 0;border-bottom:1px solid var(--bd);font-size:.78rem}
+.pmt-row:last-child{border-bottom:none}
+.pmt-date{color:var(--tx2)}
+.pmt-amt{font-family:"Exo 2",sans-serif;font-weight:800;color:var(--g)}
+.pmt-by{font-size:.65rem;color:var(--tx2)}
+.empty-state{text-align:center;padding:30px 16px;color:var(--tx2)}
+.empty-state p{margin-top:8px;font-size:.85rem}
+.toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(10px);background:var(--g);color:#fff;padding:10px 20px;border-radius:24px;font-size:.8rem;font-weight:600;z-index:9999;opacity:0;transition:opacity .25s,transform .25s;pointer-events:none;white-space:nowrap;max-width:90vw;text-align:center}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.toast.err{background:var(--r)}
+.toast.success{background:#1b5e20}
+.filter-bar{display:flex;gap:6px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none}
+.filter-bar::-webkit-scrollbar{display:none}
+.filter-btn{padding:4px 12px;border-radius:20px;border:1.5px solid var(--bd);background:#fff;font-family:"Inter",sans-serif;font-size:.7rem;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s}
+.filter-btn.active{background:var(--g);color:#fff;border-color:var(--g)}
+.total-restant-bar{background:linear-gradient(135deg,var(--r),#e53935);color:#fff;border-radius:12px;padding:12px 16px;display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}
+.total-restant-label{font-size:.78rem;font-weight:600;opacity:.9}
+.total-restant-val{font-family:"Exo 2",sans-serif;font-size:1.2rem;font-weight:900}
+</style>
+</head>
+<body>
+
+<div class="hdr">
+  <div class="hdr-inner">
+    <div class="hdr-logo">
+      <img src="./icon-512.png" alt="ZAG GROUP">
+      <div>
+        <div class="hdr-title">Crédits &amp; Avances</div>
+        <div class="hdr-sub">ZAG GROUP &mdash; Kindia</div>
+      </div>
+    </div>
+    <span class="hdr-role role-gest" id="hdrRole">...</span>
+  </div>
+</div>
+
+<div class="tabs">
+  <button class="tab active" data-tab="new-credit" onclick="switchTab('new-credit')">&#128197; Vente crédit</button>
+  <button class="tab" data-tab="liste-credits" onclick="switchTab('liste-credits')">&#128203; Crédits</button>
+  <button class="tab" data-tab="new-avance" onclick="switchTab('new-avance')">&#128181; Avance</button>
+  <button class="tab" data-tab="liste-avances" onclick="switchTab('liste-avances')">&#128220; Avances</button>
+  <button class="tab" data-tab="dashboard" id="dashTab" onclick="switchTab('dashboard')">&#128202; Dashboard</button>
+</div>
+
+<!-- ======= NOUVELLE VENTE A CREDIT ======= -->
+<div class="tab-content active" id="tab-new-credit">
+  <div class="section-title">&#128197; Nouvelle vente à crédit</div>
+  <div class="card">
+    <div class="field">
+      <label>Nom du client *</label>
+      <input type="text" id="cNom" placeholder="Ex: Mamadou Bah">
+    </div>
+    <div class="field">
+      <label>Téléphone client</label>
+      <input type="tel" id="cTel" placeholder="Ex: 626 XX XX XX">
+    </div>
+    <div class="field">
+      <label>Articles vendus *</label>
+      <textarea id="cArticles" placeholder="Ex: 1 Filtre à air Honda, 2 Bougies NGK..."></textarea>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label>Montant total (FG) *</label>
+        <input type="number" id="cTotal" placeholder="0" oninput="calcRestant()">
+      </div>
+      <div class="field">
+        <label>Acompte payé (FG)</label>
+        <input type="number" id="cAcompte" placeholder="0" oninput="calcRestant()">
+      </div>
+    </div>
+    <div id="cRestantCalc" style="font-family:'Exo 2',sans-serif;font-weight:800;color:var(--r);font-size:.88rem;margin-bottom:10px;min-height:20px"></div>
+    <div class="field">
+      <label>Date d'échéance (optionnel)</label>
+      <input type="date" id="cEcheance">
+    </div>
+    <div class="field">
+      <label>Notes internes</label>
+      <input type="text" id="cNotes" placeholder="Ex: Client habituel, livraison prévue...">
+    </div>
+    <button class="btn btn-g" onclick="soumettreCredit()">&#10003; Enregistrer la vente à crédit</button>
+  </div>
+</div>
+
+<!-- ======= LISTE CREDITS ======= -->
+<div class="tab-content" id="tab-liste-credits">
+  <div class="section-title">&#128203; Suivi des crédits</div>
+  <div class="filter-bar">
+    <button class="filter-btn active" data-cf="tous">Tous</button>
+    <button class="filter-btn" data-cf="en_cours">En cours</button>
+    <button class="filter-btn" data-cf="en_retard">En retard</button>
+    <button class="filter-btn" data-cf="solde">Soldés</button>
+  </div>
+  <div class="total-restant-bar" id="creditTotalBar" style="display:none">
+    <span class="total-restant-label">&#128680; Total dû</span>
+    <span class="total-restant-val" id="creditTotalVal">0 FG</span>
+  </div>
+  <div id="list-credits">
+    <div class="empty-state"><p>Chargement...</p></div>
+  </div>
+</div>
+
+<!-- ======= NOUVELLE AVANCE ======= -->
+<div class="tab-content" id="tab-new-avance">
+  <div class="section-title">&#128181; Demande d'avance</div>
+  <div class="card">
+    <div id="avEmpNomField" class="field">
+      <label>Nom de l'employé *</label>
+      <input type="text" id="avEmpNom" placeholder="Ex: Alpha Diallo">
+    </div>
+    <div class="field">
+      <label>Montant demandé (FG) *</label>
+      <input type="number" id="avMontant" placeholder="Ex: 100000">
+    </div>
+    <div class="field">
+      <label>Motif *</label>
+      <textarea id="avMotif" placeholder="Ex: Urgence familiale, frais scolaires..."></textarea>
+    </div>
+    <div class="field">
+      <label>Date de remboursement prévue</label>
+      <input type="date" id="avDatePrevu">
+    </div>
+    <div style="background:var(--yl);border-radius:10px;padding:10px;margin-bottom:12px;font-size:.75rem;color:#6d5500;line-height:1.5">
+      &#9888;&#65039; Les avances doivent être approuvées par l'administrateur avant d'être effectives.
+    </div>
+    <button class="btn btn-b" onclick="soumettreAvance()">&#128228; Envoyer la demande</button>
+  </div>
+</div>
+
+<!-- ======= LISTE AVANCES ======= -->
+<div class="tab-content" id="tab-liste-avances">
+  <div class="section-title">&#128220; Suivi des avances</div>
+  <div class="filter-bar" id="avFilterBar">
+    <button class="filter-btn active" data-af="tous">Toutes</button>
+    <button class="filter-btn" data-af="en_attente">En attente</button>
+    <button class="filter-btn" data-af="approuve">Approuvées</button>
+    <button class="filter-btn" data-af="rembourse">Remboursées</button>
+    <button class="filter-btn" data-af="refuse">Refusées</button>
+  </div>
+  <div id="list-avances">
+    <div class="empty-state"><p>Chargement...</p></div>
+  </div>
+</div>
+
+<!-- ======= DASHBOARD ADMIN ======= -->
+<div class="tab-content" id="tab-dashboard">
+  <div class="section-title">&#128202; Tableau de bord</div>
+  <div style="background:linear-gradient(135deg,#c62828,#e53935);color:#fff;border-radius:14px;padding:16px;margin-bottom:14px;text-align:center">
+    <div style="font-size:.75rem;opacity:.85;margin-bottom:6px">TOTAL DÛ (crédits en cours)</div>
+    <div style="font-family:'Exo 2',sans-serif;font-size:1.8rem;font-weight:900" id="dashTotalDu">---</div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card danger">
+      <div class="stat-num" id="dashNbRetard">0</div>
+      <div class="stat-label">En retard</div>
+    </div>
+    <div class="stat-card warn">
+      <div class="stat-num" id="dashNbCours">0</div>
+      <div class="stat-label">En cours</div>
+    </div>
+  </div>
+  <div class="stat-row">
+    <div class="stat-card ok">
+      <div class="stat-num" id="dashNbSolde">0</div>
+      <div class="stat-label">Soldés</div>
+    </div>
+    <div class="stat-card info">
+      <div class="stat-num" id="dashAvAttente">0</div>
+      <div class="stat-label">Avances en attente</div>
+    </div>
+  </div>
+  <div style="background:linear-gradient(135deg,#0d47a1,#1565c0);color:#fff;border-radius:14px;padding:14px;text-align:center">
+    <div style="font-size:.73rem;opacity:.85;margin-bottom:4px">AVANCES EN COURS (non remboursées)</div>
+    <div style="font-family:'Exo 2',sans-serif;font-size:1.4rem;font-weight:900" id="dashTotalAvances">---</div>
+  </div>
+  <div style="margin-top:14px">
+    <button class="btn btn-ghost" onclick="window.location.href='patron-19.html'">&#8592; Retour Admin</button>
+  </div>
+</div>
+
+<!-- MODALES -->
+<div class="ov" id="pmtOv">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="modal-title">&#128176; Enregistrer un paiement</div>
+      <button class="modal-close" onclick="closeOv('pmtOv')">&#10005;</button>
+    </div>
+    <div style="font-size:.82rem;color:var(--tx2);margin-bottom:14px">
+      Client: <b id="pmtClientNom"></b><br>
+      Solde restant: <b id="pmtRestant" style="color:var(--r)"></b>
+    </div>
+    <div class="field">
+      <label>Montant encaissé (FG) *</label>
+      <input type="number" id="pmtMontant" placeholder="0">
+    </div>
+    <div id="pmtErr" style="color:var(--r);font-size:.75rem;min-height:16px;margin-bottom:8px"></div>
+    <button class="btn btn-g" onclick="enregistrerPaiement()">&#10003; Valider le paiement</button>
+    <button class="btn btn-ghost" onclick="closeOv('pmtOv')">Annuler</button>
+  </div>
+</div>
+
+<div class="ov" id="detailOv">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="modal-title">&#128065; Détail crédit</div>
+      <button class="modal-close" onclick="closeOv('detailOv')">&#10005;</button>
+    </div>
+    <div id="detailContent"></div>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="closeOv('detailOv')">Fermer</button>
+  </div>
+</div>
+
+<div class="ov" id="rmbOv">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:12px">
+      <div class="modal-title">&#128181; Remboursement avance</div>
+      <button class="modal-close" onclick="closeOv('rmbOv')">&#10005;</button>
+    </div>
+    <div style="font-size:.82rem;color:var(--tx2);margin-bottom:14px">
+      Employé: <b id="rmbEmpNom"></b><br>
+      Restant à rembourser: <b id="rmbRestant" style="color:var(--b)"></b>
+    </div>
+    <div class="field">
+      <label>Montant remboursé (FG)</label>
+      <input type="number" id="rmbMontant" placeholder="0">
+    </div>
+    <div class="field">
+      <label>Mode de remboursement</label>
+      <select id="rmbType">
+        <option value="retenu_salaire">Retenu sur salaire</option>
+        <option value="especes">Espèces</option>
+        <option value="autre">Autre</option>
+      </select>
+    </div>
+    <div id="rmbErr" style="color:var(--r);font-size:.75rem;min-height:16px;margin-bottom:8px"></div>
+    <button class="btn btn-b" onclick="enregistrerRemboursement()">&#10003; Enregistrer</button>
+    <button class="btn btn-ghost" onclick="closeOv('rmbOv')">Annuler</button>
+  </div>
+</div>
+
+<div class="ov" id="detailAvOv">
+  <div class="modal">
+    <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:14px">
+      <div class="modal-title">&#128065; Détail avance</div>
+      <button class="modal-close" onclick="closeOv('detailAvOv')">&#10005;</button>
+    </div>
+    <div id="detailAvContent"></div>
+    <button class="btn btn-ghost" style="margin-top:8px" onclick="closeOv('detailAvOv')">Fermer</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+<script>
+
+var isAdmin=!!(sessionStorage.getItem('zagAdmin'));
+var nomGest=sessionStorage.getItem('zagNom')||'Inconnu';
+var FIREBASE_OK=false, db=null;
+var credits=[], avances=[];
+var creditFilter='tous', avanceFilter='tous';
+
+// -- Firebase --
+function initFB(){
+  if(typeof firebase!=='undefined'){
+    try{
+      if(!firebase.apps.length){
+        firebase.initializeApp({
+          apiKey:"AIzaSyDWF-Q3S2M-btrRBHBYzd9dVbY6iEg_fNk",
+          authDomain:"gestionpieces-74559.firebaseapp.com",
+          projectId:"gestionpieces-74559",
+          storageBucket:"gestionpieces-74559.firebasestorage.app",
+          messagingSenderId:"392970031226",
+          appId:"1:392970031226:web:68bb9966b4440576a2ebc3"
+        });
+      }
+      db=firebase.firestore();
+      db.enablePersistence().catch(function(){});
+      FIREBASE_OK=true;
+    }catch(e){}
+  }
+  demarrer();
+}
+(function(){
+  var s1=document.createElement('script');
+  s1.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
+  s1.onload=function(){
+    var s2=document.createElement('script');
+    s2.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js';
+    s2.onload=function(){initFB();};
+    s2.onerror=function(){demarrer();};
+    document.head.appendChild(s2);
+  };
+  s1.onerror=function(){demarrer();};
+  document.head.appendChild(s1);
+})();
+
+function fmt(n){ return Math.round(n||0).toLocaleString('fr-FR'); }
+function fmtDate(ts){
+  if(!ts) return '-';
+  var d=ts.toDate?ts.toDate():new Date(ts);
+  return d.toLocaleDateString('fr-FR');
+}
+function today(){ return new Date().toISOString().split('T')[0]; }
+function isOverdue(ts){
+  if(!ts) return false;
+  var d=ts.toDate?ts.toDate():new Date(ts);
+  return d<new Date();
+}
+
+function toast(msg,type){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.className='toast show'+(type?' '+type:'');
+  clearTimeout(t._to);
+  t._to=setTimeout(function(){t.className='toast';},2800);
+}
+function openOv(id){document.getElementById(id).classList.add('show');document.body.style.overflow='hidden';}
+function closeOv(id){document.getElementById(id).classList.remove('show');document.body.style.overflow='';}
+
+// -- Tabs --
+function switchTab(name){
+  document.querySelectorAll('.tab').forEach(function(t){t.classList.remove('active');});
+  document.querySelectorAll('.tab-content').forEach(function(t){t.classList.remove('active');});
+  document.querySelector('[data-tab="'+name+'"]').classList.add('active');
+  document.getElementById('tab-'+name).classList.add('active');
+}
+
+// -- Init --
+function demarrer(){
+  // Role UI
+  var roleEl=document.getElementById('hdrRole');
+  roleEl.textContent=isAdmin?'Administrateur':'Gestionnaire: '+nomGest;
+  roleEl.className='hdr-role '+(isAdmin?'role-admin':'role-gest');
+  // Hide admin tab if not admin
+  if(!isAdmin){
+    var dashTab=document.getElementById('dashTab');
+    if(dashTab) dashTab.style.display='none';
+  }
+  if(!FIREBASE_OK){
+    showOffline();
+    return;
+  }
+  // Listen credits
+  db.collection('credits').orderBy('date_vente','desc').onSnapshot(function(snap){
+    credits=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderCredits();
+    renderDashboard();
+  },function(){ showOffline(); });
+  // Listen avances
+  db.collection('avances').orderBy('date_demande','desc').onSnapshot(function(snap){
+    avances=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderAvances();
+    renderDashboard();
+  },function(){});
+}
+
+function showOffline(){
+  ['credits','avances'].forEach(function(id){
+    var el=document.getElementById('list-'+id);
+    if(el) el.innerHTML='<div class="empty-state"><div style="font-size:2rem">&#128268;</div><p>Mode hors-ligne. Reconnectez-vous.</p></div>';
+  });
+}
+
+// ============================================================
+// CREDITS
+// ============================================================
+function renderCredits(){
+  var el=document.getElementById('list-credits');
+  if(!el) return;
+  var f=credits.filter(function(c){
+    if(creditFilter==='en_cours') return c.statut==='en_cours';
+    if(creditFilter==='en_retard') return c.statut==='en_retard';
+    if(creditFilter==='solde') return c.statut==='solde';
+    return true;
+  });
+  // My credits only for gest (unless admin)
+  if(!isAdmin) f=f.filter(function(c){return !c.gestionnaire||c.gestionnaire===nomGest;});
+
+  // Total bar
+  var totalRestant=f.filter(function(c){return c.statut!=='solde';})
+    .reduce(function(s,c){return s+(c.montant_restant||0);},0);
+  var totalBar=document.getElementById('creditTotalBar');
+  if(totalBar){
+    document.getElementById('creditTotalVal').textContent=fmt(totalRestant)+' FG';
+    totalBar.style.display=totalRestant>0?'flex':'none';
+  }
+
+  if(!f.length){
+    el.innerHTML='<div class="empty-state"><div style="font-size:2rem">&#9989;</div><p>Aucun cr\u00e9dit dans cette cat\u00e9gorie</p></div>';
+    return;
+  }
+  el.innerHTML='';
+  f.forEach(function(c){
+    var div=document.createElement('div');
+    var retard=c.statut==='en_retard';
+    var solde=c.statut==='solde';
+    div.className='credit-item'+(retard?' retard':'')+(solde?' solde':'');
+    var pct=c.montant_total>0?Math.round((c.montant_paye||0)/c.montant_total*100):0;
+    var statut_label=solde?'Sold\u00e9':retard?'En retard':'En cours';
+    var statut_cls=solde?'s-solde':retard?'s-retard':'s-cours';
+    var html='<div class="credit-header">';
+    html+='<div><div class="credit-client">'+c.client_nom+'</div>';
+    if(c.client_tel) html+='<div class="credit-date">&#128222; '+c.client_tel+'</div>';
+    html+='</div>';
+    html+='<span class="status-pill '+statut_cls+'">'+statut_label+'</span>';
+    html+='</div>';
+    if(c.articles) html+='<div class="credit-desc">'+c.articles+'</div>';
+    html+='<div class="credit-amounts">';
+    html+='<span class="credit-badge badge-total">Total: '+fmt(c.montant_total)+' FG</span>';
+    if(!solde) html+='<span class="credit-badge badge-restant">Reste: '+fmt(c.montant_restant)+' FG</span>';
+    html+='<span class="credit-badge badge-solde">Pay\u00e9: '+fmt(c.montant_paye||0)+' FG</span>';
+    html+='</div>';
+    html+='<div class="credit-prog"><div class="credit-prog-fill" style="width:'+pct+'%"></div></div>';
+    html+='<div style="font-size:.62rem;color:var(--tx2);margin-bottom:8px">';
+    html+='Vente: '+fmtDate(c.date_vente);
+    if(c.date_echeance) html+=' &bull; \u00c9ch\u00e9ance: '+fmtDate(c.date_echeance);
+    if(c.gestionnaire) html+=' &bull; Par: '+c.gestionnaire;
+    html+='</div>';
+    if(!solde){
+      html+='<div class="credit-actions">';
+      html+='<button class="action-btn btn-payer" onclick="openPaiement(\''+c.id+'\')">&#128176; Paiement</button>';
+      html+='<button class="action-btn btn-detail" onclick="openDetailCredit(\''+c.id+'\')">&#128065; D\u00e9tail</button>';
+      html+='<button class="action-btn btn-wa-sm" onclick="relanceWA(\''+c.id+'\')">&#128241; Relance</button>';
+      html+='</div>';
+    }else{
+      html+='<div class="credit-actions"><button class="action-btn btn-detail" onclick="openDetailCredit(\''+c.id+'\')">&#128065; Historique</button></div>';
+    }
+    div.innerHTML=html;
+    el.appendChild(div);
+  });
+}
+
+// -- Nouveau crédit --
+function soumettreCredit(){
+  var nom=document.getElementById('cNom').value.trim();
+  var tel=document.getElementById('cTel').value.trim();
+  var articles=document.getElementById('cArticles').value.trim();
+  var total=parseFloat(document.getElementById('cTotal').value)||0;
+  var acompte=parseFloat(document.getElementById('cAcompte').value)||0;
+  var echeance=document.getElementById('cEcheance').value;
+  var notes=document.getElementById('cNotes').value.trim();
+  if(!nom){toast('Entrez le nom du client','err');return;}
+  if(!articles){toast('D\u00e9crivez les articles vendus','err');return;}
+  if(total<=0){toast('Montant total invalide','err');return;}
+  if(acompte>total){toast("L'acompte ne peut pas d\u00e9passer le total",'err');return;}
+  var restant=total-acompte;
+  if(!FIREBASE_OK){toast('Firebase non connect\u00e9','err');return;}
+  var data={
+    client_nom:nom, client_tel:tel, articles:articles,
+    montant_total:total, acompte:acompte, montant_paye:acompte,
+    montant_restant:restant, statut:restant<=0?'solde':'en_cours',
+    date_vente:firebase.firestore.FieldValue.serverTimestamp(),
+    date_echeance:echeance?new Date(echeance):null,
+    gestionnaire:nomGest, notes:notes,
+    paiements:acompte>0?[{montant:acompte,date:new Date().toISOString(),par:nomGest,type:'acompte'}]:[]
+  };
+  db.collection('credits').add(data).then(function(){
+    toast('Cr\u00e9dit enregistr\u00e9 !','success');
+    document.getElementById('cNom').value='';
+    document.getElementById('cTel').value='';
+    document.getElementById('cArticles').value='';
+    document.getElementById('cTotal').value='';
+    document.getElementById('cAcompte').value='';
+    document.getElementById('cEcheance').value='';
+    document.getElementById('cNotes').value='';
+    switchTab('liste-credits');
+  }).catch(function(){ toast('Erreur d\'enregistrement','err'); });
+}
+
+// Calcul automatique restant
+function calcRestant(){
+  var t=parseFloat(document.getElementById('cTotal').value)||0;
+  var a=parseFloat(document.getElementById('cAcompte').value)||0;
+  var r=document.getElementById('cRestantCalc');
+  if(r) r.textContent=t>0?'Restant : '+fmt(t-a)+' FG':'';
+}
+
+// -- Paiement sur crédit --
+var paiementCreditId=null;
+function openPaiement(id){
+  paiementCreditId=id;
+  var c=credits.find(function(x){return x.id===id;});
+  if(!c) return;
+  document.getElementById('pmtClientNom').textContent=c.client_nom;
+  document.getElementById('pmtRestant').textContent=fmt(c.montant_restant)+' FG';
+  document.getElementById('pmtMontant').value='';
+  document.getElementById('pmtMontant').max=c.montant_restant;
+  document.getElementById('pmtErr').textContent='';
+  openOv('pmtOv');
+}
+
+function enregistrerPaiement(){
+  if(!paiementCreditId) return;
+  var c=credits.find(function(x){return x.id===paiementCreditId;});
+  if(!c) return;
+  var montant=parseFloat(document.getElementById('pmtMontant').value)||0;
+  if(montant<=0){document.getElementById('pmtErr').textContent='Montant invalide';return;}
+  if(montant>c.montant_restant){document.getElementById('pmtErr').textContent='D\u00e9passe le solde restant';return;}
+  var nouveauPaye=(c.montant_paye||0)+montant;
+  var nouveauRestant=c.montant_restant-montant;
+  var nouveauStatut=nouveauRestant<=0?'solde':'en_cours';
+  var paiements=c.paiements||[];
+  paiements.push({montant:montant,date:new Date().toISOString(),par:nomGest,type:'paiement'});
+  db.collection('credits').doc(paiementCreditId).update({
+    montant_paye:nouveauPaye, montant_restant:nouveauRestant,
+    statut:nouveauStatut, paiements:paiements
+  }).then(function(){
+    toast(nouveauStatut==='solde'?'Cr\u00e9dit sold\u00e9 !':'Paiement enregistr\u00e9 !','success');
+    closeOv('pmtOv');
+    paiementCreditId=null;
+  }).catch(function(){ toast('Erreur','err'); });
+}
+
+// -- Détail crédit --
+function openDetailCredit(id){
+  var c=credits.find(function(x){return x.id===id;});
+  if(!c) return;
+  var pmts=c.paiements||[];
+  var html='<div style="margin-bottom:14px">';
+  html+='<div style="font-family:\'Exo 2\',sans-serif;font-weight:800;font-size:1rem;margin-bottom:4px">'+c.client_nom+'</div>';
+  if(c.client_tel) html+='<div style="font-size:.78rem;color:var(--tx2)">&#128222; '+c.client_tel+'</div>';
+  html+='<div style="font-size:.78rem;color:var(--tx2);margin-top:4px">Articles: '+c.articles+'</div>';
+  html+='</div>';
+  html+='<div class="stat-row" style="margin-bottom:14px">';
+  html+='<div class="stat-card info"><div class="stat-num">'+fmt(c.montant_total)+'</div><div class="stat-label">Total FG</div></div>';
+  html+='<div class="stat-card '+(c.statut==='solde'?'ok':'danger')+'"><div class="stat-num">'+fmt(c.montant_restant)+'</div><div class="stat-label">Restant FG</div></div>';
+  html+='</div>';
+  html+='<div style="font-family:\'Exo 2\',sans-serif;font-weight:700;font-size:.82rem;margin-bottom:8px;color:var(--g)">Historique des paiements</div>';
+  if(!pmts.length){
+    html+='<p style="font-size:.78rem;color:var(--tx2)">Aucun paiement enregistr\u00e9</p>';
+  }else{
+    html+='<div class="pmt-list">';
+    pmts.forEach(function(p){
+      html+='<div class="pmt-row">';
+      html+='<span class="pmt-date">'+p.date.split('T')[0]+'</span>';
+      html+='<span style="font-size:.65rem;color:var(--tx2)">'+p.type+'</span>';
+      html+='<span class="pmt-amt">+'+fmt(p.montant)+' FG</span>';
+      html+='<span class="pmt-by">par '+p.par+'</span>';
+      html+='</div>';
+    });
+    html+='</div>';
+  }
+  document.getElementById('detailContent').innerHTML=html;
+  openOv('detailOv');
+}
+
+// -- Relance WhatsApp --
+function relanceWA(id){
+  var c=credits.find(function(x){return x.id===id;});
+  if(!c) return;
+  var msg='Bonjour '+c.client_nom+',\n\nNous vous rappelons que vous avez un solde de '+fmt(c.montant_restant)+' FG chez ZAG GROUP Kindia.\n\nMerci de r\u00e9gler dans les meilleurs d\u00e9lais.\n\n&#128222; +224 626 20 76 46';
+  window.open('https://wa.me/'+(c.client_tel||'224626207646').replace(/\D/g,'')+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ============================================================
+// AVANCES
+// ============================================================
+function renderAvances(){
+  var el=document.getElementById('list-avances');
+  if(!el) return;
+  var f=avances.filter(function(a){
+    if(!isAdmin) return a.employe_nom===nomGest||a.demandeur===nomGest;
+    if(avanceFilter==='en_attente') return a.statut==='en_attente';
+    if(avanceFilter==='approuve') return a.statut==='approuve';
+    if(avanceFilter==='rembourse') return a.statut==='rembourse';
+    if(avanceFilter==='refuse') return a.statut==='refuse';
+    return true;
+  });
+  if(!f.length){
+    el.innerHTML='<div class="empty-state"><div style="font-size:2rem">&#128181;</div><p>Aucune avance dans cette cat\u00e9gorie</p></div>';
+    return;
+  }
+  el.innerHTML='';
+  f.forEach(function(a){
+    var div=document.createElement('div');
+    var cls='avance-item';
+    if(a.statut==='en_attente') cls+=' attente';
+    else if(a.statut==='approuve') cls+=' approuve';
+    else if(a.statut==='rembourse') cls+=' rembourse';
+    else if(a.statut==='refuse') cls+=' refuse';
+    div.className=cls;
+    var statLabel={en_attente:'En attente',approuve:'Approuv\u00e9',rembourse:'Rembours\u00e9',refuse:'Refus\u00e9'}[a.statut]||a.statut;
+    var statCls={en_attente:'s-attente',approuve:'s-approuve',rembourse:'s-rembourse',refuse:'s-refuse'}[a.statut]||'';
+    var html='<div class="avance-header">';
+    html+='<div class="avance-emp">'+a.employe_nom+'</div>';
+    html+='<div class="avance-montant">'+fmt(a.montant)+' FG</div>';
+    html+='</div>';
+    html+='<div style="margin-bottom:6px"><span class="status-pill '+statCls+'">'+statLabel+'</span>';
+    html+=' <span style="font-size:.65rem;color:var(--tx2)">'+fmtDate(a.date_demande)+'</span></div>';
+    if(a.motif) html+='<div class="avance-motif">Motif: '+a.motif+'</div>';
+    if(a.statut==='approuve'){
+      var rembourse=a.montant_rembourse||0;
+      var restant=a.montant-rembourse;
+      html+='<div style="font-size:.72rem;color:var(--b);font-weight:700;margin-bottom:8px">Remboursement: '+fmt(rembourse)+' / '+fmt(a.montant)+' FG</div>';
+      html+='<div class="credit-prog" style="margin-bottom:8px"><div class="credit-prog-fill" style="width:'+Math.round(rembourse/a.montant*100)+'%"></div></div>';
+    }
+    html+='<div class="avance-actions">';
+    if(isAdmin&&a.statut==='en_attente'){
+      html+='<button class="action-btn btn-payer" onclick="approuverAvance(\''+a.id+'\')">&#10003; Approuver</button>';
+      html+='<button class="action-btn" style="background:var(--r);color:#fff" onclick="refuserAvance(\''+a.id+'\')">&#10005; Refuser</button>';
+    }
+    if(isAdmin&&a.statut==='approuve'){
+      html+='<button class="action-btn btn-detail" onclick="openRemboursement(\''+a.id+'\')">&#128176; Remboursement</button>';
+    }
+    html+='<button class="action-btn btn-detail" onclick="openDetailAvance(\''+a.id+'\')">&#128065; D\u00e9tail</button>';
+    html+='</div>';
+    div.innerHTML=html;
+    el.appendChild(div);
+  });
+}
+
+// -- Nouvelle avance --
+function soumettreAvance(){
+  var employe=isAdmin?document.getElementById('avEmpNom').value.trim():nomGest;
+  var montant=parseFloat(document.getElementById('avMontant').value)||0;
+  var motif=document.getElementById('avMotif').value.trim();
+  var datePrevu=document.getElementById('avDatePrevu').value;
+  if(!employe){toast('Entrez le nom de l\u0027employ\u00e9','err');return;}
+  if(montant<=0){toast('Montant invalide','err');return;}
+  if(!motif){toast('Indiquez le motif de l\u0027avance','err');return;}
+  if(!FIREBASE_OK){toast('Firebase non connect\u00e9','err');return;}
+  db.collection('avances').add({
+    employe_nom:employe, demandeur:nomGest,
+    montant:montant, motif:motif,
+    montant_rembourse:0,
+    date_demande:firebase.firestore.FieldValue.serverTimestamp(),
+    date_remboursement_prevu:datePrevu?new Date(datePrevu):null,
+    statut:'en_attente', approuve_par:null,
+    remboursements:[], notes:''
+  }).then(function(){
+    toast('Demande d\u0027avance envoy\u00e9e !','success');
+    document.getElementById('avEmpNom').value='';
+    document.getElementById('avMontant').value='';
+    document.getElementById('avMotif').value='';
+    document.getElementById('avDatePrevu').value='';
+    switchTab('liste-avances');
+  }).catch(function(){toast('Erreur','err');});
+}
+
+function approuverAvance(id){
+  if(!isAdmin){toast('R\u00e9serv\u00e9 \u00e0 l\u0027administrateur','err');return;}
+  db.collection('avances').doc(id).update({
+    statut:'approuve', approuve_par:'Admin',
+    date_approbation:firebase.firestore.FieldValue.serverTimestamp()
+  }).then(function(){toast('Avance approuv\u00e9e !','success');})
+  .catch(function(){toast('Erreur','err');});
+}
+
+function refuserAvance(id){
+  if(!isAdmin){toast('R\u00e9serv\u00e9 \u00e0 l\u0027administrateur','err');return;}
+  db.collection('avances').doc(id).update({statut:'refuse'})
+  .then(function(){toast('Avance refus\u00e9e.','');})
+  .catch(function(){toast('Erreur','err');});
+}
+
+var remboursementAvanceId=null;
+function openRemboursement(id){
+  remboursementAvanceId=id;
+  var a=avances.find(function(x){return x.id===id;});
+  if(!a) return;
+  var restant=a.montant-(a.montant_rembourse||0);
+  document.getElementById('rmbEmpNom').textContent=a.employe_nom;
+  document.getElementById('rmbRestant').textContent=fmt(restant)+' FG';
+  document.getElementById('rmbMontant').value='';
+  document.getElementById('rmbMontant').max=restant;
+  document.getElementById('rmbErr').textContent='';
+  openOv('rmbOv');
+}
+
+function enregistrerRemboursement(){
+  if(!remboursementAvanceId) return;
+  var a=avances.find(function(x){return x.id===remboursementAvanceId;});
+  if(!a) return;
+  var montant=parseFloat(document.getElementById('rmbMontant').value)||0;
+  var type=document.getElementById('rmbType').value;
+  var restant=a.montant-(a.montant_rembourse||0);
+  if(montant<=0){document.getElementById('rmbErr').textContent='Montant invalide';return;}
+  if(montant>restant){document.getElementById('rmbErr').textContent='D\u00e9passe le restant';return;}
+  var nouveauRembourse=(a.montant_rembourse||0)+montant;
+  var nouveauStatut=nouveauRembourse>=a.montant?'rembourse':'approuve';
+  var remboursements=a.remboursements||[];
+  remboursements.push({montant:montant,date:new Date().toISOString(),type:type,par:nomGest});
+  db.collection('avances').doc(remboursementAvanceId).update({
+    montant_rembourse:nouveauRembourse, statut:nouveauStatut, remboursements:remboursements
+  }).then(function(){
+    toast(nouveauStatut==='rembourse'?'Avance enti\u00e8rement rembours\u00e9e !':'Remboursement enregistr\u00e9 !','success');
+    closeOv('rmbOv'); remboursementAvanceId=null;
+  }).catch(function(){toast('Erreur','err');});
+}
+
+function openDetailAvance(id){
+  var a=avances.find(function(x){return x.id===id;});
+  if(!a) return;
+  var rmbs=a.remboursements||[];
+  var html='<div style="margin-bottom:14px">';
+  html+='<div style="font-family:\'Exo 2\',sans-serif;font-weight:800;font-size:1rem">'+a.employe_nom+'</div>';
+  html+='<div style="font-size:.78rem;color:var(--tx2);margin-top:3px">Motif: '+a.motif+'</div>';
+  html+='</div>';
+  html+='<div class="stat-row" style="margin-bottom:14px">';
+  html+='<div class="stat-card info"><div class="stat-num">'+fmt(a.montant)+'</div><div class="stat-label">Total FG</div></div>';
+  html+='<div class="stat-card '+(a.statut==='rembourse'?'ok':'warn')+'"><div class="stat-num">'+fmt(a.montant-(a.montant_rembourse||0))+'</div><div class="stat-label">Restant FG</div></div>';
+  html+='</div>';
+  if(rmbs.length){
+    html+='<div style="font-family:\'Exo 2\',sans-serif;font-weight:700;font-size:.82rem;margin-bottom:8px;color:var(--b)">Historique remboursements</div>';
+    html+='<div class="pmt-list">';
+    rmbs.forEach(function(r){
+      html+='<div class="pmt-row"><span class="pmt-date">'+r.date.split('T')[0]+'</span><span style="font-size:.65rem;color:var(--tx2)">'+r.type+'</span><span class="pmt-amt">+'+fmt(r.montant)+' FG</span><span class="pmt-by">par '+r.par+'</span></div>';
+    });
+    html+='</div>';
+  }
+  document.getElementById('detailAvContent').innerHTML=html;
+  openOv('detailAvOv');
+}
+
+// ============================================================
+// DASHBOARD ADMIN
+// ============================================================
+function renderDashboard(){
+  if(!isAdmin) return;
+  var totalDu=credits.filter(function(c){return c.statut!=='solde';}).reduce(function(s,c){return s+(c.montant_restant||0);},0);
+  var nbRetard=credits.filter(function(c){return c.statut==='en_retard';}).length;
+  var nbCours=credits.filter(function(c){return c.statut==='en_cours';}).length;
+  var avAttente=avances.filter(function(a){return a.statut==='en_attente';}).length;
+  var totalAvances=avances.filter(function(a){return a.statut==='approuve';}).reduce(function(s,a){return s+(a.montant-(a.montant_rembourse||0));},0);
+  var nbSolde=credits.filter(function(c){return c.statut==='solde';}).length;
+  document.getElementById('dashTotalDu').textContent=fmt(totalDu)+' FG';
+  document.getElementById('dashNbRetard').textContent=nbRetard;
+  document.getElementById('dashNbCours').textContent=nbCours;
+  document.getElementById('dashNbSolde').textContent=nbSolde;
+  document.getElementById('dashAvAttente').textContent=avAttente;
+  document.getElementById('dashTotalAvances').textContent=fmt(totalAvances)+' FG';
+}
+
+// -- Filters --
+document.addEventListener('DOMContentLoaded',function(){
+  document.querySelectorAll('[data-cf]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      creditFilter=this.getAttribute('data-cf');
+      document.querySelectorAll('[data-cf]').forEach(function(b){b.classList.remove('active');});
+      this.classList.add('active');
+      renderCredits();
+    });
+  });
+  document.querySelectorAll('[data-af]').forEach(function(btn){
+    btn.addEventListener('click',function(){
+      avanceFilter=this.getAttribute('data-af');
+      document.querySelectorAll('[data-af]').forEach(function(b){b.classList.remove('active');});
+      this.classList.add('active');
+      renderAvances();
+    });
+  });
+});
+
+</script>
+</body>
+</html>
