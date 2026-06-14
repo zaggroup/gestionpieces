@@ -1,0 +1,648 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AL-HIKMA — Internat Islamique</title>
+<link rel="manifest" href="al-hikma-manifest.json">
+<meta name="theme-color" content="#2d1f14">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800&family=Amiri:wght@400;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#fdf9f0;
+  --sand:#f0e6d2;
+  --brown-dark:#2d1f14;
+  --brown-mid:#4a3526;
+  --gold:#c9a227;
+  --gold-light:#e8c84a;
+  --terracotta:#c17a4a;
+  --text-dark:#2d1f14;
+  --text-mid:#7a6a58;
+  --green-ok:#2d6a4f;
+  --red:#c0392b;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{
+  font-family:'Inter',sans-serif;
+  background:var(--cream);
+  color:var(--text-dark);
+  min-height:100vh;
+  display:flex;flex-direction:column;
+  overflow-x:hidden;
+}
+
+/* ===== HEADER ===== */
+.header{
+  background:linear-gradient(160deg,var(--brown-dark) 0%,#1a120b 100%);
+  color:#fff;
+  padding:40px 24px 32px;
+  text-align:center;
+  position:relative;
+  overflow:hidden;
+}
+.header::before{
+  content:'';position:absolute;inset:0;
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='70' height='70'%3E%3Cg fill='none' stroke='%23c9a22725' stroke-width='1'%3E%3Cpolygon points='35,5 50,20 65,20 53,32 58,48 35,38 12,48 17,32 5,20 20,20'/%3E%3Ccircle cx='35' cy='35' r='28'/%3E%3C/g%3E%3C/svg%3E");
+  opacity:.6;
+}
+.header-content{position:relative;z-index:2}
+.logo-circle{
+  width:64px;height:64px;border-radius:18px;
+  background:var(--cream);
+  display:flex;align-items:center;justify-content:center;
+  margin:0 auto 14px;
+  box-shadow:0 8px 24px rgba(0,0,0,.35);
+}
+.brand-title{
+  font-family:'Playfair Display',serif;
+  font-size:1.9rem;font-weight:900;
+  letter-spacing:2px;color:var(--gold-light);
+  margin-bottom:2px;
+}
+.brand-sub{font-size:.74rem;color:rgba(255,255,255,.6);font-weight:500;letter-spacing:.5px}
+.brand-arabic{font-family:'Amiri',serif;font-size:1rem;color:var(--gold);margin-top:8px;opacity:.85}
+.conn-status{
+  display:inline-flex;align-items:center;gap:6px;
+  margin-top:14px;font-size:.7rem;color:rgba(255,255,255,.55);
+}
+.conn-dot{width:8px;height:8px;border-radius:50%;background:#888}
+.conn-dot.ok{background:var(--green-ok);box-shadow:0 0 8px var(--green-ok)}
+
+/* ===== BODY ===== */
+.body-content{flex:1;padding:24px 20px 40px;max-width:480px;margin:0 auto;width:100%}
+
+/* Session banner */
+.session-banner{
+  display:none;background:var(--sand);
+  border:1.5px solid var(--gold);
+  border-radius:14px;padding:14px 16px;margin-bottom:18px;
+}
+.session-banner.show{display:block}
+.session-banner-title{font-weight:700;font-size:.85rem;margin-bottom:4px;display:flex;align-items:center;gap:6px}
+.session-banner-sub{font-size:.76rem;color:var(--text-mid);margin-bottom:10px}
+.session-btns{display:flex;gap:8px}
+.sb-btn{flex:1;padding:9px;border-radius:10px;border:none;font-weight:700;font-size:.75rem;cursor:pointer}
+.sb-resume{background:var(--gold);color:var(--brown-dark)}
+.sb-new{background:transparent;border:1.5px solid var(--text-mid);color:var(--text-mid)}
+
+/* Role cards */
+.role-card{
+  display:flex;align-items:center;gap:16px;
+  background:#fff;border:1.5px solid var(--sand);
+  border-radius:18px;padding:20px;margin-bottom:14px;
+  cursor:pointer;transition:transform .15s,box-shadow .15s;
+  text-align:left;width:100%;
+}
+.role-card:active{transform:scale(.98)}
+.role-card.educ{background:linear-gradient(135deg,#fff,#fdf6e8)}
+.role-card.admin{
+  background:linear-gradient(135deg,var(--brown-dark),#1a120b);
+  border-color:var(--brown-dark);color:#fff;
+}
+.role-icon{
+  width:52px;height:52px;border-radius:14px;flex-shrink:0;
+  display:flex;align-items:center;justify-content:center;font-size:1.6rem;
+}
+.role-card.educ .role-icon{background:var(--sand)}
+.role-card.admin .role-icon{background:rgba(201,162,39,.15)}
+.role-title{font-family:'Playfair Display',serif;font-weight:900;font-size:1.05rem;margin-bottom:3px}
+.role-card.admin .role-title{color:var(--gold-light)}
+.role-desc{font-size:.74rem;color:var(--text-mid)}
+.role-card.admin .role-desc{color:rgba(255,255,255,.55)}
+
+/* Fingerprint button */
+.fp-btn{
+  display:none;align-items:center;justify-content:center;gap:6px;
+  width:100%;background:rgba(201,162,39,.1);
+  border:1.5px solid rgba(201,162,39,.4);
+  border-radius:12px;padding:10px;margin:-4px 0 14px;
+  font-size:.75rem;font-weight:700;color:var(--brown-mid);cursor:pointer;
+}
+.fp-error{
+  display:none;background:#fdecea;color:var(--red);
+  font-size:.74rem;font-weight:700;padding:9px 12px;
+  border-radius:10px;text-align:center;margin-bottom:12px;
+}
+
+/* Footer */
+.footer{text-align:center;font-size:.68rem;color:var(--text-mid);padding:12px;opacity:.7}
+
+/* ===== PIN OVERLAY ===== */
+.ov{display:none;position:fixed;inset:0;background:rgba(45,31,20,.75);z-index:200;align-items:center;justify-content:center;padding:20px}
+.ov.show{display:flex}
+.pin-modal{
+  background:var(--cream);border-radius:22px;padding:28px 24px;
+  max-width:360px;width:100%;text-align:center;
+}
+.pin-modal-icon{font-size:2.4rem;margin-bottom:8px}
+.pin-modal-title{font-family:'Playfair Display',serif;font-weight:900;font-size:1.2rem;margin-bottom:4px}
+.pin-modal-sub{font-size:.78rem;color:var(--text-mid);margin-bottom:18px}
+.pin-dots{display:flex;justify-content:center;gap:14px;margin-bottom:18px}
+.pin-dot{width:16px;height:16px;border-radius:50%;border:2px solid var(--gold);background:transparent;transition:background .15s}
+.pin-dot.filled{background:var(--gold)}
+.pin-dot.shake{animation:shake .4s}
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.pin-error{font-size:.76rem;color:var(--red);font-weight:700;min-height:18px;margin-bottom:10px}
+.pin-keypad{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px;margin-bottom:16px}
+.pin-key{
+  aspect-ratio:1;border-radius:16px;border:none;background:#fff;
+  font-family:'Playfair Display',serif;font-size:1.4rem;font-weight:700;
+  color:var(--text-dark);cursor:pointer;box-shadow:0 2px 6px rgba(0,0,0,.06);
+}
+.pin-key:active{background:var(--sand)}
+.pin-key.action{background:transparent;box-shadow:none;font-size:1.1rem;color:var(--text-mid)}
+.pin-nom-field{
+  width:100%;padding:11px;border:1.5px solid var(--sand);border-radius:12px;
+  font-size:.9rem;margin-bottom:14px;text-align:center;font-family:'Inter',sans-serif;
+  outline:none;
+}
+.pin-cancel{
+  width:100%;padding:11px;border-radius:12px;border:none;
+  background:transparent;color:var(--text-mid);font-weight:700;font-size:.8rem;cursor:pointer;
+}
+.lockout-msg{
+  background:#fdecea;border-radius:12px;padding:14px;margin-bottom:14px;
+  font-size:.8rem;color:var(--red);font-weight:700;text-align:center;
+}
+</style>
+</head>
+<body>
+
+<!-- ===== HEADER ===== -->
+<div class="header">
+  <div class="header-content">
+    <div class="logo-circle">
+      <svg viewBox="0 0 100 100" width="40" height="40">
+        <g fill="none" stroke="#c9a227" stroke-width="4" stroke-linecap="round">
+          <path d="M28 58 Q28 28 50 22 Q72 28 72 58" />
+          <line x1="28" y1="58" x2="28" y2="86"/>
+          <line x1="72" y1="58" x2="72" y2="86"/>
+          <line x1="22" y1="86" x2="78" y2="86"/>
+          <line x1="50" y1="22" x2="50" y2="8"/>
+          <circle cx="50" cy="5" r="4"/>
+          <rect x="42" y="68" width="16" height="18"/>
+        </g>
+      </svg>
+    </div>
+    <div class="brand-title">AL-HIKMA</div>
+    <div class="brand-sub">INTERNAT ISLAMIQUE · KINDIA, GUIN&Eacute;E</div>
+    <div class="brand-arabic">&#1583;&#1614;&#1575;&#1585; &#1575;&#1604;&#1581;&#1616;&#1603;&#1605;&#1577;</div>
+    <div class="conn-status">
+      <span class="conn-dot" id="connDot"></span>
+      <span id="connText">Connexion...</span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== BODY ===== -->
+<div class="body-content">
+
+  <!-- Session reprise -->
+  <div class="session-banner" id="sessionBanner">
+    <div class="session-banner-title">&#8987; <span id="sessRole"></span></div>
+    <div class="session-banner-sub" id="sessSub"></div>
+    <div class="session-btns">
+      <button class="sb-btn sb-resume" id="btnResume">Reprendre &rarr;</button>
+      <button class="sb-btn sb-new" id="btnNewSession">Nouvelle session</button>
+    </div>
+  </div>
+
+  <!-- ROLE: EDUCATRICE -->
+  <button class="role-card educ" onclick="openPin('educ')">
+    <div class="role-icon">&#128214;</div>
+    <div>
+      <div class="role-title">&Eacute;ducatrice</div>
+      <div class="role-desc">Suivi quotidien : Coran, devoirs, pr&eacute;sence, sant&eacute;</div>
+    </div>
+  </button>
+  <button class="fp-btn" id="fpBtn_educ" onclick="loginWithFingerprint('educ')">
+    &#128400; Connexion par empreinte
+  </button>
+
+  <!-- ROLE: ADMINISTRATEUR -->
+  <button class="role-card admin" onclick="openPin('admin')">
+    <div class="role-icon">&#127960;</div>
+    <div>
+      <div class="role-title">Administrateur</div>
+      <div class="role-desc">Finances, inscriptions, magasin, rapports</div>
+    </div>
+  </button>
+  <button class="fp-btn" id="fpBtn_admin" onclick="loginWithFingerprint('admin')">
+    &#128400; Connexion par empreinte
+  </button>
+
+  <div class="fp-error" id="fpError">&#10060; Empreinte non reconnue. Utilisez votre code PIN.</div>
+
+</div>
+
+<div class="footer">AL-HIKMA &mdash; v1.0 &mdash; Kindia, Guin&eacute;e</div>
+
+<!-- ===== PIN OVERLAY ===== -->
+<div class="ov" id="ovPin">
+  <div class="pin-modal">
+    <div class="pin-modal-icon" id="pinIcon">&#128214;</div>
+    <div class="pin-modal-title" id="pinTitle">Acc&egrave;s &Eacute;ducatrice</div>
+    <div class="pin-modal-sub">Entrez votre code &agrave; 4 chiffres</div>
+
+    <input type="text" class="pin-nom-field" id="pinNom" placeholder="Votre pr&eacute;nom" style="display:none">
+
+    <div class="pin-dots" id="pinDots">
+      <div class="pin-dot"></div><div class="pin-dot"></div>
+      <div class="pin-dot"></div><div class="pin-dot"></div>
+    </div>
+
+    <div class="pin-error" id="pinError"></div>
+
+    <div class="lockout-msg" id="lockoutMsg" style="display:none"></div>
+
+    <div class="pin-keypad" id="pinKeypad">
+      <button class="pin-key" data-k="1">1</button>
+      <button class="pin-key" data-k="2">2</button>
+      <button class="pin-key" data-k="3">3</button>
+      <button class="pin-key" data-k="4">4</button>
+      <button class="pin-key" data-k="5">5</button>
+      <button class="pin-key" data-k="6">6</button>
+      <button class="pin-key" data-k="7">7</button>
+      <button class="pin-key" data-k="8">8</button>
+      <button class="pin-key" data-k="9">9</button>
+      <button class="pin-key action" data-k="clear">Effacer</button>
+      <button class="pin-key" data-k="0">0</button>
+      <button class="pin-key action" data-k="back">&#8676;</button>
+    </div>
+
+    <button class="pin-cancel" id="pinCancel">Annuler</button>
+  </div>
+</div>
+
+<script>
+// ===================================================
+// FIREBASE (m\u00eame projet ZAG GROUP, collections al-hikma_*)
+// ===================================================
+var db = null;
+var auth = null;
+var FIREBASE_OK = false;
+
+// Comptes d\u00e9di\u00e9s AL-HIKMA (Firebase Auth Email/Password)
+var AUTH_ACCOUNTS = {
+  educ:  { email:'educatrice@al-hikma.app', password:'AlHikma2026!Educ#Kindia' },
+  admin: { email:'admin@al-hikma.app',      password:'AlHikma2026!Admin#Kindia' }
+};
+
+function createFakeDb(){
+  var fakeRef = {
+    onSnapshot: function(ok){ ok({docs:[]}); return function(){}; },
+    get: function(){ return Promise.resolve({docs:[],exists:false,data:function(){return null;}}); },
+    add: function(){ return Promise.resolve({id:'local_'+Date.now()}); },
+    set: function(){ return Promise.resolve(); },
+    update: function(){ return Promise.resolve(); },
+    doc: function(){ return fakeRef; },
+    where: function(){ return fakeRef; },
+    orderBy: function(){ return fakeRef; }
+  };
+  return { collection: function(){ return fakeRef; } };
+}
+
+function initFirebase(){
+  if(typeof firebase==='undefined'){ db=createFakeDb(); setConnStatus(false); return; }
+  try{
+    var cfg={
+      apiKey:"AIzaSyDWF-Q3S2M-btrRBHBYzd9dVbY6iEg_fNk",
+      authDomain:"gestionpieces-74559.firebaseapp.com",
+      projectId:"gestionpieces-74559",
+      storageBucket:"gestionpieces-74559.appspot.com"
+    };
+    if(!firebase.apps || !firebase.apps.length) firebase.initializeApp(cfg);
+    db=firebase.firestore();
+    auth=firebase.auth();
+    db.enablePersistence({synchronizeTabs:true}).catch(function(){});
+    FIREBASE_OK=true;
+    setConnStatus(true);
+  }catch(e){ db=createFakeDb(); setConnStatus(false); }
+}
+
+function setConnStatus(ok){
+  var dot=document.getElementById('connDot');
+  var txt=document.getElementById('connText');
+  if(ok){ dot.classList.add('ok'); txt.textContent='Firebase connect\u00e9'; }
+  else{ dot.classList.remove('ok'); txt.textContent='Mode hors-ligne'; }
+}
+
+// ===================================================
+// SESSION MANAGEMENT
+// ===================================================
+var SESSION_KEY='alhikma_session';
+var SESSION_DURATION=15*60*1000; // 15 min
+
+function saveSession(role, nom){
+  try{
+    localStorage.setItem(SESSION_KEY, JSON.stringify({
+      role:role, nom:nom||'', ts:Date.now()
+    }));
+  }catch(e){}
+}
+function getSession(){
+  try{
+    var s=JSON.parse(localStorage.getItem(SESSION_KEY));
+    if(s && (Date.now()-s.ts)<SESSION_DURATION) return s;
+  }catch(e){}
+  return null;
+}
+function clearSession(){ try{ localStorage.removeItem(SESSION_KEY); }catch(e){} }
+
+function checkSession(){
+  var s=getSession();
+  if(s){
+    var roleLbl = s.role==='admin' ? 'Administrateur' : '\u00c9ducatrice';
+    document.getElementById('sessRole').textContent = roleLbl + (s.nom?(' \u2014 '+s.nom):'');
+    var mins = Math.ceil((SESSION_DURATION-(Date.now()-s.ts))/60000);
+    document.getElementById('sessSub').textContent = 'Session active \u2014 expire dans ~'+mins+' min';
+    document.getElementById('sessionBanner').classList.add('show');
+    document.getElementById('btnResume').onclick=function(){
+      goTo(s.role);
+    };
+    document.getElementById('btnNewSession').onclick=function(){
+      clearSession();
+      if(auth) auth.signOut().catch(function(){});
+      document.getElementById('sessionBanner').classList.remove('show');
+    };
+  }
+}
+
+function goTo(role){
+  if(role==='educ') window.location.href='al-hikma-educatrice.html';
+  else window.location.href='al-hikma-admin.html';
+}
+
+// ===================================================
+// PIN AUTHENTICATION (avec rate-limiting)
+// ===================================================
+var PIN_CODES = { educ:'2580', admin:'7410' };
+var currentRole = null;
+var pinBuffer = '';
+var MAX_ATTEMPTS = 3;
+
+function getAttempts(role){
+  try{ return parseInt(localStorage.getItem('alhikma_attempts_'+role))||0; }catch(e){return 0;}
+}
+function setAttempts(role, n){
+  try{ localStorage.setItem('alhikma_attempts_'+role, n); }catch(e){}
+}
+function getLockoutUntil(role){
+  try{ return parseInt(localStorage.getItem('alhikma_lockout_'+role))||0; }catch(e){return 0;}
+}
+function setLockoutUntil(role, ts){
+  try{ localStorage.setItem('alhikma_lockout_'+role, ts); }catch(e){}
+}
+function resetAttempts(role){
+  setAttempts(role,0);
+  setLockoutUntil(role,0);
+}
+function lockoutDuration(attemptCount){
+  // 3->30s, 4->1min, 5->2min, 6->5min, 7+->10min
+  var durations=[0,0,0,30000,60000,120000,300000,600000];
+  return durations[Math.min(attemptCount,7)]||600000;
+}
+
+var lockoutTimer=null;
+
+function openPin(role){
+  currentRole=role;
+  pinBuffer='';
+  document.getElementById('pinError').textContent='';
+  document.getElementById('pinNom').style.display = role==='educ' ? 'block' : 'none';
+  document.getElementById('pinNom').value='';
+  if(role==='educ'){
+    try{ document.getElementById('pinNom').value = localStorage.getItem('alhikma_last_nom')||''; }catch(e){}
+  }
+  document.getElementById('pinIcon').textContent = role==='educ' ? '\uD83D\uDCD6' : '\uD83D\uDD4C';
+  document.getElementById('pinTitle').textContent = role==='educ' ? 'Acc\u00e8s \u00c9ducatrice' : 'Acc\u00e8s Administrateur';
+  updatePinDots();
+  checkLockoutDisplay();
+  document.getElementById('ovPin').classList.add('show');
+}
+function closePin(){
+  document.getElementById('ovPin').classList.remove('show');
+  if(lockoutTimer){ clearInterval(lockoutTimer); lockoutTimer=null; }
+}
+
+function checkLockoutDisplay(){
+  var until=getLockoutUntil(currentRole);
+  var keypad=document.getElementById('pinKeypad');
+  var msg=document.getElementById('lockoutMsg');
+  if(until>Date.now()){
+    keypad.style.display='none';
+    msg.style.display='block';
+    updateLockoutMsg();
+    if(lockoutTimer) clearInterval(lockoutTimer);
+    lockoutTimer=setInterval(function(){
+      if(getLockoutUntil(currentRole)<=Date.now()){
+        clearInterval(lockoutTimer); lockoutTimer=null;
+        keypad.style.display='grid'; msg.style.display='none';
+        document.getElementById('pinError').textContent='';
+      } else {
+        updateLockoutMsg();
+      }
+    },1000);
+  } else {
+    keypad.style.display='grid';
+    msg.style.display='none';
+  }
+}
+function updateLockoutMsg(){
+  var until=getLockoutUntil(currentRole);
+  var remaining=Math.max(0,Math.ceil((until-Date.now())/1000));
+  var mins=Math.floor(remaining/60), secs=remaining%60;
+  var timeStr = mins>0 ? (mins+'min '+secs+'s') : (secs+'s');
+  document.getElementById('lockoutMsg').textContent =
+    '\uD83D\uDD12 Trop de tentatives. R\u00e9essayez dans '+timeStr;
+}
+
+function updatePinDots(){
+  var dots=document.querySelectorAll('.pin-dot');
+  dots.forEach(function(d,i){
+    d.classList.toggle('filled', i<pinBuffer.length);
+  });
+}
+function shakeDots(){
+  var dots=document.querySelectorAll('.pin-dot');
+  dots.forEach(function(d){ d.classList.add('shake'); });
+  setTimeout(function(){
+    dots.forEach(function(d){ d.classList.remove('shake'); });
+  },400);
+}
+
+document.getElementById('pinKeypad').addEventListener('click', function(e){
+  var btn=e.target.closest('.pin-key'); if(!btn) return;
+  var k=btn.getAttribute('data-k');
+  if(getLockoutUntil(currentRole)>Date.now()) return;
+  if(k==='clear'){ pinBuffer=''; updatePinDots(); return; }
+  if(k==='back'){ pinBuffer=pinBuffer.slice(0,-1); updatePinDots(); return; }
+  if(pinBuffer.length<4){
+    pinBuffer+=k;
+    updatePinDots();
+    if(pinBuffer.length===4) setTimeout(verifyPin,150);
+  }
+});
+
+document.getElementById('pinCancel').addEventListener('click', closePin);
+document.querySelector('.ov').addEventListener('click', function(e){
+  if(e.target.id==='ovPin') closePin();
+});
+
+function verifyPin(){
+  var nom = document.getElementById('pinNom').value.trim();
+  if(currentRole==='educ' && !nom){
+    document.getElementById('pinError').textContent='Entrez votre pr\u00e9nom';
+    pinBuffer=''; updatePinDots();
+    return;
+  }
+  if(pinBuffer !== PIN_CODES[currentRole]){
+    var attempts=getAttempts(currentRole)+1;
+    setAttempts(currentRole,attempts);
+    shakeDots();
+    if(attempts>=MAX_ATTEMPTS){
+      var dur=lockoutDuration(attempts);
+      setLockoutUntil(currentRole, Date.now()+dur);
+      document.getElementById('pinError').textContent='Code incorrect.';
+      pinBuffer=''; updatePinDots();
+      checkLockoutDisplay();
+    } else {
+      document.getElementById('pinError').textContent='Code incorrect. ('+attempts+'/'+MAX_ATTEMPTS+')';
+      pinBuffer=''; updatePinDots();
+    }
+    return;
+  }
+  // SUCCES
+  resetAttempts(currentRole);
+  var acc=AUTH_ACCOUNTS[currentRole];
+  function finishLogin(){
+    if(currentRole==='educ'){
+      var nomFinal=(nom&&isNaN(nom))?nom:'\u00c9ducatrice';
+      try{ localStorage.setItem('alhikma_last_nom', nomFinal); }catch(e){}
+      saveSession('educ', nomFinal);
+    } else {
+      saveSession('admin','Admin');
+    }
+    closePin();
+    proposerEmpreinte(currentRole).then(function(){ goTo(currentRole); });
+  }
+  if(FIREBASE_OK && auth && acc){
+    auth.signInWithEmailAndPassword(acc.email, acc.password)
+      .then(finishLogin)
+      .catch(function(e){
+        // Compte pas encore cr\u00e9\u00e9 c\u00f4t\u00e9 Firebase -> on continue quand m\u00eame (mode local)
+        finishLogin();
+      });
+  } else {
+    finishLogin();
+  }
+}
+
+// ===================================================
+// EMPREINTE DIGITALE (WebAuthn)
+// ===================================================
+var FP_SUPPORTED = !!(window.PublicKeyCredential && navigator.credentials && navigator.credentials.create);
+
+function bufToB64(buf){ return btoa(String.fromCharCode.apply(null,new Uint8Array(buf))); }
+function b64ToBuf(b64){
+  var bin=atob(b64); var arr=new Uint8Array(bin.length);
+  for(var i=0;i<bin.length;i++) arr[i]=bin.charCodeAt(i);
+  return arr.buffer;
+}
+function fpRegistered(role){
+  try{ return !!localStorage.getItem('alhikma_fp_cred_'+role); }catch(e){ return false; }
+}
+
+async function registerFingerprint(role){
+  if(!FP_SUPPORTED) return false;
+  try{
+    var challenge=crypto.getRandomValues(new Uint8Array(32));
+    var cred=await navigator.credentials.create({publicKey:{
+      challenge:challenge,
+      rp:{name:"AL-HIKMA", id:window.location.hostname},
+      user:{
+        id:new TextEncoder().encode('alhikma_'+role),
+        name:role+'@alhikma.local',
+        displayName:role==='admin'?'Administrateur':'\u00c9ducatrice'
+      },
+      pubKeyCredParams:[{alg:-7,type:"public-key"},{alg:-257,type:"public-key"}],
+      authenticatorSelection:{authenticatorAttachment:"platform",userVerification:"required",residentKey:"preferred"},
+      timeout:60000
+    }});
+    localStorage.setItem('alhikma_fp_cred_'+role, bufToB64(cred.rawId));
+    return true;
+  }catch(e){ return false; }
+}
+
+async function authenticateFingerprint(role){
+  if(!FP_SUPPORTED) return false;
+  var credId=localStorage.getItem('alhikma_fp_cred_'+role);
+  if(!credId) return false;
+  try{
+    var challenge=crypto.getRandomValues(new Uint8Array(32));
+    await navigator.credentials.get({publicKey:{
+      challenge:challenge,
+      allowCredentials:[{id:b64ToBuf(credId),type:"public-key"}],
+      userVerification:"required",timeout:60000
+    }});
+    return true;
+  }catch(e){ return false; }
+}
+
+async function loginWithFingerprint(role){
+  var ok=await authenticateFingerprint(role);
+  if(ok){
+    resetAttempts(role);
+    if(role==='educ'){
+      var nom=localStorage.getItem('alhikma_last_nom')||'\u00c9ducatrice';
+      saveSession('educ', nom);
+    } else {
+      saveSession('admin','Admin');
+    }
+    goTo(role);
+  } else {
+    document.getElementById('fpError').style.display='block';
+    setTimeout(function(){document.getElementById('fpError').style.display='none';},3000);
+  }
+}
+
+async function proposerEmpreinte(role){
+  if(!FP_SUPPORTED || fpRegistered(role)) return;
+  if(!confirm('Activer l\u2019empreinte digitale pour une connexion plus rapide la prochaine fois ?')) return;
+  var ok=await registerFingerprint(role);
+  if(ok){
+    alert('\u2705 Empreinte activ\u00e9e !');
+    updateFpButtons();
+  }
+}
+
+function updateFpButtons(){
+  ['educ','admin'].forEach(function(role){
+    var btn=document.getElementById('fpBtn_'+role);
+    if(btn) btn.style.display = fpRegistered(role) ? 'flex' : 'none';
+  });
+}
+
+// ===================================================
+// INIT
+// ===================================================
+window.addEventListener('load', function(){
+  initFirebase();
+  checkSession();
+  updateFpButtons();
+  setTimeout(function(){ if(!FIREBASE_OK) setConnStatus(false); }, 3000);
+
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('al-hikma-sw.js').then(function(reg){
+      if(reg.waiting) reg.waiting.postMessage({type:'SKIP_WAITING'});
+    }).catch(function(){});
+  }
+});
+</script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</body>
+</html>
