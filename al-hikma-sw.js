@@ -1,8 +1,9 @@
 // AL-HIKMA Service Worker v1.0
-var CACHE_NAME = 'alhikma-v1';
+var CACHE_NAME = 'alhikma-v2';
 var APP_FILES = [
   './al-hikma-launcher.html',
   './al-hikma-educatrice.html',
+  './al-hikma-admin.html',
   './al-hikma-manifest.json',
   './al-hikma-icon-192.png',
   './al-hikma-icon-512.png'
