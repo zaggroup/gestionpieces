@@ -1,0 +1,836 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AL-HIKMA — Éducatrice</title>
+<link rel="manifest" href="al-hikma-manifest.json">
+<meta name="theme-color" content="#2d1f14">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#fdf9f0; --sand:#f0e6d2; --brown-dark:#2d1f14; --brown-mid:#4a3526;
+  --gold:#c9a227; --gold-light:#e8c84a; --green-ok:#2d6a4f; --green-light:#e6f2ec;
+  --red:#c0392b; --red-light:#fdecea; --orange:#d68910; --orange-light:#fdf3e3;
+  --text-dark:#2d1f14; --text-mid:#7a6a58; --bd:#ece1cf;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text-dark);padding-bottom:78px}
+
+/* HEADER */
+.header{
+  background:linear-gradient(160deg,var(--brown-dark) 0%,#1a120b 100%);
+  color:#fff;padding:18px 18px 16px;position:sticky;top:0;z-index:90;
+}
+.header-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.header-title{font-family:'Playfair Display',serif;font-weight:900;font-size:1.2rem;color:var(--gold-light)}
+.header-sub{font-size:.68rem;color:rgba(255,255,255,.55);margin-top:2px}
+.header-right{text-align:right}
+.user-pill{font-size:.7rem;color:rgba(255,255,255,.85);background:rgba(255,255,255,.1);padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:6px}
+.logout-btn{font-size:.65rem;color:rgba(255,255,255,.55);background:none;border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:3px 10px;cursor:pointer}
+.date-display{font-size:.72rem;color:var(--gold-light);font-weight:600}
+
+/* OFFLINE BANNER */
+.offline-banner{display:none;background:#3a2a1c;color:#fff;text-align:center;padding:6px;font-size:.7rem;font-weight:700}
+.offline-banner.show{display:block}
+
+/* TABS */
+.tabs{display:flex;background:#fff;border-bottom:1.5px solid var(--bd);position:sticky;top:74px;z-index:89;overflow-x:auto}
+.tab{flex:1;text-align:center;padding:12px 6px;font-size:.74rem;font-weight:700;color:var(--text-mid);border-bottom:3px solid transparent;white-space:nowrap;cursor:pointer}
+.tab.active{color:var(--brown-dark);border-bottom-color:var(--gold)}
+
+.pg{display:none;padding:14px;max-width:520px;margin:0 auto}
+.pg.active{display:block}
+
+/* ELEVE CARDS (accueil) */
+.eleve-card{
+  background:#fff;border:1.5px solid var(--bd);border-radius:16px;
+  padding:14px;margin-bottom:12px;display:flex;align-items:center;gap:12px;cursor:pointer;
+}
+.eleve-avatar{
+  width:46px;height:46px;border-radius:50%;background:var(--sand);
+  display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;
+  font-weight:900;font-size:1.1rem;color:var(--brown-mid);flex-shrink:0;
+}
+.eleve-info{flex:1}
+.eleve-name{font-family:'Playfair Display',serif;font-weight:900;font-size:.95rem}
+.eleve-status{font-size:.7rem;color:var(--text-mid);margin-top:2px}
+.status-pill{font-size:.62rem;font-weight:700;padding:3px 9px;border-radius:20px}
+.status-done{background:var(--green-light);color:var(--green-ok)}
+.status-pending{background:var(--orange-light);color:var(--orange)}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-mid)}
+.empty-state-icon{font-size:2.4rem;margin-bottom:10px}
+.empty-state-text{font-size:.82rem;line-height:1.6}
+
+/* SECTION TITLES */
+.sec-title{font-family:'Playfair Display',serif;font-weight:900;font-size:1.05rem;margin-bottom:12px;color:var(--brown-dark)}
+.sec-sub{font-size:.74rem;color:var(--text-mid);margin-bottom:14px;line-height:1.5}
+
+/* FORM ELEMENTS */
+.field{margin-bottom:14px}
+.field-label{font-size:.76rem;font-weight:700;color:var(--brown-mid);display:block;margin-bottom:6px}
+.field-input,.field-select,.field-textarea{
+  width:100%;padding:11px 12px;border:1.5px solid var(--bd);border-radius:12px;
+  font-size:.85rem;font-family:'Inter',sans-serif;outline:none;background:#fff;color:var(--text-dark);
+}
+.field-textarea{min-height:64px;resize:none}
+.field-input:focus,.field-select:focus,.field-textarea:focus{border-color:var(--gold)}
+
+/* PILL CHOICES (eval rapide) */
+.pill-choices{display:flex;gap:8px;flex-wrap:wrap}
+.pill-choice{
+  flex:1;min-width:80px;text-align:center;padding:10px 8px;border-radius:12px;
+  border:1.5px solid var(--bd);background:#fff;font-size:.78rem;font-weight:700;
+  color:var(--text-mid);cursor:pointer;transition:all .15s;
+}
+.pill-choice.sel-excellent.active{background:var(--green-light);border-color:var(--green-ok);color:var(--green-ok)}
+.pill-choice.sel-bien.active{background:#e3f2fd;border-color:#1565c0;color:#1565c0}
+.pill-choice.sel-moyen.active{background:var(--orange-light);border-color:var(--orange);color:var(--orange)}
+.pill-choice.sel-difficile.active{background:var(--red-light);border-color:var(--red);color:var(--red)}
+
+/* CHECKLIST ROUTINE */
+.routine-item{
+  display:flex;align-items:center;gap:12px;padding:12px;
+  background:#fff;border:1.5px solid var(--bd);border-radius:12px;margin-bottom:8px;cursor:pointer;
+}
+.routine-check{
+  width:24px;height:24px;border-radius:8px;border:2px solid var(--bd);
+  display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.9rem;
+  transition:all .15s;
+}
+.routine-item.checked .routine-check{background:var(--green-ok);border-color:var(--green-ok);color:#fff}
+.routine-label{font-size:.85rem;font-weight:600;flex:1}
+.routine-time{font-size:.68rem;color:var(--text-mid)}
+
+/* CARD */
+.card{background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:14px}
+
+/* SAVE BUTTON */
+.save-btn{
+  width:100%;padding:14px;border:none;border-radius:14px;
+  background:linear-gradient(135deg,var(--brown-dark),#1a120b);color:var(--gold-light);
+  font-family:'Playfair Display',serif;font-weight:900;font-size:.95rem;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;gap:8px;
+}
+.save-btn:disabled{opacity:.6}
+.save-btn.saved{background:linear-gradient(135deg,var(--green-ok),#1b4332);color:#fff}
+
+/* BACK BUTTON */
+.back-btn{
+  display:inline-flex;align-items:center;gap:6px;font-size:.78rem;font-weight:700;
+  color:var(--brown-mid);background:none;border:none;cursor:pointer;margin-bottom:14px;padding:0;
+}
+
+/* BOTTOM NAV */
+.bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1.5px solid var(--bd);
+  display:flex;z-index:90;
+}
+.bn-item{flex:1;text-align:center;padding:10px 4px;cursor:pointer;color:var(--text-mid)}
+.bn-item.active{color:var(--brown-dark)}
+.bn-icon{font-size:1.3rem;display:block;margin-bottom:2px}
+.bn-label{font-size:.62rem;font-weight:700}
+
+/* TOAST */
+.toast{
+  position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);
+  background:var(--brown-dark);color:var(--gold-light);padding:11px 22px;border-radius:30px;
+  font-size:.8rem;font-weight:700;opacity:0;transition:all .3s;z-index:300;white-space:nowrap;
+  box-shadow:0 8px 24px rgba(0,0,0,.25);
+}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* HISTORIQUE */
+.histo-item{background:#fff;border:1.5px solid var(--bd);border-radius:14px;padding:13px;margin-bottom:10px}
+.histo-date{font-size:.7rem;font-weight:700;color:var(--gold);text-transform:uppercase;letter-spacing:.5px;margin-bottom:6px}
+.histo-row{display:flex;justify-content:space-between;font-size:.78rem;padding:3px 0;border-bottom:1px dashed var(--bd)}
+.histo-row:last-child{border-bottom:none}
+.histo-row span:first-child{color:var(--text-mid)}
+.histo-row span:last-child{font-weight:700}
+
+/* ADD ELEVE FAB */
+.fab{
+  position:fixed;bottom:90px;right:18px;width:54px;height:54px;border-radius:50%;
+  background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--brown-dark);
+  border:none;font-size:1.6rem;box-shadow:0 6px 18px rgba(201,162,39,.5);cursor:pointer;z-index:95;
+}
+
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(45,31,20,.6);z-index:250;align-items:flex-end;justify-content:center}
+.ov.show{display:flex}
+.modal{background:var(--cream);border-radius:20px 20px 0 0;padding:22px 18px 24px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto}
+.modal-title{font-family:'Playfair Display',serif;font-weight:900;font-size:1.1rem;margin-bottom:14px}
+.modal-close{position:absolute;top:14px;right:18px;font-size:1.3rem;color:var(--text-mid);cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-row">
+    <div>
+      <div class="header-title">AL-HIKMA</div>
+      <div class="header-sub">Suivi quotidien</div>
+    </div>
+    <div class="header-right">
+      <div class="user-pill" id="userPill">👤 ...</div><br>
+      <button class="logout-btn" id="btnLogout">Quitter</button>
+    </div>
+  </div>
+  <div class="date-display" id="dateDisplay"></div>
+</div>
+
+<div class="offline-banner" id="offlineBanner">📴 Mode hors-ligne — synchronisation au retour de connexion</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" id="tab0" data-pg="0">Accueil</div>
+  <div class="tab" id="tab1" data-pg="1">Historique</div>
+  <div class="tab" id="tab2" data-pg="2">Élèves</div>
+</div>
+
+<!-- PG0: ACCUEIL (checklist du jour) -->
+<div class="pg active" id="pg0">
+  <div class="sec-title">📋 Suivi du jour</div>
+  <div class="sec-sub" id="dateSubtitle">Touchez un élève pour enregistrer son suivi.</div>
+  <div id="elevesListAccueil"></div>
+</div>
+
+<!-- PG1: HISTORIQUE -->
+<div class="pg" id="pg1">
+  <div class="sec-title">📅 Historique</div>
+  <div class="field">
+    <label class="field-label">Choisir un élève</label>
+    <select class="field-select" id="histoEleveSelect"></select>
+  </div>
+  <div id="histoList"></div>
+</div>
+
+<!-- PG2: ELEVES (liste + ajout) -->
+<div class="pg" id="pg2">
+  <div class="sec-title">👦 Élèves d'AL-HIKMA</div>
+  <div class="sec-sub">5 places disponibles pour l'internat.</div>
+  <div id="elevesListGestion"></div>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bn-item active" data-pg="0"><span class="bn-icon">🏠</span><span class="bn-label">Accueil</span></div>
+  <div class="bn-item" data-pg="1"><span class="bn-icon">📅</span><span class="bn-label">Historique</span></div>
+  <div class="bn-item" data-pg="2"><span class="bn-icon">👦</span><span class="bn-label">Élèves</span></div>
+</div>
+
+<!-- FAB Ajouter élève -->
+<button class="fab" id="fabAddEleve" style="display:none">+</button>
+
+<!-- ===== MODAL: SUIVI QUOTIDIEN D'UN ELEVE ===== -->
+<div class="ov" id="ovSuivi">
+  <div class="modal">
+    <span class="modal-close" id="closeSuivi">✕</span>
+    <div class="modal-title" id="suiviTitle">Suivi de —</div>
+
+    <div class="sec-sub" id="suiviDate"></div>
+
+    <!-- CORAN -->
+    <div class="card">
+      <label class="field-label">📖 Coran — Sourate / Passage travaillé</label>
+      <input type="text" class="field-input" id="suiviCoranPassage" placeholder="Ex: Sourate Al-Baqara, v.1-10" style="margin-bottom:10px">
+      <label class="field-label">Évaluation</label>
+      <div class="pill-choices" id="suiviCoranEval">
+        <div class="pill-choice sel-excellent" data-v="excellent">Excellent</div>
+        <div class="pill-choice sel-bien" data-v="bien">Bien</div>
+        <div class="pill-choice sel-moyen" data-v="moyen">Moyen</div>
+        <div class="pill-choice sel-difficile" data-v="difficile">À revoir</div>
+      </div>
+    </div>
+
+    <!-- DEVOIRS -->
+    <div class="card">
+      <label class="field-label">📚 Devoirs / École</label>
+      <div class="pill-choices" style="margin-bottom:10px">
+        <div class="pill-choice sel-excellent" data-grp="devoirs" data-v="fait">✅ Fait</div>
+        <div class="pill-choice sel-difficile" data-grp="devoirs" data-v="non_fait">❌ Pas fait</div>
+      </div>
+      <textarea class="field-textarea" id="suiviDevoirsNote" placeholder="Matières, difficultés rencontrées..."></textarea>
+    </div>
+
+    <!-- ROUTINE -->
+    <div class="card">
+      <label class="field-label" style="margin-bottom:10px;display:block">⏰ Routine de la journée</label>
+      <div class="routine-item" data-r="fajr">
+        <div class="routine-check">✓</div>
+        <div class="routine-label">Prière de Fajr</div>
+        <div class="routine-time">5h00</div>
+      </div>
+      <div class="routine-item" data-r="repas">
+        <div class="routine-check">✓</div>
+        <div class="routine-label">Repas pris</div>
+        <div class="routine-time">midi/soir</div>
+      </div>
+      <div class="routine-item" data-r="etude">
+        <div class="routine-check">✓</div>
+        <div class="routine-label">Étude du soir</div>
+        <div class="routine-time">~18h</div>
+      </div>
+      <div class="routine-item" data-r="coucher">
+        <div class="routine-check">✓</div>
+        <div class="routine-label">Coucher à l'heure</div>
+        <div class="routine-time">~21h</div>
+      </div>
+    </div>
+
+    <!-- COMPORTEMENT -->
+    <div class="card">
+      <label class="field-label">😊 Comportement</label>
+      <div class="pill-choices" id="suiviComportement" style="margin-bottom:10px">
+        <div class="pill-choice sel-excellent" data-v="excellent">Excellent</div>
+        <div class="pill-choice sel-bien" data-v="bon">Bon</div>
+        <div class="pill-choice sel-moyen" data-v="moyen">Moyen</div>
+        <div class="pill-choice sel-difficile" data-v="difficile">Difficile</div>
+      </div>
+      <textarea class="field-textarea" id="suiviComportementNote" placeholder="Remarque (optionnel)..."></textarea>
+    </div>
+
+    <!-- SANTE -->
+    <div class="card">
+      <label class="field-label">🩺 Santé</label>
+      <div class="pill-choices" id="suiviSante" style="margin-bottom:10px">
+        <div class="pill-choice sel-excellent" data-v="ras">✅ RAS</div>
+        <div class="pill-choice sel-difficile" data-v="probleme">⚠️ Problème</div>
+      </div>
+      <textarea class="field-textarea" id="suiviSanteNote" placeholder="Si problème, décrire (fièvre, douleur...)..."></textarea>
+    </div>
+
+    <button class="save-btn" id="btnSaveSuivi">✅ Enregistrer le suivi du jour</button>
+  </div>
+</div>
+
+<!-- ===== MODAL: AJOUTER UN ELEVE ===== -->
+<div class="ov" id="ovEleve">
+  <div class="modal">
+    <span class="modal-close" id="closeEleve">✕</span>
+    <div class="modal-title">👦 Nouvel élève</div>
+    <div class="field">
+      <label class="field-label">Nom complet *</label>
+      <input type="text" class="field-input" id="eleveNom" placeholder="Ex: Ibrahima Diallo">
+    </div>
+    <div class="field">
+      <label class="field-label">Âge</label>
+      <input type="number" class="field-input" id="eleveAge" placeholder="Ex: 10">
+    </div>
+    <div class="field">
+      <label class="field-label">Nom du parent / tuteur *</label>
+      <input type="text" class="field-input" id="eleveParent" placeholder="Ex: M. Diallo">
+    </div>
+    <div class="field">
+      <label class="field-label">Téléphone parent</label>
+      <input type="tel" class="field-input" id="eleveTel" placeholder="Ex: 626 XX XX XX">
+    </div>
+    <div class="field">
+      <label class="field-label">Contact d'urgence (si différent)</label>
+      <input type="text" class="field-input" id="eleveUrgence" placeholder="Nom + téléphone">
+    </div>
+    <div class="field">
+      <label class="field-label">Informations santé (allergies, traitements...)</label>
+      <textarea class="field-textarea" id="eleveSante" placeholder="Aucune si rien à signaler"></textarea>
+    </div>
+    <div class="field">
+      <label class="field-label">Date d'inscription</label>
+      <input type="date" class="field-input" id="eleveDateInscription">
+    </div>
+    <button class="save-btn" id="btnSaveEleve">✅ Inscrire l'élève</button>
+  </div>
+</div>
+
+<!-- ===== MODAL: PROFIL ELEVE ===== -->
+<div class="ov" id="ovProfil">
+  <div class="modal">
+    <span class="modal-close" id="closeProfil">✕</span>
+    <div class="modal-title" id="profilNom">—</div>
+    <div class="card">
+      <div class="histo-row"><span>Âge</span><span id="profilAge">—</span></div>
+      <div class="histo-row"><span>Parent / Tuteur</span><span id="profilParent">—</span></div>
+      <div class="histo-row"><span>Téléphone</span><span id="profilTel">—</span></div>
+      <div class="histo-row"><span>Contact urgence</span><span id="profilUrgence">—</span></div>
+      <div class="histo-row"><span>Inscrit le</span><span id="profilDate">—</span></div>
+    </div>
+    <div class="card">
+      <div class="field-label" style="margin-bottom:6px">🩺 Informations santé</div>
+      <div style="font-size:.82rem;color:var(--text-mid)" id="profilSante">—</div>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =====================================================
+// FIREBASE INIT
+// =====================================================
+var db=null, FIREBASE_OK=false;
+function createFakeDb(){
+  var fakeRef={
+    onSnapshot:function(ok){ok({docs:[]});return function(){};},
+    get:function(){return Promise.resolve({docs:[],exists:false,data:function(){return null;}});},
+    add:function(d){return Promise.resolve({id:'local_'+Date.now()});},
+    set:function(){return Promise.resolve();},
+    update:function(){return Promise.resolve();},
+    doc:function(){return fakeRef;},
+    where:function(){return fakeRef;},
+    orderBy:function(){return fakeRef;},
+    limit:function(){return fakeRef;}
+  };
+  return {collection:function(){return fakeRef;}};
+}
+function initFirebase(){
+  if(typeof firebase==='undefined'){db=createFakeDb();setOffline(true);return;}
+  try{
+    var cfg={
+      apiKey:"AIzaSyDWF-Q3S2M-btrRBHBYzd9dVbY6iEg_fNk",
+      authDomain:"gestionpieces-74559.firebaseapp.com",
+      projectId:"gestionpieces-74559",
+      storageBucket:"gestionpieces-74559.appspot.com"
+    };
+    if(!firebase.apps||!firebase.apps.length) firebase.initializeApp(cfg);
+    db=firebase.firestore();
+    if(firebase.auth){
+      var auth=firebase.auth();
+      var acc={email:'educatrice@al-hikma.app',password:'AlHikma2026!Educ#Kindia'};
+      auth.signInWithEmailAndPassword(acc.email,acc.password).catch(function(){});
+    }
+    db.enablePersistence({synchronizeTabs:true}).catch(function(){});
+    FIREBASE_OK=true;
+    setOffline(!navigator.onLine);
+  }catch(e){db=createFakeDb();setOffline(true);}
+}
+function setOffline(isOff){
+  document.getElementById('offlineBanner').classList.toggle('show', isOff);
+}
+window.addEventListener('online',function(){setOffline(false);});
+window.addEventListener('offline',function(){setOffline(true);});
+
+// =====================================================
+// SESSION
+// =====================================================
+function checkSession(){
+  try{
+    var s=JSON.parse(localStorage.getItem('alhikma_session'));
+    if(!s || s.role!=='educ' || (Date.now()-s.ts)>15*60*1000){
+      window.location.href='al-hikma-launcher.html';
+      return;
+    }
+    document.getElementById('userPill').textContent='👤 '+(s.nom||'Éducatrice');
+  }catch(e){ window.location.href='al-hikma-launcher.html'; return; }
+}
+document.getElementById('btnLogout').addEventListener('click',function(){
+  try{localStorage.removeItem('alhikma_session');}catch(e){}
+  if(typeof firebase!=='undefined'&&firebase.auth) firebase.auth().signOut().catch(function(){});
+  window.location.href='al-hikma-launcher.html';
+});
+
+// =====================================================
+// DATE
+// =====================================================
+var TODAY = new Date();
+var TODAY_STR = TODAY.toISOString().slice(0,10); // YYYY-MM-DD
+var JOURS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+var MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+document.getElementById('dateDisplay').textContent =
+  JOURS[TODAY.getDay()]+' '+TODAY.getDate()+' '+MOIS[TODAY.getMonth()]+' '+TODAY.getFullYear();
+
+// =====================================================
+// TOAST
+// =====================================================
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg;
+  t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2400);
+}
+
+// =====================================================
+// NAVIGATION TABS
+// =====================================================
+function switchTab(i){
+  document.querySelectorAll('.pg').forEach(function(p,idx){p.classList.toggle('active',idx==i);});
+  document.querySelectorAll('.tab').forEach(function(t,idx){t.classList.toggle('active',idx==i);});
+  document.querySelectorAll('.bn-item').forEach(function(b,idx){b.classList.toggle('active',idx==i);});
+  document.getElementById('fabAddEleve').style.display = (i==2)?'flex':'none';
+}
+document.querySelectorAll('.tab').forEach(function(t,i){t.addEventListener('click',function(){switchTab(i);});});
+document.querySelectorAll('.bn-item').forEach(function(b,i){b.addEventListener('click',function(){switchTab(i);});});
+
+// =====================================================
+// DATA
+// =====================================================
+var eleves=[]; // {id, nom, age, parent, tel, urgence, sante, dateInscription}
+var suivisToday={}; // eleveId -> doc data (si déjà rempli aujourd'hui)
+var currentEleveId=null;
+
+function loadData(){
+  db.collection('alhikma_eleves').orderBy('nom').onSnapshot(function(snap){
+    eleves=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderElevesAccueil();
+    renderElevesGestion();
+    renderHistoSelect();
+  },function(){ renderElevesAccueil(); renderElevesGestion(); });
+
+  db.collection('alhikma_suivi').where('date','==',TODAY_STR).onSnapshot(function(snap){
+    suivisToday={};
+    snap.docs.forEach(function(d){ suivisToday[d.data().eleveId]=Object.assign({id:d.id},d.data()); });
+    renderElevesAccueil();
+  },function(){});
+}
+
+// =====================================================
+// RENDER: ACCUEIL (liste élèves + statut du jour)
+// =====================================================
+function initiales(nom){
+  return (nom||'?').trim().split(/\s+/).map(function(w){return w[0];}).slice(0,2).join('').toUpperCase();
+}
+function renderElevesAccueil(){
+  var el=document.getElementById('elevesListAccueil');
+  if(!eleves.length){
+    el.innerHTML='<div class="empty-state"><div class="empty-state-icon">👦</div>'+
+      '<div class="empty-state-text">Aucun élève inscrit pour le moment.<br>Va dans l\'onglet <b>Élèves</b> pour ajouter le premier.</div></div>';
+    return;
+  }
+  var html='';
+  eleves.forEach(function(el2){
+    var done=!!suivisToday[el2.id];
+    html+='<div class="eleve-card" onclick="openSuivi(\''+el2.id+'\')">';
+    html+='<div class="eleve-avatar">'+initiales(el2.nom)+'</div>';
+    html+='<div class="eleve-info">';
+    html+='<div class="eleve-name">'+el2.nom+'</div>';
+    html+='<div class="eleve-status">'+(el2.age?('Âge '+el2.age+' ans'):'')+'</div>';
+    html+='</div>';
+    html+='<div class="status-pill '+(done?'status-done':'status-pending')+'">'+(done?'✓ Fait':'À faire')+'</div>';
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+// =====================================================
+// RENDER: ELEVES (gestion)
+// =====================================================
+function renderElevesGestion(){
+  var el=document.getElementById('elevesListGestion');
+  if(!eleves.length){
+    el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📋</div>'+
+      '<div class="empty-state-text">Pas encore d\'élève. Touche le bouton + en bas à droite pour inscrire le premier.</div></div>';
+    return;
+  }
+  var html='';
+  eleves.forEach(function(el2){
+    html+='<div class="eleve-card" onclick="openProfil(\''+el2.id+'\')">';
+    html+='<div class="eleve-avatar">'+initiales(el2.nom)+'</div>';
+    html+='<div class="eleve-info">';
+    html+='<div class="eleve-name">'+el2.nom+'</div>';
+    html+='<div class="eleve-status">Tuteur: '+(el2.parent||'—')+'</div>';
+    html+='</div>';
+    html+='<div style="font-size:1.2rem">›</div>';
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+function openProfil(id){
+  var el2=eleves.find(function(x){return x.id===id;});
+  if(!el2) return;
+  document.getElementById('profilNom').textContent=el2.nom;
+  document.getElementById('profilAge').textContent=el2.age?(el2.age+' ans'):'—';
+  document.getElementById('profilParent').textContent=el2.parent||'—';
+  document.getElementById('profilTel').textContent=el2.tel||'—';
+  document.getElementById('profilUrgence').textContent=el2.urgence||'—';
+  document.getElementById('profilDate').textContent=el2.dateInscription||'—';
+  document.getElementById('profilSante').textContent=el2.sante||'Aucune information renseignée';
+  document.getElementById('ovProfil').classList.add('show');
+}
+document.getElementById('closeProfil').addEventListener('click',function(){
+  document.getElementById('ovProfil').classList.remove('show');
+});
+
+// =====================================================
+// AJOUTER UN ELEVE
+// =====================================================
+document.getElementById('fabAddEleve').addEventListener('click',function(){
+  ['eleveNom','eleveAge','eleveParent','eleveTel','eleveUrgence','eleveSante'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('eleveDateInscription').value=TODAY_STR;
+  document.getElementById('ovEleve').classList.add('show');
+});
+document.getElementById('closeEleve').addEventListener('click',function(){
+  document.getElementById('ovEleve').classList.remove('show');
+});
+document.getElementById('btnSaveEleve').addEventListener('click',function(){
+  var nom=document.getElementById('eleveNom').value.trim();
+  var parent=document.getElementById('eleveParent').value.trim();
+  if(!nom){showToast('⚠️ Le nom est obligatoire');return;}
+  if(!parent){showToast('⚠️ Le nom du tuteur est obligatoire');return;}
+  if(eleves.length>=5){
+    if(!confirm('AL-HIKMA a une capacité de 5 élèves. Continuer quand même ?')) return;
+  }
+  var btn=this; btn.disabled=true; btn.textContent='⏳...';
+  var data={
+    nom:nom,
+    age:parseInt(document.getElementById('eleveAge').value)||null,
+    parent:parent,
+    tel:document.getElementById('eleveTel').value.trim(),
+    urgence:document.getElementById('eleveUrgence').value.trim(),
+    sante:document.getElementById('eleveSante').value.trim(),
+    dateInscription:document.getElementById('eleveDateInscription').value||TODAY_STR,
+    createdAt:new Date().toISOString()
+  };
+  db.collection('alhikma_eleves').add(data).then(function(){
+    document.getElementById('ovEleve').classList.remove('show');
+    showToast('✅ '+nom+' inscrit !');
+    btn.disabled=false; btn.textContent="✅ Inscrire l'élève";
+  }).catch(function(e){
+    showToast('❌ '+e.message);
+    btn.disabled=false; btn.textContent="✅ Inscrire l'élève";
+  });
+});
+
+// =====================================================
+// SUIVI QUOTIDIEN (modal)
+// =====================================================
+var suiviState={};
+
+function resetSuiviState(){
+  suiviState={
+    coranPassage:'', coranEval:null,
+    devoirsStatut:null, devoirsNote:'',
+    routine:{fajr:false,repas:false,etude:false,coucher:false},
+    comportement:null, comportementNote:'',
+    sante:null, santeNote:''
+  };
+}
+
+function openSuivi(eleveId){
+  currentEleveId=eleveId;
+  var el2=eleves.find(function(x){return x.id===eleveId;});
+  if(!el2) return;
+  resetSuiviState();
+  document.getElementById('suiviTitle').textContent='Suivi de '+el2.nom;
+  document.getElementById('suiviDate').textContent=JOURS[TODAY.getDay()]+' '+TODAY.getDate()+' '+MOIS[TODAY.getMonth()];
+
+  // Pré-remplir si déjà saisi aujourd'hui
+  var existing=suivisToday[eleveId];
+  if(existing){
+    suiviState.coranPassage=existing.coranPassage||'';
+    suiviState.coranEval=existing.coranEval||null;
+    suiviState.devoirsStatut=existing.devoirsStatut||null;
+    suiviState.devoirsNote=existing.devoirsNote||'';
+    suiviState.routine=existing.routine||suiviState.routine;
+    suiviState.comportement=existing.comportement||null;
+    suiviState.comportementNote=existing.comportementNote||'';
+    suiviState.sante=existing.sante||null;
+    suiviState.santeNote=existing.santeNote||'';
+  }
+
+  document.getElementById('suiviCoranPassage').value=suiviState.coranPassage;
+  document.getElementById('suiviDevoirsNote').value=suiviState.devoirsNote;
+  document.getElementById('suiviComportementNote').value=suiviState.comportementNote;
+  document.getElementById('suiviSanteNote').value=suiviState.santeNote;
+
+  // Pills
+  syncPills('#suiviCoranEval','coranEval');
+  syncPillsGroup('devoirs','devoirsStatut');
+  syncPills('#suiviComportement','comportement');
+  syncPills('#suiviSante','sante');
+
+  // Routine checks
+  document.querySelectorAll('.routine-item').forEach(function(r){
+    var key=r.getAttribute('data-r');
+    r.classList.toggle('checked', !!suiviState.routine[key]);
+  });
+
+  var btn=document.getElementById('btnSaveSuivi');
+  btn.classList.remove('saved');
+  btn.textContent='✅ Enregistrer le suivi du jour';
+
+  document.getElementById('ovSuivi').classList.add('show');
+}
+document.getElementById('closeSuivi').addEventListener('click',function(){
+  document.getElementById('ovSuivi').classList.remove('show');
+});
+
+function syncPills(selector,key){
+  document.querySelectorAll(selector+' .pill-choice').forEach(function(p){
+    p.classList.toggle('active', p.getAttribute('data-v')===suiviState[key]);
+  });
+}
+function syncPillsGroup(grp,key){
+  document.querySelectorAll('.pill-choice[data-grp="'+grp+'"]').forEach(function(p){
+    p.classList.toggle('active', p.getAttribute('data-v')===suiviState[key]);
+  });
+}
+
+// Pill click handlers
+document.getElementById('suiviCoranEval').addEventListener('click',function(e){
+  var p=e.target.closest('.pill-choice'); if(!p) return;
+  suiviState.coranEval=p.getAttribute('data-v');
+  syncPills('#suiviCoranEval','coranEval');
+});
+document.querySelectorAll('.pill-choice[data-grp="devoirs"]').forEach(function(p){
+  p.addEventListener('click',function(){
+    suiviState.devoirsStatut=p.getAttribute('data-v');
+    syncPillsGroup('devoirs','devoirsStatut');
+  });
+});
+document.getElementById('suiviComportement').addEventListener('click',function(e){
+  var p=e.target.closest('.pill-choice'); if(!p) return;
+  suiviState.comportement=p.getAttribute('data-v');
+  syncPills('#suiviComportement','comportement');
+});
+document.getElementById('suiviSante').addEventListener('click',function(e){
+  var p=e.target.closest('.pill-choice'); if(!p) return;
+  suiviState.sante=p.getAttribute('data-v');
+  syncPills('#suiviSante','sante');
+});
+
+// Routine toggle
+document.querySelectorAll('.routine-item').forEach(function(r){
+  r.addEventListener('click',function(){
+    var key=r.getAttribute('data-r');
+    suiviState.routine[key]=!suiviState.routine[key];
+    r.classList.toggle('checked', suiviState.routine[key]);
+  });
+});
+
+// SAVE
+document.getElementById('btnSaveSuivi').addEventListener('click',function(){
+  if(!currentEleveId) return;
+  var btn=this;
+  suiviState.coranPassage=document.getElementById('suiviCoranPassage').value.trim();
+  suiviState.devoirsNote=document.getElementById('suiviDevoirsNote').value.trim();
+  suiviState.comportementNote=document.getElementById('suiviComportementNote').value.trim();
+  suiviState.santeNote=document.getElementById('suiviSanteNote').value.trim();
+
+  var data={
+    eleveId:currentEleveId,
+    date:TODAY_STR,
+    coranPassage:suiviState.coranPassage,
+    coranEval:suiviState.coranEval,
+    devoirsStatut:suiviState.devoirsStatut,
+    devoirsNote:suiviState.devoirsNote,
+    routine:suiviState.routine,
+    comportement:suiviState.comportement,
+    comportementNote:suiviState.comportementNote,
+    sante:suiviState.sante,
+    santeNote:suiviState.santeNote,
+    educatrice:(JSON.parse(localStorage.getItem('alhikma_session')||'{}').nom)||'',
+    updatedAt:new Date().toISOString()
+  };
+
+  btn.disabled=true; btn.textContent='⏳...';
+  var guard=setTimeout(function(){btn.disabled=false;btn.textContent='✅ Enregistrer le suivi du jour';},6000);
+
+  var existing=suivisToday[currentEleveId];
+  var promise;
+  if(existing && existing.id && !existing.id.toString().startsWith('local_')){
+    promise=db.collection('alhikma_suivi').doc(existing.id).set(data);
+  } else {
+    promise=db.collection('alhikma_suivi').add(data);
+  }
+
+  promise.then(function(){
+    clearTimeout(guard);
+    btn.disabled=false;
+    btn.classList.add('saved');
+    btn.textContent='✅ Enregistré !';
+    suivisToday[currentEleveId]=Object.assign({},data,{id:existing?existing.id:'local_'+Date.now()});
+    renderElevesAccueil();
+    setTimeout(function(){
+      document.getElementById('ovSuivi').classList.remove('show');
+    },700);
+    if(suiviState.sante==='probleme'){
+      showToast('⚠️ Problème de santé signalé — informe l\'administrateur');
+    } else {
+      showToast('✅ Suivi enregistré');
+    }
+  }).catch(function(e){
+    clearTimeout(guard);
+    btn.disabled=false; btn.textContent='✅ Enregistrer le suivi du jour';
+    showToast('💾 Sauvegardé localement (hors-ligne)');
+    suivisToday[currentEleveId]=Object.assign({},data,{id:'local_'+Date.now()});
+    renderElevesAccueil();
+    document.getElementById('ovSuivi').classList.remove('show');
+  });
+});
+
+// =====================================================
+// HISTORIQUE
+// =====================================================
+function renderHistoSelect(){
+  var sel=document.getElementById('histoEleveSelect');
+  var prev=sel.value;
+  sel.innerHTML='';
+  eleves.forEach(function(el2){
+    var opt=document.createElement('option');
+    opt.value=el2.id; opt.textContent=el2.nom;
+    sel.appendChild(opt);
+  });
+  if(prev) sel.value=prev;
+  if(sel.value) loadHistorique(sel.value);
+}
+document.getElementById('histoEleveSelect').addEventListener('change',function(){
+  loadHistorique(this.value);
+});
+
+var EVAL_LABELS={excellent:'Excellent',bien:'Bien',moyen:'Moyen',difficile:'À revoir',
+  fait:'✅ Fait',non_fait:'❌ Pas fait',bon:'Bon',ras:'✅ RAS',probleme:'⚠️ Problème'};
+
+function loadHistorique(eleveId){
+  var el=document.getElementById('histoList');
+  el.innerHTML='<div class="empty-state-text" style="text-align:center;padding:20px">Chargement...</div>';
+  db.collection('alhikma_suivi').where('eleveId','==',eleveId).orderBy('date','desc').limit(14).get()
+    .then(function(snap){
+      if(snap.docs.length===0){
+        el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📅</div><div class="empty-state-text">Aucun suivi enregistré encore.</div></div>';
+        return;
+      }
+      var html='';
+      snap.docs.forEach(function(d){
+        var s=d.data();
+        var dateObj=new Date(s.date);
+        var dateLbl=JOURS[dateObj.getDay()]+' '+dateObj.getDate()+' '+MOIS[dateObj.getMonth()];
+        html+='<div class="histo-item">';
+        html+='<div class="histo-date">'+dateLbl+'</div>';
+        if(s.coranPassage) html+='<div class="histo-row"><span>📖 Coran</span><span>'+s.coranPassage+(s.coranEval?(' — '+EVAL_LABELS[s.coranEval]):'')+'</span></div>';
+        if(s.devoirsStatut) html+='<div class="histo-row"><span>📚 Devoirs</span><span>'+(EVAL_LABELS[s.devoirsStatut]||s.devoirsStatut)+'</span></div>';
+        if(s.routine){
+          var r=s.routine;
+          var routineTxt=[r.fajr?'Fajr✓':'',r.repas?'Repas✓':'',r.etude?'Étude✓':'',r.coucher?'Coucher✓':''].filter(Boolean).join(' · ');
+          if(routineTxt) html+='<div class="histo-row"><span>⏰ Routine</span><span>'+routineTxt+'</span></div>';
+        }
+        if(s.comportement) html+='<div class="histo-row"><span>😊 Comportement</span><span>'+(EVAL_LABELS[s.comportement]||s.comportement)+'</span></div>';
+        if(s.sante) html+='<div class="histo-row"><span>🩺 Santé</span><span>'+(EVAL_LABELS[s.sante]||s.sante)+'</span></div>';
+        html+='</div>';
+      });
+      el.innerHTML=html;
+    }).catch(function(){
+      el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📴</div><div class="empty-state-text">Historique indisponible hors-ligne.</div></div>';
+    });
+}
+
+// =====================================================
+// INIT
+// =====================================================
+window.addEventListener('load',function(){
+  checkSession();
+  initFirebase();
+  loadData();
+
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('al-hikma-sw.js').catch(function(){});
+  }
+});
+</script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</body>
+</html>
