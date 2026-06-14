@@ -1,0 +1,869 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>AL-HIKMA — Administrateur</title>
+<link rel="manifest" href="al-hikma-manifest.json">
+<meta name="theme-color" content="#2d1f14">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#fdf9f0; --sand:#f0e6d2; --brown-dark:#2d1f14; --brown-mid:#4a3526;
+  --gold:#c9a227; --gold-light:#e8c84a; --green-ok:#2d6a4f; --green-light:#e6f2ec;
+  --red:#c0392b; --red-light:#fdecea; --orange:#d68910; --orange-light:#fdf3e3;
+  --blue:#1565c0; --blue-light:#e3f2fd;
+  --text-dark:#2d1f14; --text-mid:#7a6a58; --bd:#ece1cf;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+body{font-family:'Inter',sans-serif;background:var(--cream);color:var(--text-dark);padding-bottom:78px}
+
+/* HEADER */
+.header{background:linear-gradient(160deg,var(--brown-dark) 0%,#1a120b 100%);color:#fff;padding:18px 18px 16px;position:sticky;top:0;z-index:90}
+.header-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.header-title{font-family:'Playfair Display',serif;font-weight:900;font-size:1.2rem;color:var(--gold-light)}
+.header-sub{font-size:.68rem;color:rgba(255,255,255,.55);margin-top:2px}
+.header-right{text-align:right}
+.user-pill{font-size:.7rem;color:rgba(255,255,255,.85);background:rgba(255,255,255,.1);padding:4px 10px;border-radius:20px;display:inline-block;margin-bottom:6px}
+.logout-btn{font-size:.65rem;color:rgba(255,255,255,.55);background:none;border:1px solid rgba(255,255,255,.25);border-radius:20px;padding:3px 10px;cursor:pointer}
+.date-display{font-size:.72rem;color:var(--gold-light);font-weight:600}
+
+.offline-banner{display:none;background:#3a2a1c;color:#fff;text-align:center;padding:6px;font-size:.7rem;font-weight:700}
+.offline-banner.show{display:block}
+
+/* TABS */
+.tabs{display:flex;background:#fff;border-bottom:1.5px solid var(--bd);position:sticky;top:74px;z-index:89;overflow-x:auto}
+.tab{flex:1;text-align:center;padding:12px 4px;font-size:.7rem;font-weight:700;color:var(--text-mid);border-bottom:3px solid transparent;white-space:nowrap;cursor:pointer}
+.tab.active{color:var(--brown-dark);border-bottom-color:var(--gold)}
+
+.pg{display:none;padding:14px;max-width:520px;margin:0 auto}
+.pg.active{display:block}
+
+.sec-title{font-family:'Playfair Display',serif;font-weight:900;font-size:1.05rem;margin-bottom:12px;color:var(--brown-dark)}
+.sec-sub{font-size:.74rem;color:var(--text-mid);margin-bottom:14px;line-height:1.5}
+
+/* STAT CARDS */
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.stat-card{background:#fff;border:1.5px solid var(--bd);border-radius:14px;padding:14px}
+.stat-card.full{grid-column:1/-1}
+.stat-icon{font-size:1.3rem;margin-bottom:6px}
+.stat-value{font-family:'Playfair Display',serif;font-weight:900;font-size:1.25rem;line-height:1.1}
+.stat-label{font-size:.66rem;color:var(--text-mid);margin-top:3px;text-transform:uppercase;letter-spacing:.5px}
+.stat-sub{font-size:.7rem;color:var(--text-mid);margin-top:4px}
+.progress-bar{height:6px;background:var(--bd);border-radius:6px;margin-top:8px;overflow:hidden}
+.progress-fill{height:100%;background:linear-gradient(90deg,var(--gold),var(--gold-light));border-radius:6px}
+
+/* ELEVE OVERVIEW CARD */
+.eleve-card{background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:10px;display:flex;align-items:center;gap:12px}
+.eleve-avatar{width:42px;height:42px;border-radius:50%;background:var(--sand);display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-weight:900;font-size:1rem;color:var(--brown-mid);flex-shrink:0}
+.eleve-info{flex:1;min-width:0}
+.eleve-name{font-family:'Playfair Display',serif;font-weight:900;font-size:.92rem}
+.eleve-meta{font-size:.68rem;color:var(--text-mid);margin-top:2px}
+.badges{display:flex;flex-direction:column;gap:4px;align-items:flex-end}
+.badge{font-size:.62rem;font-weight:700;padding:3px 9px;border-radius:20px;white-space:nowrap}
+.badge-ok{background:var(--green-light);color:var(--green-ok)}
+.badge-pending{background:var(--orange-light);color:var(--orange)}
+.badge-late{background:var(--red-light);color:var(--red)}
+
+.empty-state{text-align:center;padding:40px 20px;color:var(--text-mid)}
+.empty-state-icon{font-size:2.4rem;margin-bottom:10px}
+.empty-state-text{font-size:.82rem;line-height:1.6}
+
+/* MONTH SELECTOR */
+.month-selector{display:flex;align-items:center;justify-content:space-between;background:#fff;border:1.5px solid var(--bd);border-radius:14px;padding:10px 14px;margin-bottom:16px}
+.month-nav{font-size:1.2rem;color:var(--brown-mid);cursor:pointer;padding:4px 10px}
+.month-label{font-family:'Playfair Display',serif;font-weight:900;font-size:.95rem}
+
+/* PAYMENT CARD */
+.pay-card{background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:10px}
+.pay-row{display:flex;justify-content:space-between;align-items:center}
+.pay-name{font-family:'Playfair Display',serif;font-weight:900;font-size:.92rem}
+.pay-detail{font-size:.7rem;color:var(--text-mid);margin-top:3px}
+.pay-action-btn{font-size:.72rem;font-weight:700;padding:7px 14px;border-radius:10px;border:none;cursor:pointer}
+.pay-action-btn.todo{background:var(--brown-dark);color:var(--gold-light)}
+.pay-action-btn.done{background:var(--green-light);color:var(--green-ok)}
+
+/* PRODUIT CARD */
+.prod-card{background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:14px;margin-bottom:10px}
+.prod-row{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:8px}
+.prod-name{font-family:'Playfair Display',serif;font-weight:900;font-size:.92rem}
+.prod-meta{font-size:.7rem;color:var(--text-mid);margin-top:3px}
+.stock-low{color:var(--red);font-weight:700}
+.prod-actions{display:flex;gap:8px}
+.prod-btn{flex:1;font-size:.74rem;font-weight:700;padding:9px;border-radius:10px;border:1.5px solid var(--bd);background:#fff;cursor:pointer;color:var(--brown-mid)}
+.prod-btn.primary{background:var(--brown-dark);color:var(--gold-light);border-color:var(--brown-dark)}
+
+/* FIELDS */
+.field{margin-bottom:14px}
+.field-label{font-size:.76rem;font-weight:700;color:var(--brown-mid);display:block;margin-bottom:6px}
+.field-input,.field-select,.field-textarea{width:100%;padding:11px 12px;border:1.5px solid var(--bd);border-radius:12px;font-size:.85rem;font-family:'Inter',sans-serif;outline:none;background:#fff;color:var(--text-dark)}
+.field-textarea{min-height:64px;resize:none}
+.field-input:focus,.field-select:focus,.field-textarea:focus{border-color:var(--gold)}
+.field-row{display:flex;gap:10px}
+.field-row>.field{flex:1}
+
+/* PILL CHOICES (period) */
+.pill-choices{display:flex;gap:8px;flex-wrap:wrap}
+.pill-choice{flex:1;min-width:80px;text-align:center;padding:10px 8px;border-radius:12px;border:1.5px solid var(--bd);background:#fff;font-size:.78rem;font-weight:700;color:var(--text-mid);cursor:pointer}
+.pill-choice.active{background:var(--brown-dark);border-color:var(--brown-dark);color:var(--gold-light)}
+
+.card{background:#fff;border:1.5px solid var(--bd);border-radius:16px;padding:16px;margin-bottom:14px}
+
+.save-btn{width:100%;padding:14px;border:none;border-radius:14px;background:linear-gradient(135deg,var(--brown-dark),#1a120b);color:var(--gold-light);font-family:'Playfair Display',serif;font-weight:900;font-size:.95rem;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px}
+.save-btn:disabled{opacity:.6}
+.save-btn.secondary{background:transparent;border:1.5px solid var(--bd);color:var(--text-mid)}
+
+/* RAPPORT */
+.rapport-output{background:#fff;border:1.5px solid var(--bd);border-radius:14px;padding:14px;font-size:.78rem;line-height:1.7;white-space:pre-wrap;font-family:'Inter',sans-serif;color:var(--text-dark);margin-bottom:12px;min-height:120px}
+
+/* BOTTOM NAV */
+.bottom-nav{position:fixed;bottom:0;left:0;right:0;background:#fff;border-top:1.5px solid var(--bd);display:flex;z-index:90}
+.bn-item{flex:1;text-align:center;padding:10px 2px;cursor:pointer;color:var(--text-mid)}
+.bn-item.active{color:var(--brown-dark)}
+.bn-icon{font-size:1.25rem;display:block;margin-bottom:2px}
+.bn-label{font-size:.6rem;font-weight:700}
+
+/* TOAST */
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--brown-dark);color:var(--gold-light);padding:11px 22px;border-radius:30px;font-size:.8rem;font-weight:700;opacity:0;transition:all .3s;z-index:300;white-space:nowrap;box-shadow:0 8px 24px rgba(0,0,0,.25)}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* FAB */
+.fab{position:fixed;bottom:90px;right:18px;width:54px;height:54px;border-radius:50%;background:linear-gradient(135deg,var(--gold),var(--gold-light));color:var(--brown-dark);border:none;font-size:1.6rem;box-shadow:0 6px 18px rgba(201,162,39,.5);cursor:pointer;z-index:95}
+
+/* MODAL */
+.ov{display:none;position:fixed;inset:0;background:rgba(45,31,20,.6);z-index:250;align-items:flex-end;justify-content:center}
+.ov.show{display:flex}
+.modal{background:var(--cream);border-radius:20px 20px 0 0;padding:22px 18px 24px;width:100%;max-width:520px;max-height:85vh;overflow-y:auto;position:relative}
+.modal-title{font-family:'Playfair Display',serif;font-weight:900;font-size:1.1rem;margin-bottom:14px}
+.modal-close{position:absolute;top:14px;right:18px;font-size:1.3rem;color:var(--text-mid);cursor:pointer}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="header">
+  <div class="header-row">
+    <div>
+      <div class="header-title">AL-HIKMA</div>
+      <div class="header-sub">Administrateur</div>
+    </div>
+    <div class="header-right">
+      <div class="user-pill">👤 Admin</div><br>
+      <button class="logout-btn" id="btnLogout">Quitter</button>
+    </div>
+  </div>
+  <div class="date-display" id="dateDisplay"></div>
+</div>
+
+<div class="offline-banner" id="offlineBanner">📴 Mode hors-ligne — données limitées</div>
+
+<!-- TABS -->
+<div class="tabs">
+  <div class="tab active" data-pg="0">Dashboard</div>
+  <div class="tab" data-pg="1">Finances</div>
+  <div class="tab" data-pg="2">Magasin</div>
+  <div class="tab" data-pg="3">Rapports</div>
+</div>
+
+<!-- PG0: DASHBOARD -->
+<div class="pg active" id="pg0">
+  <div class="sec-title">📊 Vue d'ensemble</div>
+  <div class="stats-grid">
+    <div class="stat-card full">
+      <div class="stat-icon">💰</div>
+      <div class="stat-value" id="statRevenu">0 FG</div>
+      <div class="stat-label">Revenus du mois (sur <span id="statRevenuTotal">0</span> FG attendus)</div>
+      <div class="progress-bar"><div class="progress-fill" id="statRevenuBar" style="width:0%"></div></div>
+      <div class="stat-sub" id="statRevenuSub">0 / 0 élèves ont payé</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📋</div>
+      <div class="stat-value" id="statSuivi">0/0</div>
+      <div class="stat-label">Suivi aujourd'hui</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">🏪</div>
+      <div class="stat-value" id="statVentes">0 FG</div>
+      <div class="stat-label">Ventes ce mois</div>
+    </div>
+  </div>
+
+  <div class="sec-title">👦 Élèves</div>
+  <div id="elevesOverview"></div>
+</div>
+
+<!-- PG1: FINANCES -->
+<div class="pg" id="pg1">
+  <div class="sec-title">💰 Paiements mensuels</div>
+  <div class="sec-sub">Tarif standard : 500 000 FG / élève / mois</div>
+
+  <div class="month-selector">
+    <div class="month-nav" id="monthPrev">‹</div>
+    <div class="month-label" id="monthLabel">—</div>
+    <div class="month-nav" id="monthNext">›</div>
+  </div>
+
+  <div id="paiementsList"></div>
+</div>
+
+<!-- PG2: MAGASIN -->
+<div class="pg" id="pg2">
+  <div class="sec-title">🏪 Magasin</div>
+  <div class="sec-sub">Produits du quotidien — usage maison + revente.</div>
+
+  <div class="stats-grid" style="margin-bottom:16px">
+    <div class="stat-card">
+      <div class="stat-icon">📅</div>
+      <div class="stat-value" id="statVentesJour">0 FG</div>
+      <div class="stat-label">Ventes aujourd'hui</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-icon">📦</div>
+      <div class="stat-value" id="statNbProduits">0</div>
+      <div class="stat-label">Produits en stock</div>
+    </div>
+  </div>
+
+  <div id="produitsList"></div>
+</div>
+
+<!-- PG3: RAPPORTS -->
+<div class="pg" id="pg3">
+  <div class="sec-title">📄 Rapport pour les parents</div>
+  <div class="sec-sub">Génère un résumé à partager par WhatsApp.</div>
+
+  <div class="field">
+    <label class="field-label">Élève</label>
+    <select class="field-select" id="rapportEleveSelect"></select>
+  </div>
+
+  <div class="field">
+    <label class="field-label">Période</label>
+    <div class="pill-choices">
+      <div class="pill-choice active" data-period="7">Cette semaine</div>
+      <div class="pill-choice" data-period="30">Ce mois</div>
+    </div>
+  </div>
+
+  <button class="save-btn secondary" id="btnGenRapport" style="margin-bottom:14px">✨ Générer le rapport</button>
+
+  <div class="rapport-output" id="rapportOutput">Le rapport généré apparaîtra ici...</div>
+  <button class="save-btn" id="btnCopyRapport">📋 Copier le rapport</button>
+</div>
+
+<!-- BOTTOM NAV -->
+<div class="bottom-nav">
+  <div class="bn-item active" data-pg="0"><span class="bn-icon">🏠</span><span class="bn-label">Dashboard</span></div>
+  <div class="bn-item" data-pg="1"><span class="bn-icon">💰</span><span class="bn-label">Finances</span></div>
+  <div class="bn-item" data-pg="2"><span class="bn-icon">🏪</span><span class="bn-label">Magasin</span></div>
+  <div class="bn-item" data-pg="3"><span class="bn-icon">📄</span><span class="bn-label">Rapports</span></div>
+</div>
+
+<button class="fab" id="fabAddProduit" style="display:none">+</button>
+
+<!-- MODAL: PAIEMENT -->
+<div class="ov" id="ovPaiement">
+  <div class="modal">
+    <span class="modal-close" id="closePaiement">✕</span>
+    <div class="modal-title" id="paiementTitle">Paiement de —</div>
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">Montant (FG)</label>
+        <input type="number" class="field-input" id="paiementMontant" value="500000">
+      </div>
+      <div class="field">
+        <label class="field-label">Date</label>
+        <input type="date" class="field-input" id="paiementDate">
+      </div>
+    </div>
+    <div class="field">
+      <label class="field-label">Note (optionnel)</label>
+      <input type="text" class="field-input" id="paiementNote" placeholder="Ex: Versement partiel, espèces...">
+    </div>
+    <button class="save-btn" id="btnSavePaiement" style="margin-bottom:10px">✅ Marquer comme payé</button>
+    <button class="save-btn secondary" id="btnCancelPaiement" style="display:none">↩️ Annuler le paiement</button>
+  </div>
+</div>
+
+<!-- MODAL: AJOUTER PRODUIT -->
+<div class="ov" id="ovProduit">
+  <div class="modal">
+    <span class="modal-close" id="closeProduit">✕</span>
+    <div class="modal-title">📦 Nouveau produit</div>
+    <div class="field">
+      <label class="field-label">Nom du produit *</label>
+      <input type="text" class="field-input" id="prodNom" placeholder="Ex: Savon, Riz (kg), Sucre...">
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">Stock initial *</label>
+        <input type="number" class="field-input" id="prodStock" placeholder="0">
+      </div>
+      <div class="field">
+        <label class="field-label">Unité</label>
+        <input type="text" class="field-input" id="prodUnite" placeholder="pièce, kg, L...">
+      </div>
+    </div>
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">Prix d'achat (FG)</label>
+        <input type="number" class="field-input" id="prodPrixAchat" placeholder="0">
+      </div>
+      <div class="field">
+        <label class="field-label">Prix de vente (FG) *</label>
+        <input type="number" class="field-input" id="prodPrixVente" placeholder="0">
+      </div>
+    </div>
+    <button class="save-btn" id="btnSaveProduit">✅ Ajouter le produit</button>
+  </div>
+</div>
+
+<!-- MODAL: VENTE RAPIDE -->
+<div class="ov" id="ovVente">
+  <div class="modal">
+    <span class="modal-close" id="closeVente">✕</span>
+    <div class="modal-title" id="venteTitle">Vente — —</div>
+    <div class="field-row">
+      <div class="field">
+        <label class="field-label">Quantité</label>
+        <input type="number" class="field-input" id="venteQte" value="1" min="1">
+      </div>
+      <div class="field">
+        <label class="field-label">Prix unitaire (FG)</label>
+        <input type="number" class="field-input" id="ventePrix">
+      </div>
+    </div>
+    <div class="card" style="text-align:center;margin-bottom:14px">
+      <div style="font-size:.72rem;color:var(--text-mid)">Total</div>
+      <div style="font-family:'Playfair Display',serif;font-weight:900;font-size:1.4rem" id="venteTotal">0 FG</div>
+    </div>
+    <button class="save-btn" id="btnSaveVente">✅ Enregistrer la vente</button>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// =====================================================
+// FIREBASE INIT
+// =====================================================
+var db=null, FIREBASE_OK=false;
+function createFakeDb(){
+  var fakeRef={
+    onSnapshot:function(ok){ok({docs:[]});return function(){};},
+    get:function(){return Promise.resolve({docs:[],exists:false,data:function(){return null;}});},
+    add:function(){return Promise.resolve({id:'local_'+Date.now()});},
+    set:function(){return Promise.resolve();},
+    update:function(){return Promise.resolve();},
+    delete:function(){return Promise.resolve();},
+    doc:function(){return fakeRef;},
+    where:function(){return fakeRef;},
+    orderBy:function(){return fakeRef;},
+    limit:function(){return fakeRef;}
+  };
+  return {collection:function(){return fakeRef;}};
+}
+function initFirebase(){
+  if(typeof firebase==='undefined'){db=createFakeDb();setOffline(true);return;}
+  try{
+    var cfg={
+      apiKey:"AIzaSyDWF-Q3S2M-btrRBHBYzd9dVbY6iEg_fNk",
+      authDomain:"gestionpieces-74559.firebaseapp.com",
+      projectId:"gestionpieces-74559",
+      storageBucket:"gestionpieces-74559.appspot.com"
+    };
+    if(!firebase.apps||!firebase.apps.length) firebase.initializeApp(cfg);
+    db=firebase.firestore();
+    if(firebase.auth){
+      var auth=firebase.auth();
+      auth.signInWithEmailAndPassword('admin@al-hikma.app','AlHikma2026!Admin#Kindia').catch(function(){});
+    }
+    db.enablePersistence({synchronizeTabs:true}).catch(function(){});
+    FIREBASE_OK=true;
+    setOffline(!navigator.onLine);
+  }catch(e){db=createFakeDb();setOffline(true);}
+}
+function setOffline(isOff){ document.getElementById('offlineBanner').classList.toggle('show', isOff); }
+window.addEventListener('online',function(){setOffline(false);loadAll();});
+window.addEventListener('offline',function(){setOffline(true);});
+
+// =====================================================
+// SESSION
+// =====================================================
+function checkSession(){
+  try{
+    var s=JSON.parse(localStorage.getItem('alhikma_session'));
+    if(!s || s.role!=='admin' || (Date.now()-s.ts)>15*60*1000){
+      window.location.href='al-hikma-launcher.html'; return;
+    }
+  }catch(e){ window.location.href='al-hikma-launcher.html'; return; }
+}
+document.getElementById('btnLogout').addEventListener('click',function(){
+  try{localStorage.removeItem('alhikma_session');}catch(e){}
+  if(typeof firebase!=='undefined'&&firebase.auth) firebase.auth().signOut().catch(function(){});
+  window.location.href='al-hikma-launcher.html';
+});
+
+// =====================================================
+// DATE / CONST
+// =====================================================
+var TODAY=new Date();
+var TODAY_STR=TODAY.toISOString().slice(0,10);
+var CUR_MONTH_STR=TODAY_STR.slice(0,7); // YYYY-MM
+var JOURS=['Dimanche','Lundi','Mardi','Mercredi','Jeudi','Vendredi','Samedi'];
+var MOIS=['janvier','février','mars','avril','mai','juin','juillet','août','septembre','octobre','novembre','décembre'];
+document.getElementById('dateDisplay').textContent=JOURS[TODAY.getDay()]+' '+TODAY.getDate()+' '+MOIS[TODAY.getMonth()]+' '+TODAY.getFullYear();
+var TARIF=500000;
+
+function showToast(msg){
+  var t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(function(){t.classList.remove('show');},2400);
+}
+
+// =====================================================
+// NAVIGATION
+// =====================================================
+function switchTab(i){
+  document.querySelectorAll('.pg').forEach(function(p,idx){p.classList.toggle('active',idx==i);});
+  document.querySelectorAll('.tab').forEach(function(t,idx){t.classList.toggle('active',idx==i);});
+  document.querySelectorAll('.bn-item').forEach(function(b,idx){b.classList.toggle('active',idx==i);});
+  document.getElementById('fabAddProduit').style.display=(i==2)?'flex':'none';
+}
+document.querySelectorAll('.tab').forEach(function(t,i){t.addEventListener('click',function(){switchTab(i);});});
+document.querySelectorAll('.bn-item').forEach(function(b,i){b.addEventListener('click',function(){switchTab(i);});});
+
+// =====================================================
+// DATA STORE
+// =====================================================
+var eleves=[], suivisToday={}, paiements={}, produits=[], ventes=[];
+var currentMonthDate=new Date(TODAY.getFullYear(),TODAY.getMonth(),1);
+
+function moisStr(d){ return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0'); }
+function moisLabel(d){ return MOIS[d.getMonth()].charAt(0).toUpperCase()+MOIS[d.getMonth()].slice(1)+' '+d.getFullYear(); }
+
+function loadAll(){
+  db.collection('alhikma_eleves').orderBy('nom').onSnapshot(function(snap){
+    eleves=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderDashboard(); renderFinances(); renderRapportSelect();
+  },function(){renderDashboard();renderFinances();});
+
+  db.collection('alhikma_suivi').where('date','==',TODAY_STR).onSnapshot(function(snap){
+    suivisToday={};
+    snap.docs.forEach(function(d){suivisToday[d.data().eleveId]=d.data();});
+    renderDashboard();
+  },function(){});
+
+  loadPaiements();
+
+  db.collection('alhikma_magasin_produits').orderBy('nom').onSnapshot(function(snap){
+    produits=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    renderProduits(); renderDashboard();
+  },function(){renderProduits();});
+
+  loadVentes();
+}
+
+function loadPaiements(){
+  var mStr=moisStr(currentMonthDate);
+  db.collection('alhikma_paiements').where('mois','==',mStr).get().then(function(snap){
+    paiements={};
+    snap.docs.forEach(function(d){paiements[d.data().eleveId]=Object.assign({id:d.id},d.data());});
+    renderFinances(); renderDashboard();
+  }).catch(function(){renderFinances();});
+}
+
+function loadVentes(){
+  var startMonth=CUR_MONTH_STR+'-01';
+  db.collection('alhikma_magasin_ventes').where('date','>=',startMonth).get().then(function(snap){
+    ventes=snap.docs.map(function(d){return d.data();});
+    renderDashboard(); renderProduits();
+  }).catch(function(){});
+}
+
+// =====================================================
+// RENDER: DASHBOARD
+// =====================================================
+function initiales(nom){ return (nom||'?').trim().split(/\s+/).map(function(w){return w[0];}).slice(0,2).join('').toUpperCase(); }
+
+function renderDashboard(){
+  var n=eleves.length;
+  var mStr=moisStr(currentMonthDate);
+  var isCurMonth = mStr===CUR_MONTH_STR;
+
+  // Revenus (utilise paiements du mois courant uniquement pour le dashboard)
+  var revenu=0, nbPaye=0;
+  if(isCurMonth){
+    eleves.forEach(function(el){
+      var p=paiements[el.id];
+      if(p && p.statut==='paye'){ revenu+=(p.montant||0); nbPaye++; }
+    });
+  }
+  var attendu=n*TARIF;
+  document.getElementById('statRevenu').textContent=revenu.toLocaleString('fr-FR')+' FG';
+  document.getElementById('statRevenuTotal').textContent=attendu.toLocaleString('fr-FR');
+  document.getElementById('statRevenuSub').textContent=nbPaye+' / '+n+' élèves ont payé';
+  document.getElementById('statRevenuBar').style.width=(attendu>0?Math.min(100,(revenu/attendu*100)):0)+'%';
+
+  // Suivi
+  var nbSuivi=Object.keys(suivisToday).length;
+  document.getElementById('statSuivi').textContent=nbSuivi+'/'+n;
+
+  // Ventes mois
+  var totalVentes=ventes.reduce(function(s,v){return s+(v.montant||0);},0);
+  document.getElementById('statVentes').textContent=totalVentes.toLocaleString('fr-FR')+' FG';
+
+  // Liste eleves overview
+  var el=document.getElementById('elevesOverview');
+  if(!n){
+    el.innerHTML='<div class="empty-state"><div class="empty-state-icon">👦</div><div class="empty-state-text">Aucun élève inscrit. Ajoute-les depuis l\'interface Éducatrice.</div></div>';
+    return;
+  }
+  var html='';
+  eleves.forEach(function(e2){
+    var p=isCurMonth?paiements[e2.id]:null;
+    var payeBadge = p&&p.statut==='paye' ? '<span class="badge badge-ok">✅ Payé</span>' : '<span class="badge badge-pending">⏳ En attente</span>';
+    var suiviBadge = suivisToday[e2.id] ? '<span class="badge badge-ok">📋 Fait</span>' : '<span class="badge badge-late">📋 À faire</span>';
+    html+='<div class="eleve-card">';
+    html+='<div class="eleve-avatar">'+initiales(e2.nom)+'</div>';
+    html+='<div class="eleve-info"><div class="eleve-name">'+e2.nom+'</div><div class="eleve-meta">'+(e2.age?(e2.age+' ans'):'')+'</div></div>';
+    html+='<div class="badges">'+payeBadge+suiviBadge+'</div>';
+    html+='</div>';
+  });
+  el.innerHTML=html;
+}
+
+// =====================================================
+// RENDER: FINANCES
+// =====================================================
+document.getElementById('monthPrev').addEventListener('click',function(){
+  currentMonthDate=new Date(currentMonthDate.getFullYear(),currentMonthDate.getMonth()-1,1);
+  loadPaiements();
+});
+document.getElementById('monthNext').addEventListener('click',function(){
+  currentMonthDate=new Date(currentMonthDate.getFullYear(),currentMonthDate.getMonth()+1,1);
+  loadPaiements();
+});
+
+function renderFinances(){
+  document.getElementById('monthLabel').textContent=moisLabel(currentMonthDate);
+  var el=document.getElementById('paiementsList');
+  if(!eleves.length){
+    el.innerHTML='<div class="empty-state"><div class="empty-state-icon">💰</div><div class="empty-state-text">Aucun élève inscrit.</div></div>';
+    return;
+  }
+  var html='';
+  eleves.forEach(function(e2){
+    var p=paiements[e2.id];
+    var paye=p&&p.statut==='paye';
+    html+='<div class="pay-card">';
+    html+='<div class="pay-row">';
+    html+='<div><div class="pay-name">'+e2.nom+'</div>';
+    if(paye){
+      html+='<div class="pay-detail">✅ Payé le '+formatDateFr(p.datePaiement)+' — '+(p.montant||0).toLocaleString('fr-FR')+' FG'+(p.note?(' · '+p.note):'')+'</div>';
+    } else {
+      html+='<div class="pay-detail">⏳ En attente — '+TARIF.toLocaleString('fr-FR')+' FG attendus</div>';
+    }
+    html+='</div>';
+    html+='<button class="pay-action-btn '+(paye?'done':'todo')+'" onclick="openPaiement(\''+e2.id+'\',\''+e2.nom.replace(/'/g,"\\'")+'\')">'+(paye?'Modifier':'Marquer payé')+'</button>';
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
+}
+
+function formatDateFr(dStr){
+  if(!dStr) return '';
+  var d=new Date(dStr);
+  return d.getDate()+' '+MOIS[d.getMonth()].slice(0,3)+'. '+d.getFullYear();
+}
+
+// MODAL PAIEMENT
+var currentPaiementEleveId=null;
+function openPaiement(eleveId,nom){
+  currentPaiementEleveId=eleveId;
+  document.getElementById('paiementTitle').textContent='Paiement de '+nom;
+  var p=paiements[eleveId];
+  document.getElementById('paiementMontant').value=p?(p.montant||TARIF):TARIF;
+  document.getElementById('paiementDate').value=p?(p.datePaiement||TODAY_STR):TODAY_STR;
+  document.getElementById('paiementNote').value=p?(p.note||''):'';
+  document.getElementById('btnCancelPaiement').style.display=(p&&p.statut==='paye')?'block':'none';
+  document.getElementById('ovPaiement').classList.add('show');
+}
+document.getElementById('closePaiement').addEventListener('click',function(){document.getElementById('ovPaiement').classList.remove('show');});
+document.getElementById('btnSavePaiement').addEventListener('click',function(){
+  var btn=this; btn.disabled=true; btn.textContent='⏳...';
+  var mStr=moisStr(currentMonthDate);
+  var docId=currentPaiementEleveId+'_'+mStr;
+  var data={
+    eleveId:currentPaiementEleveId, mois:mStr, statut:'paye',
+    montant:parseInt(document.getElementById('paiementMontant').value)||TARIF,
+    datePaiement:document.getElementById('paiementDate').value||TODAY_STR,
+    note:document.getElementById('paiementNote').value.trim(),
+    updatedAt:new Date().toISOString()
+  };
+  db.collection('alhikma_paiements').doc(docId).set(data).then(function(){
+    paiements[currentPaiementEleveId]=Object.assign({id:docId},data);
+    renderFinances(); renderDashboard();
+    document.getElementById('ovPaiement').classList.remove('show');
+    showToast('✅ Paiement enregistré');
+    btn.disabled=false; btn.textContent='✅ Marquer comme payé';
+  }).catch(function(e){ showToast('❌ '+e.message); btn.disabled=false; btn.textContent='✅ Marquer comme payé'; });
+});
+document.getElementById('btnCancelPaiement').addEventListener('click',function(){
+  if(!confirm('Annuler ce paiement ?')) return;
+  var mStr=moisStr(currentMonthDate);
+  var docId=currentPaiementEleveId+'_'+mStr;
+  db.collection('alhikma_paiements').doc(docId).delete().then(function(){
+    delete paiements[currentPaiementEleveId];
+    renderFinances(); renderDashboard();
+    document.getElementById('ovPaiement').classList.remove('show');
+    showToast('Paiement annulé');
+  }).catch(function(e){showToast('❌ '+e.message);});
+});
+
+// =====================================================
+// RENDER: MAGASIN
+// =====================================================
+function renderProduits(){
+  var todayVentes=ventes.filter(function(v){return v.date===TODAY_STR;});
+  var totalJour=todayVentes.reduce(function(s,v){return s+(v.montant||0);},0);
+  document.getElementById('statVentesJour').textContent=totalJour.toLocaleString('fr-FR')+' FG';
+  document.getElementById('statNbProduits').textContent=produits.length;
+
+  var el=document.getElementById('produitsList');
+  if(!produits.length){
+    el.innerHTML='<div class="empty-state"><div class="empty-state-icon">📦</div><div class="empty-state-text">Aucun produit. Touche le bouton + pour ajouter le premier article du magasin.</div></div>';
+    return;
+  }
+  var html='';
+  produits.forEach(function(p){
+    var low=p.stock<=5;
+    html+='<div class="prod-card">';
+    html+='<div class="prod-row"><div>';
+    html+='<div class="prod-name">'+p.nom+'</div>';
+    html+='<div class="prod-meta '+(low?'stock-low':'')+'">Stock: '+p.stock+' '+(p.unite||'')+(low?' ⚠️ bas':'')+' · '+(p.prixVente||0).toLocaleString('fr-FR')+' FG/'+(p.unite||'unité')+'</div>';
+    html+='</div></div>';
+    html+='<div class="prod-actions">';
+    html+='<button class="prod-btn primary" onclick="openVente(\''+p.id+'\')">🛒 Vendre</button>';
+    html+='<button class="prod-btn" onclick="restockProduit(\''+p.id+'\')">➕ Réassort</button>';
+    html+='</div></div>';
+  });
+  el.innerHTML=html;
+}
+
+// MODAL AJOUT PRODUIT
+document.getElementById('fabAddProduit').addEventListener('click',function(){
+  ['prodNom','prodStock','prodUnite','prodPrixAchat','prodPrixVente'].forEach(function(id){document.getElementById(id).value='';});
+  document.getElementById('ovProduit').classList.add('show');
+});
+document.getElementById('closeProduit').addEventListener('click',function(){document.getElementById('ovProduit').classList.remove('show');});
+document.getElementById('btnSaveProduit').addEventListener('click',function(){
+  var nom=document.getElementById('prodNom').value.trim();
+  var prixVente=parseInt(document.getElementById('prodPrixVente').value);
+  if(!nom){showToast('⚠️ Nom du produit requis');return;}
+  if(!prixVente){showToast('⚠️ Prix de vente requis');return;}
+  var btn=this; btn.disabled=true; btn.textContent='⏳...';
+  var data={
+    nom:nom,
+    stock:parseInt(document.getElementById('prodStock').value)||0,
+    unite:document.getElementById('prodUnite').value.trim()||'pièce',
+    prixAchat:parseInt(document.getElementById('prodPrixAchat').value)||0,
+    prixVente:prixVente,
+    createdAt:new Date().toISOString()
+  };
+  db.collection('alhikma_magasin_produits').add(data).then(function(){
+    document.getElementById('ovProduit').classList.remove('show');
+    showToast('✅ '+nom+' ajouté au magasin');
+    btn.disabled=false; btn.textContent='✅ Ajouter le produit';
+  }).catch(function(e){showToast('❌ '+e.message);btn.disabled=false;btn.textContent='✅ Ajouter le produit';});
+});
+
+// REASSORT rapide
+function restockProduit(prodId){
+  var p=produits.find(function(x){return x.id===prodId;});
+  if(!p) return;
+  var qte=prompt('Ajouter combien au stock de "'+p.nom+'" ? (stock actuel: '+p.stock+')','10');
+  if(qte===null) return;
+  qte=parseInt(qte); if(!qte||qte<=0) return;
+  db.collection('alhikma_magasin_produits').doc(prodId).update({
+    stock:(p.stock||0)+qte
+  }).then(function(){
+    showToast('✅ Stock mis à jour (+'+qte+')');
+  }).catch(function(e){showToast('❌ '+e.message);});
+}
+
+// MODAL VENTE
+var currentVenteProdId=null;
+function openVente(prodId){
+  var p=produits.find(function(x){return x.id===prodId;});
+  if(!p) return;
+  currentVenteProdId=prodId;
+  document.getElementById('venteTitle').textContent='Vente — '+p.nom;
+  document.getElementById('venteQte').value=1;
+  document.getElementById('ventePrix').value=p.prixVente||0;
+  updateVenteTotal();
+  document.getElementById('ovVente').classList.add('show');
+}
+document.getElementById('closeVente').addEventListener('click',function(){document.getElementById('ovVente').classList.remove('show');});
+['venteQte','ventePrix'].forEach(function(id){
+  document.getElementById(id).addEventListener('input',updateVenteTotal);
+});
+function updateVenteTotal(){
+  var q=parseFloat(document.getElementById('venteQte').value)||0;
+  var px=parseFloat(document.getElementById('ventePrix').value)||0;
+  document.getElementById('venteTotal').textContent=(q*px).toLocaleString('fr-FR')+' FG';
+}
+document.getElementById('btnSaveVente').addEventListener('click',function(){
+  var p=produits.find(function(x){return x.id===currentVenteProdId;});
+  if(!p) return;
+  var qte=parseFloat(document.getElementById('venteQte').value)||0;
+  var px=parseFloat(document.getElementById('ventePrix').value)||0;
+  if(qte<=0){showToast('⚠️ Quantité invalide');return;}
+  if(qte>p.stock){ if(!confirm('Stock insuffisant ('+p.stock+' '+p.unite+'). Continuer quand même ?')) return; }
+  var btn=this; btn.disabled=true; btn.textContent='⏳...';
+  var venteData={
+    produitId:p.id, produitNom:p.nom, quantite:qte, prixUnitaire:px,
+    montant:qte*px, date:TODAY_STR, createdAt:new Date().toISOString()
+  };
+  db.collection('alhikma_magasin_ventes').add(venteData).then(function(){
+    return db.collection('alhikma_magasin_produits').doc(p.id).update({stock:Math.max(0,(p.stock||0)-qte)});
+  }).then(function(){
+    document.getElementById('ovVente').classList.remove('show');
+    showToast('✅ Vente enregistrée');
+    ventes.push(venteData);
+    btn.disabled=false; btn.textContent='✅ Enregistrer la vente';
+  }).catch(function(e){showToast('❌ '+e.message);btn.disabled=false;btn.textContent='✅ Enregistrer la vente';});
+});
+
+// =====================================================
+// RAPPORTS
+// =====================================================
+function renderRapportSelect(){
+  var sel=document.getElementById('rapportEleveSelect');
+  var prev=sel.value;
+  sel.innerHTML='';
+  eleves.forEach(function(e2){
+    var opt=document.createElement('option'); opt.value=e2.id; opt.textContent=e2.nom;
+    sel.appendChild(opt);
+  });
+  if(prev) sel.value=prev;
+}
+var rapportPeriod=7;
+document.querySelectorAll('.pill-choice[data-period]').forEach(function(p){
+  p.addEventListener('click',function(){
+    document.querySelectorAll('.pill-choice[data-period]').forEach(function(x){x.classList.remove('active');});
+    p.classList.add('active');
+    rapportPeriod=parseInt(p.getAttribute('data-period'));
+  });
+});
+
+var EVAL_LABELS={excellent:'Excellent',bien:'Bien',moyen:'Moyen',difficile:'À revoir',bon:'Bon',ras:'RAS'};
+
+document.getElementById('btnGenRapport').addEventListener('click',function(){
+  var eleveId=document.getElementById('rapportEleveSelect').value;
+  var eleve=eleves.find(function(x){return x.id===eleveId;});
+  if(!eleve){showToast('⚠️ Sélectionne un élève');return;}
+
+  var out=document.getElementById('rapportOutput');
+  out.textContent='Chargement...';
+
+  var startDate=new Date(TODAY); startDate.setDate(startDate.getDate()-(rapportPeriod-1));
+  var startStr=startDate.toISOString().slice(0,10);
+
+  db.collection('alhikma_suivi').where('eleveId','==',eleveId).where('date','>=',startStr).orderBy('date','asc').get()
+    .then(function(snap){
+      var entries=snap.docs.map(function(d){return d.data();});
+      out.textContent=buildRapportText(eleve,entries,startDate,TODAY);
+    }).catch(function(){
+      out.textContent='⚠️ Impossible de charger le suivi (hors-ligne ?).';
+    });
+});
+
+function buildRapportText(eleve,entries,startDate,endDate){
+  var periodLbl=startDate.getDate()+' '+MOIS[startDate.getMonth()]+' au '+endDate.getDate()+' '+MOIS[endDate.getMonth()];
+  var txt='📋 RAPPORT — '+eleve.nom+'\n';
+  txt+='Période: '+periodLbl+'\n';
+  txt+='AL-HIKMA, Kindia\n\n';
+
+  if(!entries.length){
+    txt+='Aucun suivi enregistré sur cette période.';
+    return txt;
+  }
+
+  txt+='📖 CORAN:\n';
+  var coranEntries=entries.filter(function(e){return e.coranPassage;});
+  if(coranEntries.length){
+    coranEntries.forEach(function(e){
+      var d=new Date(e.date);
+      txt+='  • '+d.getDate()+'/'+(d.getMonth()+1)+': '+e.coranPassage+(e.coranEval?(' ('+(EVAL_LABELS[e.coranEval]||e.coranEval)+')'):'')+'\n';
+    });
+  } else { txt+='  Aucune session enregistrée.\n'; }
+
+  txt+='\n📚 DEVOIRS:\n';
+  var devoirsFait=entries.filter(function(e){return e.devoirsStatut==='fait';}).length;
+  var devoirsTotal=entries.filter(function(e){return e.devoirsStatut;}).length;
+  txt+='  '+devoirsFait+'/'+devoirsTotal+' jours faits\n';
+
+  txt+='\n⏰ ROUTINE:\n';
+  var routineKeys=['fajr','repas','etude','coucher'];
+  var routineLabels={fajr:'Fajr',repas:'Repas',etude:'Étude du soir',coucher:'Coucher à l\'heure'};
+  routineKeys.forEach(function(k){
+    var done=entries.filter(function(e){return e.routine&&e.routine[k];}).length;
+    txt+='  '+routineLabels[k]+': '+done+'/'+entries.length+'\n';
+  });
+
+  txt+='\n😊 COMPORTEMENT:\n';
+  var compCount={};
+  entries.forEach(function(e){ if(e.comportement) compCount[e.comportement]=(compCount[e.comportement]||0)+1; });
+  var compTxt=Object.keys(compCount).map(function(k){return (EVAL_LABELS[k]||k)+': '+compCount[k];}).join(', ');
+  txt+='  '+(compTxt||'Pas de donnée')+'\n';
+  var compNotes=entries.filter(function(e){return e.comportementNote;}).map(function(e){
+    var d=new Date(e.date); return '  • '+d.getDate()+'/'+(d.getMonth()+1)+': '+e.comportementNote;
+  });
+  if(compNotes.length) txt+=compNotes.join('\n')+'\n';
+
+  txt+='\n🩺 SANTÉ:\n';
+  var problemes=entries.filter(function(e){return e.sante==='probleme';});
+  if(problemes.length){
+    problemes.forEach(function(e){
+      var d=new Date(e.date);
+      txt+='  ⚠️ '+d.getDate()+'/'+(d.getMonth()+1)+': '+(e.santeNote||'Problème signalé')+'\n';
+    });
+  } else {
+    txt+='  ✅ Rien à signaler durant cette période.\n';
+  }
+
+  txt+='\n— AL-HIKMA, Internat Islamique, Kindia';
+  return txt;
+}
+
+document.getElementById('btnCopyRapport').addEventListener('click',function(){
+  var txt=document.getElementById('rapportOutput').textContent;
+  if(!txt || txt.indexOf('apparaîtra')>-1){ showToast('⚠️ Génère d\'abord le rapport'); return; }
+  if(navigator.clipboard){
+    navigator.clipboard.writeText(txt).then(function(){showToast('✅ Rapport copié !');}).catch(function(){showToast('❌ Copie impossible');});
+  } else {
+    showToast('❌ Copie non supportée sur ce navigateur');
+  }
+});
+
+// =====================================================
+// INIT
+// =====================================================
+window.addEventListener('load',function(){
+  checkSession();
+  initFirebase();
+  document.getElementById('paiementDate').value=TODAY_STR;
+  loadAll();
+  if('serviceWorker' in navigator){
+    navigator.serviceWorker.register('al-hikma-sw.js').catch(function(){});
+  }
+});
+</script>
+
+<!-- Firebase SDK -->
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js"></script>
+<script src="https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js"></script>
+</body>
+</html>
