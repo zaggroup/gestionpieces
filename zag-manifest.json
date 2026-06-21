@@ -1,0 +1,21 @@
+{
+  "name": "ZAG — Zone d'Abondance Globale",
+  "short_name": "ZAG Centre",
+  "description": "Gestion du Centre ZAG — Kindia, Guinée",
+  "start_url": "./zag-launcher.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0D1B2A",
+  "theme_color": "#0D1B2A",
+  "lang": "fr",
+  "icons": [
+    { "src": "zag-icon-192.png", "sizes": "192x192", "type": "image/png", "purpose": "any maskable" },
+    { "src": "zag-icon-512.png", "sizes": "512x512", "type": "image/png", "purpose": "any maskable" }
+  ],
+  "shortcuts": [
+    { "name": "Direction", "url": "./zag-directeur.html" },
+    { "name": "Enseignant", "url": "./zag-enseignant.html" },
+    { "name": "Pointage", "url": "./zag-scanner.html" }
+  ]
+}
