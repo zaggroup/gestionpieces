@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html lang="fr" dir="ltr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<title>ZAG — Pointage</title>
+<link rel="manifest" href="zag-manifest.json">
+  <link rel="apple-touch-icon" href="zag-icon-192.png">
+  <meta name="theme-color" content="#0D1B2A">
+  <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Exo+2:wght@400;600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --night:#0D1B2A;--night2:#162436;--night3:#1E3148;--night4:#243a56;
+  --gold:#C9A84C;--gold2:#E8C96A;--gold-dim:rgba(201,168,76,.15);
+  --green:#2E7D32;--green2:#43A047;--green-dim:rgba(46,125,50,.15);
+  --red:#C62828;--red2:#EF5350;--red-dim:rgba(198,40,40,.15);
+  --text:#F5F0E8;--text2:rgba(245,240,232,.65);--text3:rgba(245,240,232,.3);
+  --bd:rgba(255,255,255,.07);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent}
+html,body{height:100%;overflow:hidden;background:var(--night)}
+body{font-family:'Exo 2',sans-serif;color:var(--text);display:flex}
+
+/* ── FOND ÉTOILE ── */
+.star-bg{position:fixed;inset:0;pointer-events:none;z-index:0;display:flex;align-items:center;justify-content:center}
+.star-bg svg{width:min(90vw,90vh);opacity:.035;animation:rot 150s linear infinite}
+@keyframes rot{to{transform:rotate(360deg)}}
+
+/* ── LAYOUT ── */
+.layout{position:relative;z-index:1;display:flex;width:100%;height:100vh}
+
+/* ── SIDEBAR GAUCHE ── */
+.sidebar{
+  width:200px;flex-shrink:0;
+  background:rgba(255,255,255,.025);border-right:1px solid rgba(201,168,76,.1);
+  padding:16px 12px;display:flex;flex-direction:column;gap:14px;overflow:hidden
+}
+.school-brand{text-align:center;padding-bottom:14px;border-bottom:1px solid rgba(201,168,76,.12)}
+.school-logo{width:48px;height:48px;border-radius:12px;overflow:hidden;background:var(--gold-dim);border:1.5px solid var(--gold);display:flex;align-items:center;justify-content:center;font-family:'Amiri',serif;font-size:1.5rem;color:var(--gold);margin:0 auto 8px}
+.school-name{font-family:'Amiri',serif;font-size:.85rem;font-weight:700;color:var(--gold);line-height:1.3}
+.clock{text-align:center}
+.clock-time{font-size:2.2rem;font-weight:900;letter-spacing:-1px;color:var(--text)}
+.clock-date{font-size:.65rem;color:var(--text2);margin-top:2px;line-height:1.5}
+.clock-ar{font-family:'Amiri',serif;font-size:.8rem;color:var(--gold);direction:rtl}
+.stats{display:flex;flex-direction:column;gap:7px}
+.stat{background:rgba(255,255,255,.04);border-radius:10px;padding:9px 10px;border:1px solid var(--bd)}
+.stat-n{font-size:1.5rem;font-weight:900}
+.stat-l{font-size:.58rem;font-weight:700;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-top:2px}
+.c-green{color:#69F0AE}.c-gold{color:var(--gold)}.c-red{color:var(--red2)}
+.arrivals{flex:1;overflow-y:auto;display:flex;flex-direction:column;gap:5px;min-height:0}
+.arrivals::-webkit-scrollbar{width:2px}
+.arrivals::-webkit-scrollbar-thumb{background:rgba(201,168,76,.2);border-radius:2px}
+.arr-title{font-size:.58rem;font-weight:800;text-transform:uppercase;letter-spacing:.5px;color:var(--text3);margin-bottom:4px}
+.arr-card{display:flex;align-items:center;gap:7px;padding:5px 7px;background:rgba(255,255,255,.03);border-radius:8px;border:1px solid var(--bd);animation:slideIn .3s ease-out both}
+@keyframes slideIn{from{opacity:0;transform:translateX(-10px)}to{opacity:1;transform:translateX(0)}}
+.arr-photo{width:28px;height:28px;border-radius:6px;object-fit:cover;background:var(--night3);display:flex;align-items:center;justify-content:center;font-size:.75rem;flex-shrink:0;border:1px solid var(--bd)}
+.arr-info{flex:1;min-width:0}
+.arr-name{font-size:.62rem;font-weight:700;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.arr-time{font-size:.55rem;color:var(--text3)}
+
+/* ── CENTRE (pavé numérique) ── */
+.center{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;gap:16px}
+/* ── TOGGLE ARRIVÉE/DÉPART ── */
+.arrdep-toggle{display:flex;gap:10px;width:100%;max-width:320px}
+.ad-btn{
+  flex:1;display:flex;align-items:center;justify-content:center;gap:8px;
+  padding:13px 10px;border-radius:14px;border:2px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.04);cursor:pointer;transition:all .25s;
+  font-family:'Exo 2',sans-serif;font-size:.85rem;font-weight:800;color:var(--text2)
+}
+.ad-icon{font-size:1.1rem}
+.ad-btn.arr.active{background:var(--green-dim);border-color:var(--green2);color:#69F0AE}
+.ad-btn.dep.active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold)}
+
+.mode-indicator{text-align:center}
+.mode-badge{
+  display:inline-flex;align-items:center;gap:7px;padding:8px 18px;border-radius:30px;
+  font-size:.75rem;font-weight:800;letter-spacing:.3px;margin-bottom:6px;
+  background:var(--gold-dim);border:1px solid rgba(201,168,76,.35);color:var(--gold)
+}
+.mode-badge.pin{background:var(--green-dim);border-color:var(--green2);color:#69F0AE}
+.mode-title{font-family:'Amiri',serif;font-size:1.2rem;color:var(--text);font-weight:700}
+.mode-sub{font-size:.72rem;color:var(--text2);margin-top:3px}
+
+/* Display de saisie */
+.input-display{
+  display:flex;align-items:center;justify-content:center;gap:10px;
+  background:var(--night2);border-radius:16px;padding:14px 24px;
+  border:2px solid rgba(201,168,76,.2);min-width:220px;min-height:60px;
+  transition:border-color .2s
+}
+.input-display.active{border-color:var(--gold)}
+.input-display.pin-mode{border-color:var(--green2)}
+.input-digit{
+  width:36px;height:42px;border-radius:8px;
+  background:rgba(255,255,255,.08);border:1.5px solid rgba(255,255,255,.12);
+  display:flex;align-items:center;justify-content:center;
+  font-size:1.4rem;font-weight:900;color:var(--text);transition:all .15s
+}
+.input-digit.filled{background:var(--gold-dim);border-color:var(--gold);color:var(--gold)}
+.input-digit.filled.pin{background:var(--green-dim);border-color:var(--green2);color:#69F0AE;font-size:.7rem}
+.input-digit.cursor{animation:blink .8s ease-in-out infinite}
+@keyframes blink{0%,100%{border-color:var(--gold);background:var(--gold-dim)}50%{border-color:rgba(201,168,76,.2);background:transparent}}
+
+/* Carte élève (confirmation) */
+.student-confirm{
+  display:none;text-align:center;padding:14px 20px;
+  background:var(--night2);border-radius:18px;border:1.5px solid rgba(201,168,76,.3);
+  min-width:220px;
+}
+.student-confirm.show{display:block;animation:popIn .35s cubic-bezier(.34,1.56,.64,1) both}
+@keyframes popIn{from{opacity:0;transform:scale(.85)}to{opacity:1;transform:scale(1)}}
+.sc-photo{width:72px;height:72px;border-radius:14px;object-fit:cover;border:2px solid var(--gold);margin:0 auto 10px;display:block;background:var(--night3)}
+.sc-name{font-family:'Amiri',serif;font-size:1.1rem;font-weight:700;color:var(--parch);margin-bottom:2px}
+.sc-class{font-size:.68rem;color:var(--text2)}
+.sc-ok{font-size:.72rem;color:#69F0AE;margin-top:8px;font-weight:700}
+
+/* Pavé numérique */
+.numpad{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;max-width:280px;width:100%}
+.key{
+  aspect-ratio:1;border-radius:14px;border:1px solid rgba(255,255,255,.1);
+  background:rgba(255,255,255,.06);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  cursor:pointer;user-select:none;transition:all .1s;
+  -webkit-user-select:none
+}
+.key:active,.key.pressed{background:var(--gold-dim);border-color:var(--gold);transform:scale(.93)}
+.key.special:active,.key.special.pressed{background:var(--green-dim);border-color:var(--green2)}
+.key-num{font-size:1.6rem;font-weight:900;color:var(--text);line-height:1}
+.key-letters{font-size:.5rem;color:var(--text3);letter-spacing:.5px;margin-top:2px}
+.key.backspace .key-num{font-size:1.2rem}
+.key.confirm{background:var(--green-dim);border-color:var(--green2)}
+.key.confirm .key-num{color:#69F0AE;font-size:1.4rem}
+.key.empty{background:none;border-color:transparent;cursor:default}
+.key.mode-btn{background:var(--gold-dim);border-color:var(--gold)}
+.key.mode-btn .key-num{font-size:.8rem;color:var(--gold);font-weight:800}
+
+/* Erreur */
+/* ── ÉCRAN AUTO-SIGNALEMENT LEÇON ── */
+.lecon-report{display:flex;flex-direction:column;gap:14px;width:100%;max-width:340px;background:var(--night2);border-radius:18px;padding:18px;border:1.5px solid rgba(201,168,76,.25)}
+.lr-step{display:flex;flex-direction:column;gap:8px}
+.lr-title{font-family:'Amiri',serif;font-size:.95rem;font-weight:700;color:var(--gold)}
+.lr-row{display:flex;gap:8px;align-items:center}
+.lr-select{
+  flex:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);
+  border-radius:10px;padding:10px 10px;font-family:'Exo 2',sans-serif;
+  font-size:.8rem;color:var(--text);outline:none
+}
+.lr-select.small{flex:0 0 70px;text-align:center}
+.lr-select option{background:var(--night2)}
+.lr-sep{font-size:.75rem;color:var(--text2)}
+.lr-prev-info{background:rgba(255,255,255,.04);border-radius:8px;padding:8px 10px;font-size:.76rem;color:var(--text2);font-family:'Amiri',serif;direction:rtl}
+.lr-label{font-size:.74rem;color:var(--text2)}
+.lr-self-eval{display:flex;gap:6px}
+.lse-btn{flex:1;padding:9px 4px;border-radius:9px;border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.04);color:var(--text2);font-size:.68rem;font-weight:700;cursor:pointer;transition:all .15s}
+.lse-btn.active{background:var(--gold-dim);border-color:var(--gold);color:var(--gold)}
+.lr-actions{display:flex;flex-direction:column;gap:8px;margin-top:4px}
+.lr-btn-submit{padding:12px;border-radius:12px;border:none;background:linear-gradient(135deg,var(--green),var(--green2));color:#fff;font-family:'Exo 2',sans-serif;font-size:.82rem;font-weight:800;cursor:pointer}
+.lr-btn-cancel{padding:10px;border-radius:12px;border:1px solid rgba(255,255,255,.1);background:none;color:var(--text2);font-size:.75rem;cursor:pointer}
+
+.error-msg{
+  text-align:center;padding:8px 20px;border-radius:10px;
+  font-size:.75rem;font-weight:700;min-height:34px;
+  transition:all .3s
+}
+.error-msg.show{background:var(--red-dim);border:1px solid var(--red2);color:var(--red2)}
+.error-msg.locked{background:rgba(249,168,37,.1);border:1px solid #F9A825;color:#FFD54F}
+
+/* Flash succès */
+.success-flash{
+  position:fixed;inset:0;z-index:200;pointer-events:none;
+  display:flex;align-items:center;justify-content:center;
+  opacity:0
+}
+.success-flash.show{animation:flashAnim .9s ease-out both}
+@keyframes flashAnim{0%{opacity:0}20%{opacity:1}80%{opacity:1}100%{opacity:0}}
+.flash-box{
+  background:rgba(13,27,42,.96);border-radius:28px;padding:36px 52px;
+  text-align:center;border:2px solid var(--green2);
+  box-shadow:0 0 80px rgba(46,125,50,.5)
+}
+.flash-photo{width:80px;height:80px;border-radius:16px;object-fit:cover;border:2px solid var(--gold);margin:0 auto 14px;display:block;background:var(--night3)}
+.flash-name{font-family:'Amiri',serif;font-size:1.6rem;color:var(--parch);font-weight:700}
+.flash-meta{font-size:.78rem;color:var(--text2);margin-top:4px}
+.flash-msg{font-family:'Amiri',serif;font-size:1rem;color:var(--gold);margin-top:10px;direction:rtl}
+
+/* Shake animation */
+@keyframes shake{0%,100%{transform:translateX(0)}25%{transform:translateX(-10px)}75%{transform:translateX(10px)}}
+.shake{animation:shake .4s ease-in-out}
+
+/* Auth overlay */
+#scanAuthOverlay{position:fixed;inset:0;z-index:500;background:linear-gradient(145deg,#07111c,#0d1b2a);display:none;flex-direction:column;align-items:center;justify-content:center;gap:20px;padding:28px}
+#scanAuthOverlay.open{display:flex}
+
+/* Responsive */
+@media(max-width:540px){
+  .sidebar{display:none}
+  .key{border-radius:12px}
+  .key-num{font-size:1.4rem}
+}
+</style>
+</head>
+<body>
+
+<div class="star-bg">
+  <svg viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <path d="M100 10L112 80L178 52L140 110L190 130L122 140L130 200L100 152L70 200L78 140L10 130L60 110L22 52L88 80Z" fill="none" stroke="currentColor" stroke-width="1.5"/>
+    <circle cx="100" cy="100" r="35" fill="none" stroke="currentColor" stroke-width="1"/>
+    <circle cx="100" cy="100" r="58" fill="none" stroke="currentColor" stroke-width=".5"/>
+    <path d="M100 42L103 97L100 100L97 97Z M158 100L103 103L100 100L103 97Z M100 158L97 103L100 100L103 103Z M42 100L97 97L100 100L97 103Z" fill="currentColor"/>
+  </svg>
+</div>
+
+<div class="layout">
+  <!-- SIDEBAR -->
+  <div class="sidebar">
+    <div class="school-brand">
+      <div class="school-logo" id="sLogo"><img src="zag-icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"></div>
+      <div class="school-name" id="sName">École Al-Hikma</div>
+    </div>
+    <div class="clock">
+      <div class="clock-time" id="cTime">--:--</div>
+      <div class="clock-date" id="cDate">—</div>
+      <div class="clock-ar" id="cDateAr">—</div>
+    </div>
+    <div class="stats">
+      <div class="stat"><div class="stat-n c-green" id="sPresents">0</div><div class="stat-l">Présents</div></div>
+      <div class="stat"><div class="stat-n c-gold" id="sDeparts">0</div><div class="stat-l">Partis</div></div>
+      <div class="stat"><div class="stat-n c-red" id="sAbsents">0</div><div class="stat-l">Absents</div></div>
+    </div>
+    <div class="arr-title">Flux du jour</div>
+    <div class="arrivals" id="fluxList">
+      <div style="text-align:center;color:var(--text3);padding:16px;font-size:.65rem">🕌 En attente...</div>
+    </div>
+  </div>
+
+  <!-- CENTRE -->
+  <div class="center">
+    <div class="arrdep-toggle" id="arrdepToggle">
+      <button class="ad-btn arr active" onclick="setModeArrDep('arrivee')">
+        <span class="ad-icon">✅</span><span>ARRIVÉE</span>
+      </button>
+      <button class="ad-btn dep" onclick="setModeArrDep('depart')">
+        <span class="ad-icon">🚪</span><span>DÉPART</span>
+      </button>
+    </div>
+    <div class="mode-indicator">
+      <div class="mode-title" id="modeTitle">Pointage des élèves</div>
+      <div class="mode-sub" id="modeSub">Entrez votre numéro d'identification</div>
+    </div>
+
+    <div class="input-display" id="inputDisplay">
+      <div class="input-digit" id="d0">_</div>
+      <div class="input-digit" id="d1">_</div>
+      <div class="input-digit" id="d2">_</div>
+      <div class="input-digit" id="d3">_</div>
+    </div>
+
+    <div class="student-confirm" id="studentConfirm">
+      <img class="sc-photo" id="scPhoto" src="" alt="">
+      <div class="sc-name" id="scName">—</div>
+      <div class="sc-class" id="scClass">—</div>
+      <div class="sc-ok">✅ Entrez maintenant votre code secret</div>
+    </div>
+
+    <div class="numpad" id="numpad">
+      <div class="key" data-k="1" ontouchstart="touchKey(this)" onclick="pressKey('1')"><div class="key-num">1</div><div class="key-letters">ABC</div></div>
+      <div class="key" data-k="2" ontouchstart="touchKey(this)" onclick="pressKey('2')"><div class="key-num">2</div><div class="key-letters">DEF</div></div>
+      <div class="key" data-k="3" ontouchstart="touchKey(this)" onclick="pressKey('3')"><div class="key-num">3</div><div class="key-letters">GHI</div></div>
+      <div class="key" data-k="4" ontouchstart="touchKey(this)" onclick="pressKey('4')"><div class="key-num">4</div><div class="key-letters">JKL</div></div>
+      <div class="key" data-k="5" ontouchstart="touchKey(this)" onclick="pressKey('5')"><div class="key-num">5</div><div class="key-letters">MNO</div></div>
+      <div class="key" data-k="6" ontouchstart="touchKey(this)" onclick="pressKey('6')"><div class="key-num">6</div><div class="key-letters">PQR</div></div>
+      <div class="key" data-k="7" ontouchstart="touchKey(this)" onclick="pressKey('7')"><div class="key-num">7</div><div class="key-letters">STU</div></div>
+      <div class="key" data-k="8" ontouchstart="touchKey(this)" onclick="pressKey('8')"><div class="key-num">8</div><div class="key-letters">VWX</div></div>
+      <div class="key" data-k="9" ontouchstart="touchKey(this)" onclick="pressKey('9')"><div class="key-num">9</div><div class="key-letters">YZﺍ</div></div>
+      <div class="key backspace special" ontouchstart="touchKey(this)" onclick="pressBackspace()"><div class="key-num">⌫</div></div>
+      <div class="key" data-k="0" ontouchstart="touchKey(this)" onclick="pressKey('0')"><div class="key-num">0</div></div>
+      <div class="key confirm special" id="keyConfirm" ontouchstart="touchKey(this)" onclick="pressConfirm()"><div class="key-num">✓</div></div>
+    </div>
+
+    <!-- ÉCRAN AUTO-SIGNALEMENT DE LEÇON (élèves autonomes, au départ) -->
+    <div class="lecon-report" id="leconReport" style="display:none">
+      <div class="lr-step" id="lrStepNouvelle">
+        <div class="lr-title">📖 Nouvelle leçon apprise aujourd'hui</div>
+        <div class="lr-row">
+          <select class="lr-select" id="lrSourateNouvelle" onchange="updateAyatRange('lrSourateNouvelle','lrAyatDebutN','lrAyatFinN')"></select>
+        </div>
+        <div class="lr-row">
+          <select class="lr-select small" id="lrAyatDebutN"></select>
+          <span class="lr-sep">à</span>
+          <select class="lr-select small" id="lrAyatFinN"></select>
+        </div>
+      </div>
+      <!-- Ancienne leçon révisée (bornage) -->
+      <div class="lr-step" style="margin-top:8px">
+        <div class="lr-title">🔁 Ancienne leçon révisée aujourd'hui</div>
+        <div class="lr-row">
+          <select class="lr-select" id="lrSourateAncienne" onchange="updateAyatRange('lrSourateAncienne','lrAyatDebutA','lrAyatFinA')"></select>
+        </div>
+        <div class="lr-row">
+          <select class="lr-select small" id="lrAyatDebutA"></select>
+          <span class="lr-sep">à</span>
+          <select class="lr-select small" id="lrAyatFinA"></select>
+        </div>
+      </div>
+      <div class="lr-step" id="lrStepRestitution">
+        <div class="lr-title">🎯 Auto-évaluation de la restitution</div>
+        <div class="lr-self-eval" id="lrSelfEval">
+          <button class="lse-btn" data-v="bien" onclick="setLrSelfEval('bien')">😊 Bien</button>
+          <button class="lse-btn" data-v="moyen" onclick="setLrSelfEval('moyen')">😐 Moyen</button>
+          <button class="lse-btn" data-v="difficile" onclick="setLrSelfEval('difficile')">😕 Difficile</button>
+        </div>
+      </div>
+      <div class="lr-actions">
+        <button class="lr-btn-submit" onclick="soumettreSignalementLecon()">✅ Envoyer à mon enseignant</button>
+        <button class="lr-btn-cancel" onclick="annulerSignalementLecon()">Annuler</button>
+      </div>
+    </div>
+
+    <div class="error-msg" id="errorMsg"></div>
+  </div>
+</div>
+
+<!-- FLASH SUCCÈS -->
+<div class="success-flash" id="flashDiv">
+  <div class="flash-box">
+    <img class="flash-photo" id="flashPhoto" src="" alt="">
+    <div class="flash-name" id="flashName">—</div>
+    <div class="flash-meta" id="flashMeta">—</div>
+    <div class="flash-msg" id="flashMsg">أهلاً وسهلاً!</div>
+  </div>
+</div>
+
+<!-- AUTH OVERLAY -->
+<div id="scanAuthOverlay">
+  <div style="width:60px;height:60px;border-radius:14px;overflow:hidden;border:2px solid #C9A84C"><img src="zag-icon-192.png" style="width:100%;height:100%;object-fit:cover;display:block"></div>
+  <div style="text-align:center">
+    <div style="font-family:'Amiri',serif;font-size:1.2rem;font-weight:700;color:#C9A84C">ZAG — Tablette de pointage</div>
+    <div style="font-size:.72rem;color:rgba(245,240,232,.55);margin-top:4px">Connexion administrateur requise</div>
+  </div>
+  <div style="width:100%;max-width:280px;display:flex;flex-direction:column;gap:10px">
+    <input id="scanAuthEmail" type="email" placeholder="E-mail" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 16px;font-family:'Exo 2',sans-serif;font-size:.85rem;color:#F5F0E8;outline:none">
+    <input id="scanAuthPass" type="password" placeholder="Mot de passe" style="width:100%;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.12);border-radius:12px;padding:12px 16px;font-family:'Exo 2',sans-serif;font-size:.85rem;color:#F5F0E8;outline:none">
+    <div id="scanAuthErr" style="color:#EF5350;font-size:.7rem;text-align:center;min-height:14px"></div>
+    <button onclick="scanConnexion()" style="width:100%;padding:13px;border-radius:12px;border:none;cursor:pointer;background:linear-gradient(135deg,#2E7D32,#43A047);color:#fff;font-family:'Exo 2',sans-serif;font-size:.86rem;font-weight:800">🔐 Accéder au scanner</button>
+  </div>
+</div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────
+var FIREBASE_CONFIG={apiKey:"AIzaSyDWF-Q3S2M-btrRBHBYzd9dVbY6iEg_fNk",authDomain:"gestionpieces-74559.firebaseapp.com",projectId:"gestionpieces-74559",storageBucket:"gestionpieces-74559.firebasestorage.app",messagingSenderId:"392970031226",appId:"1:392970031226:web:68bb9966b4440576a2ebc3"};
+// Données structurelles du Coran (114 sourates) - noms + nombre de versets
+// Source: decompte standard (lecture Hafs 'an 'Asim), verifie.
+var SOURATES=[
+{n:1,ar:"الفاتحة",fr:"Al-Fatiha",fr_sens:"L'Ouverture",ayat:7},
+{n:2,ar:"البقرة",fr:"Al-Baqara",fr_sens:"La Vache",ayat:286},
+{n:3,ar:"آل عمران",fr:"Aal Imran",fr_sens:"La Famille d'Imran",ayat:200},
+{n:4,ar:"النساء",fr:"An-Nisa",fr_sens:"Les Femmes",ayat:176},
+{n:5,ar:"المائدة",fr:"Al-Ma'ida",fr_sens:"La Table Servie",ayat:120},
+{n:6,ar:"الأنعام",fr:"Al-An'am",fr_sens:"Les Bestiaux",ayat:165},
+{n:7,ar:"الأعراف",fr:"Al-A'raf",fr_sens:"Al-A'raf",ayat:206},
+{n:8,ar:"الأنفال",fr:"Al-Anfal",fr_sens:"Le Butin",ayat:75},
+{n:9,ar:"التوبة",fr:"At-Tawba",fr_sens:"Le Repentir",ayat:129},
+{n:10,ar:"يونس",fr:"Yunus",fr_sens:"Jonas",ayat:109},
+{n:11,ar:"هود",fr:"Hud",fr_sens:"Hud",ayat:123},
+{n:12,ar:"يوسف",fr:"Yusuf",fr_sens:"Joseph",ayat:111},
+{n:13,ar:"الرعد",fr:"Ar-Ra'd",fr_sens:"Le Tonnerre",ayat:43},
+{n:14,ar:"ابراهيم",fr:"Ibrahim",fr_sens:"Abraham",ayat:52},
+{n:15,ar:"الحجر",fr:"Al-Hijr",fr_sens:"Al-Hijr",ayat:99},
+{n:16,ar:"النحل",fr:"An-Nahl",fr_sens:"Les Abeilles",ayat:128},
+{n:17,ar:"الإسراء",fr:"Al-Isra",fr_sens:"Le Voyage Nocturne",ayat:111},
+{n:18,ar:"الكهف",fr:"Al-Kahf",fr_sens:"La Caverne",ayat:110},
+{n:19,ar:"مريم",fr:"Maryam",fr_sens:"Marie",ayat:98},
+{n:20,ar:"طه",fr:"Ta-Ha",fr_sens:"Ta-Ha",ayat:135},
+{n:21,ar:"الأنبياء",fr:"Al-Anbiya",fr_sens:"Les Prophètes",ayat:112},
+{n:22,ar:"الحج",fr:"Al-Hajj",fr_sens:"Le Pèlerinage",ayat:78},
+{n:23,ar:"المؤمنون",fr:"Al-Mu'minun",fr_sens:"Les Croyants",ayat:118},
+{n:24,ar:"النور",fr:"An-Nur",fr_sens:"La Lumière",ayat:64},
+{n:25,ar:"الفرقان",fr:"Al-Furqan",fr_sens:"Le Discernement",ayat:77},
+{n:26,ar:"الشعراء",fr:"Ash-Shu'ara",fr_sens:"Les Poètes",ayat:227},
+{n:27,ar:"النمل",fr:"An-Naml",fr_sens:"Les Fourmis",ayat:93},
+{n:28,ar:"القصص",fr:"Al-Qasas",fr_sens:"Le Récit",ayat:88},
+{n:29,ar:"العنكبوت",fr:"Al-Ankabut",fr_sens:"L'Araignée",ayat:69},
+{n:30,ar:"الروم",fr:"Ar-Rum",fr_sens:"Les Romains",ayat:60},
+{n:31,ar:"لقمان",fr:"Luqman",fr_sens:"Luqman",ayat:34},
+{n:32,ar:"السجدة",fr:"As-Sajda",fr_sens:"La Prosternation",ayat:30},
+{n:33,ar:"الأحزاب",fr:"Al-Ahzab",fr_sens:"Les Coalisés",ayat:73},
+{n:34,ar:"سبأ",fr:"Saba",fr_sens:"Saba",ayat:54},
+{n:35,ar:"فاطر",fr:"Fatir",fr_sens:"Le Créateur",ayat:45},
+{n:36,ar:"يس",fr:"Ya-Sin",fr_sens:"Ya-Sin",ayat:83},
+{n:37,ar:"الصافات",fr:"As-Saffat",fr_sens:"Les Rangés",ayat:182},
+{n:38,ar:"ص",fr:"Sad",fr_sens:"Sad",ayat:88},
+{n:39,ar:"الزمر",fr:"Az-Zumar",fr_sens:"Les Groupes",ayat:75},
+{n:40,ar:"غافر",fr:"Ghafir",fr_sens:"Le Pardonneur",ayat:85},
+{n:41,ar:"فصلت",fr:"Fussilat",fr_sens:"Les Versets Détaillés",ayat:54},
+{n:42,ar:"الشورى",fr:"Ash-Shura",fr_sens:"La Consultation",ayat:53},
+{n:43,ar:"الزخرف",fr:"Az-Zukhruf",fr_sens:"L'Ornement",ayat:89},
+{n:44,ar:"الدخان",fr:"Ad-Dukhan",fr_sens:"La Fumée",ayat:59},
+{n:45,ar:"الجاثية",fr:"Al-Jathiya",fr_sens:"L'Agenouillée",ayat:37},
+{n:46,ar:"الأحقاف",fr:"Al-Ahqaf",fr_sens:"Al-Ahqaf",ayat:35},
+{n:47,ar:"محمد",fr:"Muhammad",fr_sens:"Muhammad",ayat:38},
+{n:48,ar:"الفتح",fr:"Al-Fath",fr_sens:"La Victoire Éclatante",ayat:29},
+{n:49,ar:"الحجرات",fr:"Al-Hujurat",fr_sens:"Les Appartements",ayat:18},
+{n:50,ar:"ق",fr:"Qaf",fr_sens:"Qaf",ayat:45},
+{n:51,ar:"الذاريات",fr:"Adh-Dhariyat",fr_sens:"Qui Éparpillent",ayat:60},
+{n:52,ar:"الطور",fr:"At-Tur",fr_sens:"At-Tur",ayat:49},
+{n:53,ar:"النجم",fr:"An-Najm",fr_sens:"L'Étoile",ayat:62},
+{n:54,ar:"القمر",fr:"Al-Qamar",fr_sens:"La Lune",ayat:55},
+{n:55,ar:"الرحمن",fr:"Ar-Rahman",fr_sens:"Le Tout Miséricordieux",ayat:78},
+{n:56,ar:"الواقعة",fr:"Al-Waqi'a",fr_sens:"L'Événement",ayat:96},
+{n:57,ar:"الحديد",fr:"Al-Hadid",fr_sens:"Le Fer",ayat:29},
+{n:58,ar:"المجادلة",fr:"Al-Mujadila",fr_sens:"La Discussion",ayat:22},
+{n:59,ar:"الحشر",fr:"Al-Hashr",fr_sens:"L'Exode",ayat:24},
+{n:60,ar:"الممتحنة",fr:"Al-Mumtahina",fr_sens:"L'Éprouvée",ayat:13},
+{n:61,ar:"الصف",fr:"As-Saff",fr_sens:"Le Rang",ayat:14},
+{n:62,ar:"الجمعة",fr:"Al-Jumu'a",fr_sens:"Le Vendredi",ayat:11},
+{n:63,ar:"المنافقون",fr:"Al-Munafiqun",fr_sens:"Les Hypocrites",ayat:11},
+{n:64,ar:"التغابن",fr:"At-Taghabun",fr_sens:"La Grande Perte",ayat:18},
+{n:65,ar:"الطلاق",fr:"At-Talaq",fr_sens:"Le Divorce",ayat:12},
+{n:66,ar:"التحريم",fr:"At-Tahrim",fr_sens:"L'Interdiction",ayat:12},
+{n:67,ar:"الملك",fr:"Al-Mulk",fr_sens:"La Royauté",ayat:30},
+{n:68,ar:"القلم",fr:"Al-Qalam",fr_sens:"La Plume",ayat:52},
+{n:69,ar:"الحاقة",fr:"Al-Haqqa",fr_sens:"Celle Qui Montre la Vérité",ayat:52},
+{n:70,ar:"المعارج",fr:"Al-Ma'arij",fr_sens:"Les Voies d'Ascension",ayat:44},
+{n:71,ar:"نوح",fr:"Nuh",fr_sens:"Noé",ayat:28},
+{n:72,ar:"الجن",fr:"Al-Jinn",fr_sens:"Les Djinns",ayat:28},
+{n:73,ar:"المزمل",fr:"Al-Muzzammil",fr_sens:"L'Enveloppé",ayat:20},
+{n:74,ar:"المدثر",fr:"Al-Muddaththir",fr_sens:"Le Revêtu d'un Manteau",ayat:56},
+{n:75,ar:"القيامة",fr:"Al-Qiyama",fr_sens:"La Résurrection",ayat:40},
+{n:76,ar:"الانسان",fr:"Al-Insan",fr_sens:"L'Homme",ayat:31},
+{n:77,ar:"المرسلات",fr:"Al-Mursalat",fr_sens:"Les Envoyés",ayat:50},
+{n:78,ar:"النبأ",fr:"An-Naba",fr_sens:"La Nouvelle",ayat:40},
+{n:79,ar:"النازعات",fr:"An-Nazi'at",fr_sens:"Les Anges Qui Arrachent",ayat:46},
+{n:80,ar:"عبس",fr:"Abasa",fr_sens:"Il S'est Renfrogné",ayat:42},
+{n:81,ar:"التكوير",fr:"At-Takwir",fr_sens:"L'Obscurcissement",ayat:29},
+{n:82,ar:"الإنفطار",fr:"Al-Infitar",fr_sens:"La Rupture",ayat:19},
+{n:83,ar:"المطففين",fr:"Al-Mutaffifin",fr_sens:"Les Fraudeurs",ayat:36},
+{n:84,ar:"الإنشقاق",fr:"Al-Inshiqaq",fr_sens:"La Déchirure",ayat:25},
+{n:85,ar:"البروج",fr:"Al-Buruj",fr_sens:"Les Constellations",ayat:22},
+{n:86,ar:"الطارق",fr:"At-Tariq",fr_sens:"L'Astre Nocturne",ayat:17},
+{n:87,ar:"الأعلى",fr:"Al-A'la",fr_sens:"Le Très-Haut",ayat:19},
+{n:88,ar:"الغاشية",fr:"Al-Ghashiya",fr_sens:"L'Enveloppante",ayat:26},
+{n:89,ar:"الفجر",fr:"Al-Fajr",fr_sens:"L'Aube",ayat:30},
+{n:90,ar:"البلد",fr:"Al-Balad",fr_sens:"La Cité",ayat:20},
+{n:91,ar:"الشمس",fr:"Ash-Shams",fr_sens:"Le Soleil",ayat:15},
+{n:92,ar:"الليل",fr:"Al-Layl",fr_sens:"La Nuit",ayat:21},
+{n:93,ar:"الضحى",fr:"Ad-Duha",fr_sens:"Le Jour Montant",ayat:11},
+{n:94,ar:"الشرح",fr:"Ash-Sharh",fr_sens:"L'Ouverture",ayat:8},
+{n:95,ar:"التين",fr:"At-Tin",fr_sens:"Le Figuier",ayat:8},
+{n:96,ar:"العلق",fr:"Al-Alaq",fr_sens:"L'Adhérence",ayat:19},
+{n:97,ar:"القدر",fr:"Al-Qadr",fr_sens:"La Destinée",ayat:5},
+{n:98,ar:"البينة",fr:"Al-Bayyina",fr_sens:"La Preuve",ayat:8},
+{n:99,ar:"الزلزلة",fr:"Az-Zalzala",fr_sens:"La Secousse",ayat:8},
+{n:100,ar:"العاديات",fr:"Al-Adiyat",fr_sens:"Les Coursiers",ayat:11},
+{n:101,ar:"القارعة",fr:"Al-Qari'a",fr_sens:"Le Fracas",ayat:11},
+{n:102,ar:"التكاثر",fr:"At-Takathur",fr_sens:"La Course aux Richesses",ayat:8},
+{n:103,ar:"العصر",fr:"Al-Asr",fr_sens:"Le Temps",ayat:3},
+{n:104,ar:"الهمزة",fr:"Al-Humaza",fr_sens:"Les Calomniateurs",ayat:9},
+{n:105,ar:"الفيل",fr:"Al-Fil",fr_sens:"L'Éléphant",ayat:5},
+{n:106,ar:"قريش",fr:"Quraysh",fr_sens:"Quraysh",ayat:4},
+{n:107,ar:"الماعون",fr:"Al-Ma'un",fr_sens:"L'Ustensile",ayat:7},
+{n:108,ar:"الكوثر",fr:"Al-Kawthar",fr_sens:"L'Abondance",ayat:3},
+{n:109,ar:"الكافرون",fr:"Al-Kafirun",fr_sens:"Les Infidèles",ayat:6},
+{n:110,ar:"النصر",fr:"An-Nasr",fr_sens:"Les Secours",ayat:3},
+{n:111,ar:"المسد",fr:"Al-Masad",fr_sens:"Les Fibres",ayat:5},
+{n:112,ar:"الإخلاص",fr:"Al-Ikhlas",fr_sens:"Le Monothéisme Pur",ayat:4},
+{n:113,ar:"الفلق",fr:"Al-Falaq",fr_sens:"L'Aube Naissante",ayat:5},
+{n:114,ar:"الناس",fr:"An-Nas",fr_sens:"Les Hommes",ayat:6}
+];
+
+var ECOLE_ID="alhikma_kindia"; // identifiant technique invariant — ne jamais changer
+var db=null, FIREBASE_OK=false;
+var omSettings = {};
+
+// ── ÉTAT MACHINE ─────────────────────────────────
+var STATE='IDLE'; // IDLE | ID_ENTRY | PIN_ENTRY | LECON_NOUVELLE | LECON_RESTITUTION
+var ARRDEP_MODE='arrivee'; // 'arrivee' | 'depart' — choisi explicitement par l'utilisateur
+var inputBuffer='';
+var currentEleve=null;
+var failCount={};       // eleveId -> nb échecs
+var lockoutUntil={};    // eleveId -> timestamp
+var eleves=[];
+var presences=[];
+var PIN_LENGTH=4;
+var ID_LENGTH=4;
+
+// ── HORLOGE ──────────────────────────────────────
+function updateClock(){
+  var n=new Date();
+  var hh=String(n.getHours()).padStart(2,'0');
+  var mm=String(n.getMinutes()).padStart(2,'0');
+  document.getElementById('cTime').textContent=hh+':'+mm;
+  var j=['Dim','Lun','Mar','Mer','Jeu','Ven','Sam'][n.getDay()];
+  var m=['jan','fév','mar','avr','mai','jun','jul','aoû','sep','oct','nov','déc'][n.getMonth()];
+  document.getElementById('cDate').textContent=j+' '+n.getDate()+' '+m+'. '+n.getFullYear();
+  document.getElementById('cDateAr').textContent=n.toLocaleDateString('ar-SA');
+}
+setInterval(updateClock,1000); updateClock();
+
+// ── WEB CRYPTO: HASH PIN ──────────────────────────
+async function hashPin(eleveId, pin){
+  var str=ECOLE_ID+':'+eleveId+':'+pin;
+  var data=new TextEncoder().encode(str);
+  var buf=await crypto.subtle.digest('SHA-256',data);
+  return Array.from(new Uint8Array(buf)).map(function(b){return b.toString(16).padStart(2,'0');}).join('');
+}
+
+// ── RENDU AFFICHAGE ──────────────────────────────
+function renderDisplay(){
+  var isPIN=(STATE==='PIN_ENTRY');
+  var len=isPIN?PIN_LENGTH:ID_LENGTH;
+  var disp=document.getElementById('inputDisplay');
+  disp.className='input-display active'+(isPIN?' pin-mode':'');
+  disp.innerHTML='';
+  for(var i=0;i<len;i++){
+    var d=document.createElement('div');
+    var filled=(i<inputBuffer.length);
+    d.className='input-digit'+(filled?' filled'+(isPIN?' pin':''):'')+(i===inputBuffer.length?' cursor':'');
+    d.textContent=filled?(isPIN?'•':inputBuffer[i]):'_';
+    disp.appendChild(d);
+  }
+}
+
+function setModeArrDep(mode){
+  ARRDEP_MODE=mode;
+  document.querySelectorAll('.ad-btn').forEach(function(b){
+    b.classList.toggle('active', b.classList.contains(mode==='arrivee'?'arr':'dep'));
+  });
+  resetState();
+}
+
+function setUI(state){
+  var isPIN=(state==='PIN_ENTRY');
+  var title=document.getElementById('modeTitle');
+  var sub=document.getElementById('modeSub');
+  if(isPIN){
+    title.textContent='Entrez votre code secret';
+    sub.textContent='Votre code personnel à 4 chiffres';
+  } else {
+    title.textContent='Pointage des élèves';
+    sub.textContent=ARRDEP_MODE==='depart'?'Entrez votre numéro — DÉPART':'Entrez votre numéro — ARRIVÉE';
+  }
+}
+
+// ── PAVÉ NUMÉRIQUE ────────────────────────────────
+function pressKey(k){
+  clearError();
+  if(STATE==='IDLE') STATE='ID_ENTRY';
+  var maxLen=(STATE==='PIN_ENTRY')?PIN_LENGTH:ID_LENGTH;
+  if(inputBuffer.length>=maxLen) return;
+  inputBuffer+=k;
+  renderDisplay();
+  // Auto-valider quand complet
+  if(inputBuffer.length===maxLen) setTimeout(pressConfirm,200);
+}
+
+function pressBackspace(){
+  clearError();
+  if(inputBuffer.length>0){ inputBuffer=inputBuffer.slice(0,-1); renderDisplay(); }
+  else if(STATE==='PIN_ENTRY') annulerPin();
+}
+
+function pressConfirm(){
+  if(STATE==='ID_ENTRY'||STATE==='IDLE'){
+    if(inputBuffer.length<ID_LENGTH){ showError('Numéro incomplet — '+ID_LENGTH+' chiffres requis'); return; }
+    validerID(inputBuffer.padStart(ID_LENGTH,'0'));
+  } else if(STATE==='PIN_ENTRY'){
+    if(inputBuffer.length<PIN_LENGTH){ showError('Code incomplet — '+PIN_LENGTH+' chiffres requis'); return; }
+    validerPIN(inputBuffer);
+  }
+}
+
+function touchKey(el){ el.classList.add('pressed'); setTimeout(function(){el.classList.remove('pressed');},150); }
+
+// ── VALIDATION ID ─────────────────────────────────
+function validerID(id){
+  var eleve=eleves.find(function(e){ return e.numero===id||e.numero===parseInt(id,10).toString().padStart(ID_LENGTH,'0'); });
+  if(!eleve){ shakeDisplay(); showError('Numéro non reconnu — vérifiez et réessayez'); inputBuffer=''; renderDisplay(); return; }
+
+  // Vérifier lockout
+  var lockUntil=lockoutUntil[eleve.id];
+  if(lockUntil && Date.now()<lockUntil){
+    var reste=Math.ceil((lockUntil-Date.now())/1000);
+    showError('Compte verrouillé — réessayez dans '+reste+' secondes','locked');
+    inputBuffer=''; renderDisplay(); return;
+  }
+
+  currentEleve=eleve;
+  STATE='PIN_ENTRY';
+  inputBuffer='';
+  setUI('PIN_ENTRY');
+  renderDisplay();
+  afficherConfirmEleve(eleve);
+}
+
+// ── VALIDATION PIN ────────────────────────────────
+async function validerPIN(pin){
+  if(!currentEleve){ resetState(); return; }
+
+  var hash=await hashPin(currentEleve.id, pin);
+  if(hash!==currentEleve.pinHash){
+    // Mauvais PIN
+    failCount[currentEleve.id]=(failCount[currentEleve.id]||0)+1;
+    if(failCount[currentEleve.id]>=3){
+      lockoutUntil[currentEleve.id]=Date.now()+5*60*1000;
+      failCount[currentEleve.id]=0;
+      showError('3 erreurs — compte verrouillé 5 minutes','locked');
+    } else {
+      shakeDisplay();
+      showError('Code incorrect — tentative '+(failCount[currentEleve.id])+'/3');
+    }
+    inputBuffer=''; renderDisplay(); return;
+  }
+
+  // ✅ CODE CORRECT
+  failCount[currentEleve.id]=0;
+  var eleve=currentEleve;
+
+  if(ARRDEP_MODE==='depart' && eleve.autonome===true){
+    // Élève autonome au départ → écran d'auto-signalement de leçon
+    lancerSignalementLecon(eleve);
+    return;
+  }
+
+  enregistrerPresence(eleve);
+  afficherSucces(eleve);
+  setTimeout(resetState, 2200);
+}
+
+// ── ENREGISTREMENT ────────────────────────────────
+function enregistrerPresence(eleve){
+  var n=new Date();
+  var hh=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+  var dateISO=n.toISOString().split('T')[0]; // Format YYYY-MM-DD cohérent pour tous les filtres
+  var type=ARRDEP_MODE; // choisi explicitement par le bouton, jamais devine
+
+  // Unicité : un seul pointage ARRIVÉE par élève par jour
+  if(type==='arrivee'){
+    var dejaPointe=presences.some(function(p){
+      var pd=p.date&&p.date.toDate?p.date.toDate().toISOString().split('T')[0]:String(p.date||'').split('T')[0];
+      return p.eleveId===eleve.id && p.type==='arrivee' && pd===dateISO;
+    });
+    if(dejaPointe){ showError((LANG==='ar'?'تم تسجيل الحضور مسبقاً اليوم':'Déjà pointé aujourd\'hui ✓')); return; }
+  }
+
+  // Calcul statut retard selon seuil configuré
+  var statutArrivee = 'present';
+  if(type==='arrivee' && omSettings && omSettings.heureLimitArrivee){
+    statutArrivee = hh > omSettings.heureLimitArrivee ? 'retard' : 'present';
+  }
+
+  var data={eleveId:eleve.id,eleveNom:(eleve.prenom||'')+' '+(eleve.nom||''),eleveNomAr:eleve.prenom_ar||'',photo:eleve.photo||'',type:type,heure:hh,statut:type==='arrivee'?statutArrivee:'depart',ecoleId:ECOLE_ID,date:dateISO};
+  var lp=[];try{lp=JSON.parse(localStorage.getItem('zag_presences_pending')||'[]');}catch(e){}
+  lp.unshift(Object.assign({},data,{_localId:'loc_'+Date.now(),_synced:false}));
+  try{localStorage.setItem('zag_presences_pending',JSON.stringify(lp));}catch(e){}
+  presences.push(data);
+  updateStats();
+  ajouterFlux(eleve,hh,type);
+  if(FIREBASE_OK&&db){
+    db.collection('zag_presences').add(data).then(function(){ syncPresences(); }).catch(function(){});
+  }
+}
+
+function estAujourdHui(date){
+  if(!date) return false;
+  var d=date.toDate?date.toDate():(typeof date==='string'?new Date(date):date);
+  return d.toDateString()===new Date().toDateString();
+}
+
+// ── AFFICHAGE ÉLÈVE (confirmation) ───────────────
+// ── LABEL ACTION SELON RÉGIME (interne/externe) ──
+function labelActionPourEleve(eleve, mode){
+  var interne = eleve.regime==='interne';
+  if(mode==='arrivee') return interne ? '🛏️ Retour au centre' : '🚶 Arrivée';
+  return interne ? '🛏️ Sortie du centre' : '🚶 Départ';
+}
+
+function labelActionEnregistree(eleve, mode){
+  var interne = eleve.regime==='interne';
+  if(mode==='arrivee') return interne ? '🛏️ Retour enregistré' : '🚶 Arrivée enregistrée';
+  return interne ? '🛏️ Sortie enregistrée' : '🚶 Départ enregistré';
+}
+
+function afficherConfirmEleve(eleve){
+  var sc=document.getElementById('studentConfirm');
+  var photo=document.getElementById('scPhoto');
+  photo.src=eleve.photo||'';
+  photo.style.display=eleve.photo?'block':'none';
+  document.getElementById('scName').textContent=(eleve.prenom_ar||'')||((eleve.prenom||'')+' '+(eleve.nom||''));
+  document.getElementById('scClass').textContent=(eleve.classe||'—')+' · '+labelActionPourEleve(eleve, ARRDEP_MODE);
+  sc.classList.add('show');
+}
+
+// ── FLASH SUCCÈS ─────────────────────────────────
+function afficherSucces(eleve, customMsg){
+  var isDepart=(ARRDEP_MODE==='depart');
+  var n=new Date(); var hh=String(n.getHours()).padStart(2,'0')+':'+String(n.getMinutes()).padStart(2,'0');
+  var fp=document.getElementById('flashPhoto');
+  fp.src=eleve.photo||''; fp.style.display=eleve.photo?'block':'none';
+  document.getElementById('flashName').textContent=(eleve.prenom_ar||'')||((eleve.prenom||'')+' '+(eleve.nom||''));
+  document.getElementById('flashMeta').textContent=labelActionEnregistree(eleve, ARRDEP_MODE)+' · '+hh;
+  document.getElementById('flashMsg').textContent=customMsg||(isDepart?'إلى اللقاء، بارك الله فيك':'أهلاً وسهلاً! مرحباً بك');
+  var f=document.getElementById('flashDiv');
+  f.className='success-flash show';
+  setTimeout(function(){f.className='success-flash';},2000);
+}
+
+// ── FLUX ─────────────────────────────────────────
+function ajouterFlux(eleve,heure,type){
+  var list=document.getElementById('fluxList');
+  var placeholder=list.querySelector('div[style]');
+  if(placeholder) list.innerHTML='';
+  var isArr=(type==='arrivee');
+  var card=document.createElement('div');
+  card.className='arr-card';
+  var photoEl=eleve.photo?('<img src="'+escHtml(eleve.photo)+'" class="arr-photo" style="width:28px;height:28px;border-radius:6px;object-fit:cover">'):('<div class="arr-photo">👤</div>');
+  card.innerHTML=photoEl+'<div class="arr-info"><div class="arr-name">'+escHtml((eleve.prenom||'')+' '+(eleve.nom||''))+'</div><div class="arr-time">'+(isArr?'✅':'🚪')+' '+heure+'</div></div>';
+  list.insertBefore(card,list.firstChild);
+  while(list.children.length>15) list.removeChild(list.lastChild);
+}
+
+// ── STATS ─────────────────────────────────────────
+function updateStats(){
+  var todArr=presences.filter(function(p){return p.type==='arrivee'&&estAujourdHui(p.date);});
+  var todDep=presences.filter(function(p){return p.type==='depart'&&estAujourdHui(p.date);});
+  var presents=todArr.length-todDep.length;
+  document.getElementById('sPresents').textContent=Math.max(0,presents);
+  document.getElementById('sDeparts').textContent=todDep.length;
+  document.getElementById('sAbsents').textContent=Math.max(0,eleves.length-todArr.length);
+}
+
+// ── RESET ─────────────────────────────────────────
+function resetState(){
+  STATE='IDLE'; inputBuffer=''; currentEleve=null;
+  document.getElementById('studentConfirm').classList.remove('show');
+  setUI('ID_ENTRY'); renderDisplay(); clearError();
+}
+
+function annulerPin(){ resetState(); }
+
+// ── ERREURS ───────────────────────────────────────
+function showError(msg,type){
+  var el=document.getElementById('errorMsg');
+  el.textContent=msg; el.className='error-msg show'+(type?' '+type:'');
+}
+function clearError(){document.getElementById('errorMsg').className='error-msg';document.getElementById('errorMsg').textContent='';}
+function shakeDisplay(){var d=document.getElementById('inputDisplay');d.classList.add('shake');setTimeout(function(){d.classList.remove('shake');},500);}
+
+// ── SYNC PRÉSENCES ────────────────────────────────
+function syncPresences(){
+  if(!FIREBASE_OK||!navigator.onLine||!db) return;
+  var pending=[];try{pending=JSON.parse(localStorage.getItem('zag_presences_pending')||'[]');}catch(e){}
+  pending.filter(function(p){return p._synced===false;}).forEach(function(p){
+    var d=Object.assign({},p); delete d._localId; delete d._synced;
+    // Conserver la date ISO string — NE PAS écraser avec Timestamp.now()
+    db.collection('zag_presences').add(d).then(function(){
+      var arr=[];try{arr=JSON.parse(localStorage.getItem('zag_presences_pending')||'[]');}catch(e){}
+      arr=arr.filter(function(x){return x._localId!==p._localId;});
+      try{localStorage.setItem('zag_presences_pending',JSON.stringify(arr));}catch(e){}
+    }).catch(function(){});
+  });
+}
+window.addEventListener('online',syncPresences);
+setInterval(function(){if(navigator.onLine) syncPresences();},30000);
+
+// ── FIREBASE AUTH ─────────────────────────────────
+function initFirebase(){
+  if(typeof firebase==='undefined') return;
+  try{
+    if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
+    db=firebase.firestore();
+    db.enablePersistence({synchronizeTabs:true}).catch(function(){});
+    FIREBASE_OK=true;
+    firebase.auth().onAuthStateChanged(function(user){
+      if(user){
+        db.collection('zag_users').doc(user.uid).get()
+          .then(function(doc){ if(doc.exists) lancerDonnees(); else{ firebase.auth().signOut(); document.getElementById('scanAuthOverlay').classList.add('open'); } })
+          .catch(function(){ lancerDonnees(); }); // offline
+      } else {
+        document.getElementById('scanAuthOverlay').classList.add('open');
+      }
+    });
+  }catch(e){ console.warn(e); }
+}
+
+function scanConnexion(){
+  var email=document.getElementById('scanAuthEmail').value.trim();
+  var pass=document.getElementById('scanAuthPass').value;
+  var errEl=document.getElementById('scanAuthErr');
+  errEl.textContent='';
+  if(!email||!pass){ errEl.textContent='Remplissez tous les champs'; return; }
+  firebase.auth().signInWithEmailAndPassword(email,pass)
+    .catch(function(e){ errEl.textContent=e.code==='auth/user-not-found'||e.code==='auth/wrong-password'?'Email ou mot de passe incorrect':e.message; });
+}
+
+// ── DONNÉES ───────────────────────────────────────
+function lancerDonnees(){
+  document.getElementById('scanAuthOverlay').classList.remove('open');
+  // Charger paramètres (seuils horaires)
+  if(FIREBASE_OK&&db){
+    db.collection('zag_parametres').doc(ECOLE_ID).get().then(function(doc){ if(doc.exists) omSettings=doc.data(); });
+  }
+  // Charger depuis cache local d'abord
+  var cached=[];try{cached=JSON.parse(localStorage.getItem('zag_eleves_scanner')||'[]');}catch(e){}
+  if(cached.length){ eleves=cached; updateStats(); }
+  if(!FIREBASE_OK||!db) return;
+  db.collection('zag_eleves').where('ecoleId','==',ECOLE_ID).limit(300).onSnapshot(function(snap){
+    eleves=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    // Stocker sans photos pour ne pas dépasser le quota localStorage (5MB mobile)
+    var elevesLite=eleves.map(function(e){var r=Object.assign({},e);delete r.photo;return r;});
+    try{localStorage.setItem('zag_eleves_scanner',JSON.stringify(elevesLite));}catch(e){}
+    updateStats();
+  });
+  var today=new Date(); today.setHours(0,0,0,0);
+  db.collection('zag_presences').where('ecoleId','==',ECOLE_ID)
+    .where('date','>=',firebase.firestore.Timestamp.fromDate(today))
+    .onSnapshot(function(snap){
+      presences=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+      updateStats();
+    });
+
+  window.talimSignalements=[];
+  db.collection('zag_signalements_lecon').where('ecoleId','==',ECOLE_ID)
+    .orderBy('date','desc').limit(500)
+    .onSnapshot(function(snap){
+      window.talimSignalements=snap.docs.map(function(d){return Object.assign({id:d.id},d.data());});
+    });
+}
+
+
+var currentSignalementEleve = null;
+var lrSelfEvalVal = '';
+
+function peuplerSelectSourates(selectId){
+  var sel = document.getElementById(selectId);
+  sel.innerHTML = SOURATES.map(function(s){
+    return '<option value="'+s.n+'">'+s.n+'. '+s.fr+' ('+s.fr_sens+') — '+s.ar+'</option>';
+  }).join('');
+}
+
+function updateAyatRange(sourateSelectId, debutId, finId){
+  var n = parseInt(document.getElementById(sourateSelectId).value, 10);
+  var sourate = SOURATES.find(function(s){ return s.n===n; });
+  if(!sourate) return;
+  var max = sourate.ayat;
+  var opts = '';
+  for(var i=1;i<=max;i++) opts += '<option value="'+i+'">'+i+'</option>';
+  document.getElementById(debutId).innerHTML = opts;
+  document.getElementById(finId).innerHTML = opts;
+  document.getElementById(finId).value = max;
+}
+
+function getDerniereLeconAssignee(eleveId){
+  // Cherche dans les présences/signalements précédents la dernière "nouvelle leçon" confirmée
+  var hist = (window.talimSignalements||[]).filter(function(s){
+    return s.eleveId===eleveId && s.statut==='confirme';
+  }).sort(function(a,b){
+    return dateMs(b.date)-dateMs(a.date);
+  });
+  return hist.length ? hist[0] : null;
+}
+
+function lancerSignalementLecon(eleve){
+  currentSignalementEleve = eleve;
+  lrSelfEvalVal = '';
+  document.getElementById('inputDisplay').style.display='none';
+  document.getElementById('studentConfirm').classList.remove('show');
+  document.getElementById('numpad').style.display='none';
+  document.getElementById('leconReport').style.display='flex';
+
+  peuplerSelectSourates('lrSourateNouvelle');
+  updateAyatRange('lrSourateNouvelle','lrAyatDebutN','lrAyatFinN');
+  peuplerSelectSourates('lrSourateAncienne');
+  updateAyatRange('lrSourateAncienne','lrAyatDebutA','lrAyatFinA');
+
+  // Pré-remplir l'ancienne leçon avec la dernière connue
+  var derniere = getDerniereLeconAssignee(eleve.id);
+  if(derniere && derniere.lecon_nouvelle){
+    document.getElementById('lrSourateAncienne').value = derniere.lecon_nouvelle.sourate;
+    updateAyatRange('lrSourateAncienne','lrAyatDebutA','lrAyatFinA');
+    setTimeout(function(){
+      document.getElementById('lrAyatDebutA').value = derniere.lecon_nouvelle.debut;
+      document.getElementById('lrAyatFinA').value = derniere.lecon_nouvelle.fin;
+    },100);
+  }
+
+  document.querySelectorAll('.lse-btn').forEach(function(b){ b.classList.remove('active'); });
+  setUI('ID_ENTRY');
+  document.getElementById('modeTitle').textContent = '📖 Signalement de leçon';
+  document.getElementById('modeSub').textContent = (eleve.prenom||'')+' '+(eleve.nom||'');
+}
+
+function setLrSelfEval(v){
+  lrSelfEvalVal = v;
+  document.querySelectorAll('.lse-btn').forEach(function(b){
+    b.classList.toggle('active', b.getAttribute('data-v')===v);
+  });
+}
+
+function annulerSignalementLecon(){
+  document.getElementById('leconReport').style.display='none';
+  document.getElementById('numpad').style.display='grid';
+  document.getElementById('inputDisplay').style.display='flex';
+  resetState();
+}
+
+function soumettreSignalementLecon(){
+  if(!currentSignalementEleve) return;
+  var nSourate = parseInt(document.getElementById('lrSourateNouvelle').value,10);
+  var nDebut = parseInt(document.getElementById('lrAyatDebutN').value,10);
+  var nFin = parseInt(document.getElementById('lrAyatFinN').value,10);
+  var aSourate = parseInt(document.getElementById('lrSourateAncienne').value,10);
+  var aDebut = parseInt(document.getElementById('lrAyatDebutA').value,10);
+  var aFin = parseInt(document.getElementById('lrAyatFinA').value,10);
+  if(nFin<nDebut){ showError('Le verset de fin doit être après celui de début'); return; }
+  if(!lrSelfEvalVal){ showError('Indiquez comment s\'est passée votre restitution'); return; }
+
+  var eleve = currentSignalementEleve;
+  var dateISO = new Date().toISOString().split('T')[0];
+
+  var data = {
+    eleveId: eleve.id,
+    eleveNom: (eleve.prenom||'')+' '+(eleve.nom||''),
+    enseignantId: eleve.enseignantId || '',
+    enseignantNom: eleve.enseignantNom || '',
+    classe: eleve.classe || '',
+    lecon_nouvelle: {sourate:nSourate, debut:nDebut, fin:nFin},
+    lecon_ancienne: aSourate ? {sourate:aSourate, debut:aDebut, fin:aFin} : null,
+    restitution_eval: lrSelfEvalVal,
+    statut: 'en_attente',
+    source: 'eleve_autonome',
+    ecoleId: ECOLE_ID,
+    date: dateISO
+  };
+
+  // Sauvegarde locale d'abord
+  var lp=[]; try{ lp=JSON.parse(localStorage.getItem('zag_signalements_pending')||'[]'); }catch(e){}
+  lp.unshift(Object.assign({},data,{_localId:'sig_'+Date.now(),_synced:false}));
+  try{ localStorage.setItem('zag_signalements_pending', JSON.stringify(lp)); }catch(e){}
+
+  if(FIREBASE_OK && db){
+    db.collection('zag_signalements_lecon').add(data).catch(function(){});
+  }
+
+  // Enregistrer aussi la présence de départ
+  enregistrerPresence(eleve);
+  document.getElementById('leconReport').style.display='none';
+  document.getElementById('numpad').style.display='grid';
+  document.getElementById('inputDisplay').style.display='flex';
+  afficherSucces(eleve, 'Leçon envoyée à votre enseignant 📖');
+  setTimeout(resetState, 2200);
+}
+
+// ── UTILITAIRES ───────────────────────────────────
+function escHtml(s){ if(!s) return ''; return String(s).replace(/[&<>"']/g,function(c){return{'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];}); }
+
+// Clavier physique
+document.addEventListener('keydown',function(e){
+  if(e.key>='0'&&e.key<='9') pressKey(e.key);
+  else if(e.key==='Backspace') pressBackspace();
+  else if(e.key==='Enter') pressConfirm();
+});
+
+// ── DÉMARRAGE ─────────────────────────────────────
+resetState();
+(function(){
+  if(navigator.onLine){
+    var sf=document.createElement('script');
+    sf.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
+    sf.onload=function(){
+      var sf2=document.createElement('script');
+      sf2.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js';
+      sf2.onload=function(){
+        var sf3=document.createElement('script');
+        sf3.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js';
+        sf3.onload=initFirebase;
+        document.head.appendChild(sf3);
+      };
+      document.head.appendChild(sf2);
+    };
+    document.head.appendChild(sf);
+  } else {
+    // Offline: charger depuis cache
+    var cached=[];try{cached=JSON.parse(localStorage.getItem('zag_eleves_scanner')||'[]');}catch(e){}
+    if(cached.length){ eleves=cached; document.getElementById('scanAuthOverlay').classList.remove('open'); updateStats(); }
+    else { document.getElementById('scanAuthOverlay').classList.add('open'); }
+  }
+})();
+</script>
+<script>
+if('serviceWorker' in navigator){
+  navigator.serviceWorker.register('./zag-sw.js').catch(function(){});
+}
+</script>
+</body>
+</html>
