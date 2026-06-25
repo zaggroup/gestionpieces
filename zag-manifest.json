@@ -1,0 +1,43 @@
+{
+  "name": "Centre ZAG Al-Hikma",
+  "short_name": "ZAG Al-Hikma",
+  "description": "Système de gestion du Centre ZAG Al-Hikma — Kindia, Guinée",
+  "start_url": "./zag-launcher.html",
+  "display": "standalone",
+  "background_color": "#0D1B2A",
+  "theme_color": "#0D1B2A",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "zag-icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "zag-icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Direction",
+      "url": "./zag-directeur.html",
+      "icons": [{"src": "zag-icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Enseignant",
+      "url": "./zag-enseignant.html",
+      "icons": [{"src": "zag-icon-192.png", "sizes": "192x192"}]
+    },
+    {
+      "name": "Pointage",
+      "url": "./zag-scanner.html",
+      "icons": [{"src": "zag-icon-192.png", "sizes": "192x192"}]
+    }
+  ],
+  "lang": "fr",
+  "categories": ["education"]
+}
