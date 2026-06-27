@@ -1,0 +1,43 @@
+{
+  "name": "ZAG GROUP — Gestion Moto",
+  "short_name": "ZAG GROUP",
+  "description": "Gestion stock, ventes, caisse et crédits — ZAG MOTO Kindia",
+  "start_url": "./zaggroup-11.html",
+  "display": "standalone",
+  "background_color": "#0d2b1a",
+  "theme_color": "#1a472a",
+  "orientation": "portrait-primary",
+  "lang": "fr",
+  "scope": "./",
+  "icons": [
+    {
+      "src": "./icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "./icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "shortcuts": [
+    {
+      "name": "Gestionnaire",
+      "short_name": "Ventes",
+      "description": "Enregistrer une vente ou entrée stock",
+      "url": "./gestionnaire_new-2-7.html",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    },
+    {
+      "name": "Tableau de bord",
+      "short_name": "Dashboard",
+      "description": "Rapports et analyses",
+      "url": "./patron-19.html",
+      "icons": [{ "src": "./icon-192.png", "sizes": "192x192" }]
+    }
+  ],
+  "categories": ["business", "finance", "productivity"]
+}
