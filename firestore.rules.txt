@@ -1,0 +1,216 @@
+// ZAG GROUP — Règles de sécurité Firestore
+// Projet : gestionpieces-74559
+// À déployer via : firebase deploy --only firestore:rules
+//
+// IMPORTANT : Ces règles protègent les données sans Firebase Auth.
+// Le PIN est vérifié côté client. Les règles limitent les abus
+// (lecture/écriture massive par des inconnus).
+//
+// Pour déployer :
+//   1. firebase login
+//   2. firebase use gestionpieces-74559
+//   3. firebase deploy --only firestore:rules
+
+rules_version = '2';
+service cloud.firestore {
+  match /databases/{database}/documents {
+
+    // ══════════════════════════════════════════════
+    // FONCTIONS UTILITAIRES
+    // ══════════════════════════════════════════════
+
+    // Vérifier si la requête vient d'un navigateur (User-Agent check basique)
+    function isWebClient() {
+      return request.auth == null; // toutes les requêtes non-auth (notre cas)
+    }
+
+    // Vérifier les champs obligatoires d'une vente
+    function venteValide() {
+      return request.resource.data.keys().hasAll(['produitId', 'quantite', 'montantTotal', 'date'])
+        && request.resource.data.quantite is int
+        && request.resource.data.quantite > 0
+        && request.resource.data.montantTotal is number
+        && request.resource.data.montantTotal >= 0;
+    }
+
+    // Vérifier les champs d'une entrée stock
+    function entreeValide() {
+      return request.resource.data.keys().hasAll(['produitId', 'quantite', 'date'])
+        && request.resource.data.quantite is int
+        && request.resource.data.quantite > 0;
+    }
+
+    // Vérifier qu'un montant est positif
+    function montantPositif() {
+      return request.resource.data.montantTotal is number
+        && request.resource.data.montantTotal >= 0;
+    }
+
+    // ══════════════════════════════════════════════
+    // PRODUITS — Lecture libre, écriture contrôlée
+    // ══════════════════════════════════════════════
+    match /produits/{produitId} {
+      // Tout le monde peut lire (vitrine publique)
+      allow read: if true;
+
+      // Écriture : vérifier la structure minimale
+      allow create: if request.resource.data.keys().hasAll(['nom', 'stock'])
+        && request.resource.data.nom is string
+        && request.resource.data.nom.size() > 0
+        && request.resource.data.nom.size() <= 200
+        && request.resource.data.stock is int
+        && request.resource.data.stock >= 0;
+
+      allow update: if request.resource.data.nom is string
+        && request.resource.data.nom.size() > 0;
+
+      // Suppression autorisée (archivage géré par le patron)
+      allow delete: if true;
+    }
+
+    // ══════════════════════════════════════════════
+    // SORTIES (ventes) — Écriture contrôlée
+    // ══════════════════════════════════════════════
+    match /sorties/{sortieId} {
+      allow read: if true;
+      allow create: if venteValide()
+        && request.resource.data.gestionnaire is string
+        && request.resource.data.gestionnaire.size() > 0;
+      // Pas de mise à jour ni suppression des ventes (intégrité)
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ══════════════════════════════════════════════
+    // ENTRÉES STOCK — Écriture contrôlée
+    // ══════════════════════════════════════════════
+    match /entrees/{entreeId} {
+      allow read: if true;
+      allow create: if entreeValide();
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ══════════════════════════════════════════════
+    // MOUVEMENTS CAISSE — Lecture/écriture contrôlée
+    // ══════════════════════════════════════════════
+    match /mouvements_caisse/{mouvId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['type', 'montant', 'date'])
+        && request.resource.data.montant is number
+        && request.resource.data.montant >= 0;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ══════════════════════════════════════════════
+    // CRÉDITS — Lecture/écriture complète
+    // ══════════════════════════════════════════════
+    match /credits/{creditId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['client', 'montantTotal', 'date_vente'])
+        && request.resource.data.client is string
+        && request.resource.data.client.size() > 0;
+      allow update: if true; // Paiements partiels, relances
+      allow delete: if false;
+    }
+
+    // ══════════════════════════════════════════════
+    // AVANCES CLIENTS
+    // ══════════════════════════════════════════════
+    match /avances_clients/{avanceId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['client', 'montant'])
+        && request.resource.data.montant is number
+        && request.resource.data.montant > 0;
+      allow update: if true;
+      allow delete: if false;
+    }
+
+    // ══════════════════════════════════════════════
+    // CLÔTURES JOURNALIÈRES
+    // ══════════════════════════════════════════════
+    match /clotures/{clotureId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['date', 'gestionnaire'])
+        && request.resource.data.gestionnaire is string;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ══════════════════════════════════════════════
+    // SESSIONS — Monitoring multi-appareils
+    // ══════════════════════════════════════════════
+    match /sessions/{sessionId} {
+      allow read: if true; // Patron surveille les sessions actives
+      allow create: if request.resource.data.keys().hasAll(['gestionnaire', 'action', 'date'])
+        && request.resource.data.gestionnaire is string;
+      allow update: if false;
+      allow delete: if false;
+    }
+
+    // ══════════════════════════════════════════════
+    // SIGNALEMENTS D'ERREURS
+    // ══════════════════════════════════════════════
+    match /signalements/{sigId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['ref', 'date']);
+      allow update: if true; // Marquer comme traité
+      allow delete: if false;
+    }
+
+    // ══════════════════════════════════════════════
+    // DEMANDES (commandes spéciales vitrine)
+    // ══════════════════════════════════════════════
+    match /demandes/{demandeId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['produit', 'date']);
+      allow update: if true; // Traitement par le patron
+      allow delete: if false;
+    }
+
+    // ══════════════════════════════════════════════
+    // ALERTES STOCK
+    // ══════════════════════════════════════════════
+    match /alertes_stock/{alerteId} {
+      allow read: if true;
+      allow create: if true;
+      allow update: if true; // Marquer comme lue
+      allow delete: if true;
+    }
+
+    // ══════════════════════════════════════════════
+    // DÉPENSES / BÉNÉFICES
+    // ══════════════════════════════════════════════
+    match /depenses_benefice/{depId} {
+      allow read: if true;
+      allow create: if request.resource.data.keys().hasAll(['type', 'montant', 'date'])
+        && request.resource.data.montant is number;
+      allow update: if true;
+      allow delete: if true;
+    }
+
+    // ══════════════════════════════════════════════
+    // CONFIG APPLICATION — ACCÈS RESTREINT
+    // ══════════════════════════════════════════════
+    // CRITIQUE : app_config contient les codes PIN
+    // Lecture autorisée seulement pour charger les codes au démarrage
+    // En production, remplacer par Firebase Auth
+    match /app_config/{configId} {
+      // Autoriser la lecture (nécessaire pour charger les codes au démarrage)
+      // TODO: Restreindre avec Firebase Auth dès que possible
+      allow read: if true;
+
+      // Écriture très restrictive : seulement les documents connus
+      allow write: if configId in ['codes', 'whatsapp', 'parametres']
+        && request.resource.data.size() <= 10;
+    }
+
+    // ══════════════════════════════════════════════
+    // BLOC PAR DÉFAUT — Refuser tout le reste
+    // ══════════════════════════════════════════════
+    match /{document=**} {
+      allow read, write: if false;
+    }
+  }
+}
