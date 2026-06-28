@@ -1,0 +1,28 @@
+{
+  "id": "/gestionpieces/zag-moto",
+  "name": "ZAG MOTO — Gestion Pièces",
+  "short_name": "ZAG MOTO",
+  "description": "Gestion de la boutique de pièces moto ZAG — Kindia, Guinée",
+  "start_url": "/gestionpieces/zag-launcher.html",
+  "scope": "/gestionpieces/",
+  "display": "standalone",
+  "background_color": "#0A0F1E",
+  "theme_color": "#0A0F1E",
+  "orientation": "portrait-primary",
+  "icons": [
+    {
+      "src": "icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "icon-512.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ],
+  "lang": "fr",
+  "categories": ["business", "productivity"]
+}
