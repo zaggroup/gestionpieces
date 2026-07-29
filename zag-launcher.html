@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Centre ZAG Al-Hikma</title>
+<link rel="manifest" href="zag-manifest.json">
+<link rel="apple-touch-icon" href="zag-icon-192.png">
+<meta name="theme-color" content="#0D1B2A">
+<link href="https://fonts.googleapis.com/css2?family=Amiri:wght@700&family=Exo+2:wght@400;700;900&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+body{min-height:100vh;background:linear-gradient(145deg,#07111c,#0D1B2A,#162436);color:#F5F0E8;font-family:'Exo 2',sans-serif;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:20px}
+.logo{width:84px;height:84px;border-radius:20px;border:2px solid #C9A84C;overflow:hidden}
+.logo img{width:100%;height:100%;object-fit:cover;display:block}
+h1{font-family:'Amiri',serif;color:#C9A84C;font-size:1.5rem;text-align:center}
+p.sub{font-size:.78rem;color:rgba(245,240,232,.55);text-align:center;margin-top:-12px}
+.grid{width:100%;max-width:360px;display:flex;flex-direction:column;gap:10px}
+a.tile{display:flex;align-items:center;gap:14px;background:rgba(255,255,255,.05);border:1px solid rgba(201,168,76,.25);border-radius:14px;padding:15px 18px;color:#F5F0E8;text-decoration:none;font-weight:700;font-size:.9rem;transition:all .2s}
+a.tile:hover{background:rgba(201,168,76,.12);border-color:#C9A84C}
+a.tile .ic{font-size:1.4rem}
+a.tile .desc{font-size:.65rem;color:rgba(245,240,232,.45);font-weight:400;margin-top:2px}
+footer{font-size:.62rem;color:rgba(245,240,232,.3);text-align:center;font-family:'Amiri',serif}
+</style>
+</head>
+<body>
+  <div class="logo"><img src="zag-icon-192.png" alt="ZAG"></div>
+  <h1>Centre ZAG Al-Hikma</h1>
+  <p class="sub">Kindia, Guinée — الإيمان · العلم · العمل · البركة</p>
+  <div class="grid">
+    <a class="tile" href="zag-directeur.html"><span class="ic">👔</span><span>Direction<div class="desc">Tableau de bord, élèves, finances, bulletins</div></span></a>
+    <a class="tile" href="zag-enseignant.html"><span class="ic">👨‍🏫</span><span>Enseignant<div class="desc">Leçons du Coran et suivi des élèves</div></span></a>
+    <a class="tile" href="zag-scanner.html"><span class="ic">📱</span><span>Pointage<div class="desc">Arrivées et départs des élèves</div></span></a>
+    <a class="tile" href="zag-parent.html"><span class="ic">👨‍👩‍👦</span><span>Portail parent<div class="desc">Progression, présences, événements</div></span></a>
+  </div>
+  <footer>Centre ZAG Al-Hikma © 2026</footer>
+  <script>
+    if('serviceWorker' in navigator){ navigator.serviceWorker.register('./zag-sw.js').catch(function(){}); }
+  </script>
+</body>
+</html>
