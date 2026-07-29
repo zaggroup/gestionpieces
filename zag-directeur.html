@@ -421,7 +421,7 @@ body{font-family:'Exo 2',sans-serif;color:var(--text);display:flex;flex-directio
   <div class="header-brand">
     <div class="header-logo" id="hdrLogo"><img src="zag-icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:8px;display:block"></div>
     <div>
-      <div class="header-title" id="hdrSchool">École Al-Hikma</div>
+      <div class="header-title" id="hdrSchool" onclick="ouvrirModalCentres()" style="cursor:pointer" title="Gérer les centres">École Al-Hikma <span style="font-size:.6rem;opacity:.6">▾</span></div>
       <div class="header-title-sub">
         <span class="badge-online" id="onlineDot"></span>
         <span id="onlineStatus">En ligne</span>
@@ -465,7 +465,11 @@ body{font-family:'Exo 2',sans-serif;color:var(--text);display:flex;flex-directio
     <div class="card" style="margin-bottom:10px">
       <div style="display:flex;justify-content:space-between;align-items:center">
         <div class="card-title" style="margin-bottom:0">📊 Rapport du mois</div>
-        <button class="btn btn-primary" onclick="genererRapportMensuel()" style="font-size:.72rem;padding:7px 12px">📱 Envoyer WhatsApp</button>
+        <div style="display:flex;gap:5px">
+          <button class="btn" onclick="genererRapportMensuel(true)" style="background:rgba(37,211,102,.12);border:1px solid #25D366;color:#25D366;font-size:.65rem;padding:5px 8px" title="Rapport WhatsApp">📱</button>
+          <button class="btn" onclick="sauvegarderDonnees()" style="background:rgba(100,181,246,.12);border:1px solid #64B5F6;color:#64B5F6;font-size:.65rem;padding:5px 8px" title="Télécharger sauvegarde">💾</button>
+          <button class="btn" onclick="cloturerJournee()" style="background:rgba(255,140,0,.12);border:1px solid #FF8C00;color:#FF8C00;font-size:.65rem;padding:5px 8px" title="Bilan du jour">🌙</button>
+        </div>
       </div>
       <div id="dashRapportMini" style="margin-top:10px;font-size:.72rem;color:var(--text2)">Chargement…</div>
     </div>
@@ -488,12 +492,17 @@ body{font-family:'Exo 2',sans-serif;color:var(--text);display:flex;flex-directio
         <span data-fr="Aucune alerte en cours." data-ar="لا توجد تنبيهات حالياً.">Aucune alerte en cours.</span>
       </div>
     </div>
+
+    <div class="card">
+      <div class="card-title" data-fr="📖 Sans leçon aujourd'hui" data-ar="📖 بدون درس اليوم">📖 Sans leçon aujourd'hui</div>
+      <div id="sansLeconList"><div style="color:var(--text3);text-align:center;padding:12px;font-size:.72rem">Chargement…</div></div>
+    </div>
   </div>
 
   <!-- ── PAGE ÉLÈVES ── -->
   <div class="page" id="page-eleves">
     <div style="display:flex;gap:8px;align-items:center">
-      <input type="text" class="form-input" id="eleveSearch" placeholder="🔍 Rechercher un élève..." oninput="renderEleves()" style="flex:1">
+      <input type="text" class="form-input" id="eleveSearch" placeholder="🔍 Rechercher un élève..." oninput="renderEleves(true)" style="flex:1">
       <button class="btn btn-primary" onclick="ouvrirFormEleve(null)" style="padding:10px 16px;white-space:nowrap">+ Inscrire</button>
     </div>
 
@@ -998,6 +1007,44 @@ body{font-family:'Exo 2',sans-serif;color:var(--text);display:flex;flex-directio
   </div>
 </div>
 
+<!-- ── MODAL PERMISSIONS ÉLÈVE ── -->
+<div class="modal-ov" id="modalPermissions">
+  <div class="modal-inner">
+    <div class="modal-hdr">
+      <div class="modal-hdr-title">✅ Permissions — <span id="permEleveNom">—</span></div>
+      <button class="modal-close" onclick="fermerModal('modalPermissions')">✕</button>
+    </div>
+    <div class="modal-body">
+      <!-- Formulaire accorder nouvelle permission -->
+      <div style="background:rgba(105,240,174,.06);border:1px solid rgba(105,240,174,.2);border-radius:12px;padding:14px;margin-bottom:14px">
+        <div style="font-size:.78rem;font-weight:700;color:#69F0AE;margin-bottom:10px">+ Accorder une permission</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:8px">
+          <div>
+            <div class="form-label">Date début</div>
+            <input type="date" class="form-input" id="permDateDebut" style="font-size:.8rem">
+          </div>
+          <div>
+            <div class="form-label">Date fin (optionnel)</div>
+            <input type="date" class="form-input" id="permDateFin" style="font-size:.8rem">
+          </div>
+        </div>
+        <div style="margin-bottom:8px">
+          <div class="form-label">Motif</div>
+          <input type="text" class="form-input" id="permMotif" placeholder="Ex: rendez-vous médical, voyage familial..." style="font-size:.8rem">
+        </div>
+        <button onclick="accorderPermission()" style="width:100%;padding:10px;background:linear-gradient(135deg,rgba(105,240,174,.2),rgba(105,240,174,.1));border:1px solid #69F0AE;border-radius:10px;color:#69F0AE;font-weight:700;cursor:pointer;font-size:.78rem">✅ Accorder la permission</button>
+      </div>
+      <!-- Liste des permissions existantes -->
+      <div id="permissionsList">
+        <div style="color:var(--text3);text-align:center;padding:16px;font-size:.75rem">Chargement…</div>
+      </div>
+    </div>
+    <div class="modal-footer">
+      <button class="btn btn-ghost" onclick="fermerModal('modalPermissions')" style="flex:1">Fermer</button>
+    </div>
+  </div>
+</div>
+
 <!-- ── MODAL FICHE PROFIL ÉLÈVE ── -->
 <div class="modal-ov" id="modalFicheEleve">
   <div class="modal-inner">
@@ -1253,6 +1300,9 @@ body{font-family:'Exo 2',sans-serif;color:var(--text);display:flex;flex-directio
           <option value="rentree">🎒 Rentrée scolaire</option>
           <option value="examen">📝 Examen</option>
           <option value="conge">🌴 Congé / Vacances</option>
+          <option value="repos">😴 Jour de repos (exclu du bulletin)</option>
+          <option value="permission">✅ Permission accordée (exclu du bulletin)</option>
+          <option value="ferie">🕌 Jour férié islamique (exclu du bulletin)</option>
           <option value="evenement">🎉 Événement</option>
           <option value="remise">🏆 Cérémonie / Remise</option>
           <option value="autre">📌 Autre</option>
@@ -1365,6 +1415,31 @@ body{font-family:'Exo 2',sans-serif;color:var(--text);display:flex;flex-directio
 </div>
 
 <!-- ── MODAL PARAMÈTRES ORANGE MONEY ── -->
+<!-- ═══ MODAL MULTI-CENTRES ═══ -->
+<div class="modal-ov" id="modalCentres">
+  <div class="modal-inner" style="max-width:430px">
+    <div class="modal-hdr">
+      <div class="modal-hdr-title">🕌 Centres de mémorisation</div>
+      <button class="modal-close" onclick="fermerModal('modalCentres')">✕</button>
+    </div>
+    <div class="modal-body">
+      <div style="font-size:.62rem;color:var(--text3);margin-bottom:8px">Chaque centre a ses propres élèves, enseignants, présences et finances — les données sont totalement séparées.</div>
+      <div id="listeCentres" style="display:flex;flex-direction:column;gap:8px;margin-bottom:14px"></div>
+      <div style="border-top:1px solid var(--bd);padding-top:12px">
+        <div style="font-weight:800;font-size:.78rem;color:var(--gold);margin-bottom:8px">➕ Créer un nouveau centre</div>
+        <div class="form-group"><label class="form-label">Nom du centre *</label>
+          <input class="form-input" id="centreNom" placeholder="Ex : Centre An-Nour"></div>
+        <div class="form-group"><label class="form-label">Ville *</label>
+          <input class="form-input" id="centreVille" placeholder="Ex : Mamou"></div>
+        <div class="form-group"><label class="form-label">Téléphone</label>
+          <input class="form-input" id="centreTel" placeholder="+224 6XX XX XX XX"></div>
+        <div id="centreErr" style="color:var(--red2);font-size:.68rem;min-height:14px"></div>
+        <button class="auth-btn" style="width:100%" onclick="creerCentre()">✅ Créer le centre</button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="modal-ov" id="modalOrangeSettings">
   <div class="modal-inner" style="max-width:380px">
     <div class="modal-hdr">
@@ -1636,8 +1711,31 @@ body{font-family:'Exo 2',sans-serif;color:var(--text);display:flex;flex-directio
     <input class="auth-field" type="email" id="authEmail" placeholder="Adresse e-mail" autocomplete="email">
     <input class="auth-field" type="password" id="authPass" placeholder="Mot de passe" autocomplete="current-password">
     <div class="auth-err" id="authErr"></div>
-    <button class="auth-btn" id="authBtn" onclick="authConnexion()">🔐 Se connecter</button>
+    <button class="auth-btn" id="authBtn" onclick="validerAuthDirecteur()">🔐 Se connecter</button>
     <button class="auth-link" onclick="authMdpOublie()">Mot de passe oublié ?</button>
+    <div style="border-top:1px solid rgba(255,255,255,.1);margin:10px 0 4px"></div>
+    <button class="auth-link" style="color:var(--gold);font-weight:800" onclick="ouvrirInscription()">🏛️ Votre organisation ? Créer un compte direction</button>
+  </div>
+</div>
+
+<!-- ── ÉCRAN D'INSCRIPTION ORGANISATION ── -->
+<div class="auth-screen hidden" id="inscScreen" style="overflow-y:auto">
+  <div class="auth-logo" style="margin-top:18px"><img src="zag-icon-192.png" style="width:100%;height:100%;object-fit:cover;border-radius:inherit;display:block"></div>
+  <div class="auth-title">
+    <h1>Nouvelle organisation</h1>
+    <p>Créez le compte direction de votre centre de mémorisation</p>
+  </div>
+  <div class="auth-form">
+    <input class="auth-field" type="text" id="inscOrgNom" placeholder="Nom du centre / organisation *">
+    <input class="auth-field" type="text" id="inscOrgVille" placeholder="Ville *">
+    <input class="auth-field" type="tel" id="inscOrgTel" placeholder="Téléphone du centre">
+    <input class="auth-field" type="text" id="inscDirNom" placeholder="Nom complet du directeur *">
+    <input class="auth-field" type="email" id="inscEmail" placeholder="Adresse e-mail *" autocomplete="email">
+    <input class="auth-field" type="password" id="inscPass" placeholder="Mot de passe (6 caractères min.) *" autocomplete="new-password">
+    <input class="auth-field" type="password" id="inscPass2" placeholder="Confirmer le mot de passe *" autocomplete="new-password">
+    <div class="auth-err" id="inscErr"></div>
+    <button class="auth-btn" id="inscBtn" onclick="validerInscription()">🏛️ Créer mon compte direction</button>
+    <button class="auth-link" onclick="fermerInscription()">← Retour à la connexion</button>
   </div>
 </div>
 
@@ -1715,6 +1813,8 @@ body{font-family:'Exo 2',sans-serif;color:var(--text);display:flex;flex-directio
 
 <!-- TOAST -->
 <div class="toast" id="toast"></div>
+
+<!-- Firebase SDK compat chargé dynamiquement au démarrage (les balises modulaires v9 provoquaient "Cannot use import statement outside a module") -->
 
 <script>
 // ── CONFIG ───────────────────────────────────────
@@ -1845,12 +1945,18 @@ var SOURATES=[
 {n:114,ar:"الناس",fr:"An-Nas",fr_sens:"Les Hommes",ayat:6}
 ];
 
-var ECOLE_ID = "alhikma_kindia"; // identifiant technique invariant — ne jamais changer
+// ── MULTI-CENTRES ────────────────────────────────
+// Le centre actif est mémorisé sur l'appareil ; "alhikma_kindia" reste le centre d'origine.
+var CENTRE_DEFAUT = "alhikma_kindia";
+var ECOLE_ID = (function(){ try{ return localStorage.getItem('zag_centre_actif') || CENTRE_DEFAUT; }catch(e){ return CENTRE_DEFAUT; } })();
+var CENTRE_NOM = (function(){ try{ return localStorage.getItem('zag_centre_actif_nom') || ''; }catch(e){ return ''; } })();
+var mesCentres = []; // liste des centres accessibles au directeur connecté
 var db = null, FIREBASE_OK = false;
 var LANG = 'fr';
 
 // ── DONNÉES GLOBALES ─────────────────────────────
 var eleves = [], enseignants = [], presences = [], leconsSignalements = [], chambres = [];
+var calData = []; // Données calendrier pour exclure jours repos/permission
 var DATE_DEBUT_SCOLARITE = '2026-07-01'; // Début année scolaire (modifiable dans Paramètres)
 var photoBase64 = '';
 
@@ -1959,7 +2065,7 @@ function sauvegarderChambre(){
   var data={nom:nom, capacite:capacite, ecoleId:ECOLE_ID};
   var op=editId
     ? db.collection('zag_chambres').doc(editId).update(data)
-    : db.collection('zag_chambres').add(data);
+    : db.collection('zag_chambres').add(data).catch(function(){});
   op.then(function(){
     showToast(editId?'Chambre mise à jour':'Chambre créée');
     fermerModal('modalChambre');
@@ -2069,20 +2175,33 @@ function toggleLang(){
 // ── AUTH ─────────────────────────────────────────
 var AUTH_USER = null;
 
-function initFirebase(){
-  if(typeof firebase==='undefined') return;
+console.log("📱 [DÉMARRAGE] Page directeur chargée"); function initFirebase(){
+  console.log("🔥 [FIREBASE] Initialisation..."); if(typeof firebase==='undefined') return;
   try{
     if(!firebase.apps.length) firebase.initializeApp(FIREBASE_CONFIG);
     db = firebase.firestore();
-    db.enablePersistence({synchronizeTabs:true}).catch(function(){});
+    // Cache local illimité : toutes les données consultées restent disponibles hors-ligne,
+    // les écritures hors-ligne sont mises en file et synchronisées dès le retour du réseau.
+    db.settings({cacheSizeBytes: firebase.firestore.CACHE_SIZE_UNLIMITED, merge:true});
+    db.enablePersistence({synchronizeTabs:true}).catch(function(err){
+      console.warn('[OFFLINE] Persistance IndexedDB indisponible:', err && err.code);
+    });
     FIREBASE_OK = true;
     firebase.auth().onAuthStateChanged(function(user){
+      if(INSCRIPTION_EN_COURS) return; // l'inscription crée d'abord le profil zag_users, puis recharge
       if(user){
         db.collection('zag_users').doc(user.uid).get().then(function(doc){
           if(!doc.exists){ firebase.auth().signOut(); afficherAuthErr("Compte non autorisé pour cette école."); return; }
           var data=doc.data();
           if(data.role!=='directeur'){ firebase.auth().signOut(); afficherAuthErr("Rôle insuffisant — accès directeur requis."); return; }
           AUTH_USER=Object.assign({uid:user.uid,email:user.email},data);
+          // Multi-centres : vérifier que le centre actif est autorisé pour ce directeur
+          var autorises = [data.ecoleId].concat(Array.isArray(data.centres)?data.centres:[]);
+          if(autorises.indexOf(ECOLE_ID)===-1){
+            ECOLE_ID = data.ecoleId || CENTRE_DEFAUT;
+            try{ localStorage.setItem('zag_centre_actif', ECOLE_ID); }catch(e){}
+          }
+          chargerMesCentres();
           ouvrirDirecteur();
         }).catch(function(e){ afficherAuthErr("Erreur: "+e.message); });
       } else {
@@ -2092,16 +2211,21 @@ function initFirebase(){
   }catch(e){ console.warn(e); }
 }
 
-function authConnexion(){
+function validerAuthDirecteur(){
+  console.log("🔐 [AUTH] Tentative de connexion...");
   var email=document.getElementById('authEmail').value.trim();
   var pass=document.getElementById('authPass').value;
   var btn=document.getElementById('authBtn');
   document.getElementById('authErr').textContent='';
   if(!email||!pass){ document.getElementById('authErr').textContent='Remplissez tous les champs'; return; }
   btn.disabled=true; btn.textContent='Connexion...';
+  console.log("📧 [AUTH] Email: " + email); 
   firebase.auth().signInWithEmailAndPassword(email,pass)
-    .then(function(){ btn.disabled=false; btn.textContent='🔐 Se connecter'; })
+    .then(function(cred){ 
+    console.log("✅ [AUTH] Succès! Utilisateur:", cred.user && cred.user.email); 
+    btn.disabled=false; btn.textContent='🔐 Se connecter'; })
     .catch(function(e){
+      console.error("❌ [AUTH] ERREUR:", e.message);
       btn.disabled=false; btn.textContent='🔐 Se connecter';
       var msg=e.code==='auth/user-not-found'||e.code==='auth/wrong-password'?'Email ou mot de passe incorrect'
         :e.code==='auth/too-many-requests'?'Trop de tentatives — réessayez plus tard':e.message;
@@ -2207,7 +2331,7 @@ function ouvrirListeAbsents(){
         ? '<img loading="lazy" src="'+escHtml(e.photo)+'" style="width:38px;height:38px;border-radius:50%;object-fit:cover;flex-shrink:0">'
         : '<div style="width:38px;height:38px;border-radius:50%;background:var(--gold-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0">👤</div>';
 
-      var tel = (e.parent_tel||'').replace(/\\D/g,'');
+      var tel = (e.parent_tel||'').replace(/\D/g,'');
       var telDisplay = e.parent_tel || 'Numéro non renseigné';
       var waBtn = '';
       if(tel){
@@ -2227,12 +2351,13 @@ function ouvrirListeAbsents(){
       }
 
       html += '<div style="display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--bd)">'
-        +'<div style="cursor:pointer;display:flex;align-items:center;gap:10px;flex:1;min-width:0" onclick="fermerModal(\'modalAbsents\');ouvrirFormEleve(\''+e.id+'\')">'
+        +'<div style="cursor:pointer;display:flex;align-items:center;gap:10px;flex:1;min-width:0" onclick="fermerModal(\'modalAbsents\');ouvrirFicheProfilEleve(\''+e.id+'\')">'
         +photo
         +'<div style="flex:1;min-width:0">'
         +'<div style="font-size:.82rem;font-weight:700;color:var(--text1)">'+escHtml((e.prenom||'')+' '+(e.nom||''))+'</div>'
         +'<div style="font-size:.62rem;color:var(--text3)">'+escHtml(e.classe||'—')+' · 📞 '+escHtml(telDisplay)+'</div>'
         +'</div></div>'
+        +'<button onclick="event.stopPropagation();fermerModal(\'modalAbsents\');setTimeout(function(){ouvrirPermissionsEleve(\''+e.id+'\')},200)" style="background:rgba(105,240,174,.12);border:1px solid rgba(105,240,174,.3);color:#69F0AE;padding:5px 8px;border-radius:7px;font-size:.6rem;cursor:pointer;white-space:nowrap">✅ Permis.</button>'
         +waBtn
         +'</div>';
     });
@@ -2244,6 +2369,8 @@ function ouvrirListeAbsents(){
 
 function ouvrirDirecteur(){
   document.getElementById('authScreen').classList.add('hidden');
+  setTimeout(chargerCalDataSilencieux, 3000); // charger le calendrier en arrière-plan
+  setTimeout(chargerPermissionsCache, 4000); // charger les permissions individuelles
   document.getElementById('onlineDot').className='badge-online';
   document.getElementById('onlineStatus').textContent='En ligne';
   lancerListeners();
@@ -2251,7 +2378,168 @@ function ouvrirDirecteur(){
   updateDashboard();
   chargerOmSettings();
   verifierMessagesNonLus();
+  majTitreCentre();
   // chargerRapportMiniDashboard est appelé depuis updateDashboard (plus fiable que setTimeout)
+}
+
+// ── MULTI-CENTRES ────────────────────────────────
+function majTitreCentre(){
+  var el = document.getElementById('hdrSchool');
+  var c = mesCentres.filter(function(x){ return x.id===ECOLE_ID; })[0];
+  var nom = (c && c.nom) || CENTRE_NOM || (ECOLE_ID===CENTRE_DEFAUT ? 'École Al-Hikma' : ECOLE_ID);
+  el.innerHTML = escHtml(nom)+' <span style="font-size:.6rem;opacity:.6">▾</span>';
+  document.title = nom+' — Direction';
+}
+function slugCentre(nom, ville){
+  var base = (nom+'_'+ville).toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'_').replace(/^_+|_+$/g,'');
+  return base.slice(0,40) || ('centre_'+Date.now().toString(36));
+}
+function chargerMesCentres(){
+  if(!FIREBASE_OK || !AUTH_USER) return;
+  var autorises = [AUTH_USER.ecoleId].concat(Array.isArray(AUTH_USER.centres)?AUTH_USER.centres:[]);
+  autorises = autorises.filter(function(x,i){ return x && autorises.indexOf(x)===i; });
+  // Firestore "in" limite à 10 : on lit chaque doc individuellement (liste courte)
+  Promise.all(autorises.map(function(id){
+    return db.collection('zag_centres').doc(id).get().then(function(d){
+      return d.exists ? Object.assign({id:d.id}, d.data()) : {id:id, nom:(id===CENTRE_DEFAUT?'École Al-Hikma':id), ville:''};
+    }).catch(function(){ return {id:id, nom:id, ville:''}; });
+  })).then(function(list){
+    mesCentres = list;
+    cacheLocal('zag_centres_dir', list);
+    majTitreCentre();
+    renderListeCentres();
+  });
+}
+function renderListeCentres(){
+  var box = document.getElementById('listeCentres');
+  if(!box) return;
+  if(!mesCentres.length){ box.innerHTML = '<div style="font-size:.68rem;color:var(--text3)">Aucun centre chargé.</div>'; return; }
+  box.innerHTML = mesCentres.map(function(c){
+    var actif = c.id===ECOLE_ID;
+    return '<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:12px;border:1px solid '+(actif?'var(--gold)':'var(--bd)')+';background:'+(actif?'rgba(201,168,76,.1)':'rgba(255,255,255,.03)')+'">'
+      +'<span style="font-size:1.1rem">🕌</span>'
+      +'<div style="flex:1;min-width:0"><div style="font-weight:800;font-size:.78rem">'+escHtml(c.nom||c.id)+'</div>'
+      +'<div style="font-size:.6rem;color:var(--text3)">'+escHtml(c.ville||'')+(actif?' · <span style="color:var(--gold)">Centre actif</span>':'')+'</div></div>'
+      +(actif?'<span style="font-size:.62rem;color:var(--gold);font-weight:800">✓</span>'
+             :'<button class="btn-sm" onclick="activerCentre(\''+escHtml(c.id)+'\')">Ouvrir</button>')
+      +'</div>';
+  }).join('');
+}
+function ouvrirModalCentres(){
+  if(!mesCentres.length){ mesCentres = loadLocal('zag_centres_dir'); }
+  renderListeCentres();
+  document.getElementById('centreErr').textContent='';
+  document.getElementById('modalCentres').classList.add('open');
+}
+function activerCentre(id){
+  if(id===ECOLE_ID) return;
+  var c = mesCentres.filter(function(x){ return x.id===id; })[0];
+  try{
+    localStorage.setItem('zag_centre_actif', id);
+    localStorage.setItem('zag_centre_actif_nom', (c&&c.nom)||'');
+  }catch(e){}
+  showToast('🕌 Ouverture de '+((c&&c.nom)||id)+'…');
+  setTimeout(function(){ location.reload(); }, 600); // recharge : tous les écouteurs repartent sur le nouveau centre
+}
+function creerCentre(){
+  var nom = document.getElementById('centreNom').value.trim();
+  var ville = document.getElementById('centreVille').value.trim();
+  var tel = document.getElementById('centreTel').value.trim();
+  var err = document.getElementById('centreErr');
+  err.textContent='';
+  if(!nom || !ville){ err.textContent='Nom et ville sont obligatoires.'; return; }
+  if(!FIREBASE_OK || !AUTH_USER){ err.textContent='Connexion requise pour créer un centre.'; return; }
+  var id = slugCentre(nom, ville);
+  db.collection('zag_centres').doc(id).get().then(function(d){
+    if(d.exists && d.data().createdBy !== AUTH_USER.uid){
+      err.textContent='Un centre avec cet identifiant existe déjà — modifiez le nom ou la ville.';
+      return;
+    }
+    var centre = {nom:nom, ville:ville, tel:tel, createdBy:AUTH_USER.uid, createdByNom:AUTH_USER.nom||'', createdAt:firebase.firestore.Timestamp.now()};
+    return db.collection('zag_centres').doc(id).set(centre,{merge:true}).then(function(){
+      // Donner l'accès au directeur créateur (liste "centres" de son profil)
+      return db.collection('zag_users').doc(AUTH_USER.uid).set(
+        {centres: firebase.firestore.FieldValue.arrayUnion(id)}, {merge:true});
+    }).then(function(){
+      AUTH_USER.centres = (AUTH_USER.centres||[]).concat([id]);
+      mesCentres.push(Object.assign({id:id}, centre));
+      cacheLocal('zag_centres_dir', mesCentres);
+      renderListeCentres();
+      ['centreNom','centreVille','centreTel'].forEach(function(i){ document.getElementById(i).value=''; });
+      showToast('✅ Centre "'+nom+'" créé');
+      if(confirm('Centre créé ! Voulez-vous l\'ouvrir maintenant ?')) activerCentre(id);
+    });
+  }).catch(function(e){ err.textContent='Erreur : '+e.message; });
+}
+
+// ── INSCRIPTION D'UNE NOUVELLE ORGANISATION ──────
+var INSCRIPTION_EN_COURS = false;
+function ouvrirInscription(){
+  document.getElementById('authScreen').classList.add('hidden');
+  document.getElementById('inscScreen').classList.remove('hidden');
+  document.getElementById('inscErr').textContent='';
+}
+function fermerInscription(){
+  document.getElementById('inscScreen').classList.add('hidden');
+  document.getElementById('authScreen').classList.remove('hidden');
+}
+function validerInscription(){
+  var orgNom = document.getElementById('inscOrgNom').value.trim();
+  var ville  = document.getElementById('inscOrgVille').value.trim();
+  var tel    = document.getElementById('inscOrgTel').value.trim();
+  var dirNom = document.getElementById('inscDirNom').value.trim();
+  var email  = document.getElementById('inscEmail').value.trim();
+  var pass   = document.getElementById('inscPass').value;
+  var pass2  = document.getElementById('inscPass2').value;
+  var err = document.getElementById('inscErr');
+  var btn = document.getElementById('inscBtn');
+  err.textContent='';
+  if(!orgNom||!ville||!dirNom||!email||!pass){ err.textContent='Remplissez tous les champs obligatoires (*).'; return; }
+  if(pass.length<6){ err.textContent='Le mot de passe doit contenir au moins 6 caractères.'; return; }
+  if(pass!==pass2){ err.textContent='Les deux mots de passe ne correspondent pas.'; return; }
+  if(!FIREBASE_OK){ err.textContent='Connexion Internet requise pour créer un compte.'; return; }
+  btn.disabled=true; btn.textContent='Création en cours…';
+  var centreId = slugCentre(orgNom, ville);
+  INSCRIPTION_EN_COURS = true;
+  // 1) Vérifier que l'identifiant du centre est libre
+  db.collection('zag_centres').doc(centreId).get().then(function(d){
+    if(d.exists){ centreId = centreId.slice(0,30)+'_'+Date.now().toString(36); }
+    // 2) Créer le compte d'authentification
+    return firebase.auth().createUserWithEmailAndPassword(email, pass);
+  }).then(function(cred){
+    var uid = cred.user.uid;
+    // 3) Créer le centre + le profil directeur (batch atomique)
+    var batch = db.batch();
+    batch.set(db.collection('zag_centres').doc(centreId), {
+      nom:orgNom, ville:ville, tel:tel,
+      createdBy:uid, createdByNom:dirNom,
+      createdAt:firebase.firestore.Timestamp.now()
+    });
+    batch.set(db.collection('zag_users').doc(uid), {
+      nom:dirNom, email:email, tel:tel||'',
+      role:'directeur', ecoleId:centreId, centres:[centreId],
+      createdAt:firebase.firestore.Timestamp.now()
+    });
+    return batch.commit();
+  }).then(function(){
+    // 4) Activer le nouveau centre sur cet appareil puis recharger
+    try{
+      localStorage.setItem('zag_centre_actif', centreId);
+      localStorage.setItem('zag_centre_actif_nom', orgNom);
+    }catch(e){}
+    showToast('🎉 Bienvenue ! Votre centre "'+orgNom+'" est prêt.');
+    setTimeout(function(){ location.reload(); }, 900);
+  }).catch(function(e){
+    INSCRIPTION_EN_COURS = false;
+    btn.disabled=false; btn.textContent='🏛️ Créer mon compte direction';
+    var msg = e && e.code==='auth/email-already-in-use' ? 'Cette adresse e-mail a déjà un compte — connectez-vous.'
+            : e && e.code==='auth/invalid-email' ? 'Adresse e-mail invalide.'
+            : e && e.code==='auth/weak-password' ? 'Mot de passe trop faible (6 caractères minimum).'
+            : 'Erreur : '+(e&&e.message||e);
+    err.textContent = msg;
+  });
 }
 
 function seDeconnecter(){
@@ -2335,6 +2623,7 @@ function supprimerUser(btn){
 
 
 var _unsubs = [];
+var seancesEnseignant = [];
 var _scoreCache = {}; // cache: eleveId -> {score, prog, absC, ts}
 var _scoreCacheTs = 0; // timestamp du dernier calcul
 
@@ -2356,6 +2645,7 @@ function invalidateScoreCache(){
   _scoreCache = {};
 } // Stocke les désabonnements onSnapshot
 function lancerListeners(){
+  if(!FIREBASE_OK || !db) { setTimeout(lancerListeners, 2000); return; }
   // Désabonner les anciens listeners si reconnexion
   _unsubs.forEach(function(u){ try{u();}catch(e){} }); _unsubs=[];
   lancerListenerSeances(); // Séances enseignants
@@ -2373,6 +2663,7 @@ function lancerListeners(){
   _unsubs.push(db.collection('zag_enseignants').where('ecoleId','==',ECOLE_ID)
     .onSnapshot(function(snap){
       enseignants = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+      cacheLocal('zag_ens_dir', enseignants);
       renderEnseignants();
       updateDashboard();
     }));
@@ -2383,6 +2674,7 @@ function lancerListeners(){
     .onSnapshot(function(snap){
       presences = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
       presences.sort(function(a,b){ return dateMs(b.date)-dateMs(a.date); });
+      cacheLocal('zag_pres_dir', presences.slice(0,600));
       updateDashboard();
       if(document.getElementById('page-presences').classList.contains('active')) renderPresences();
       if(document.getElementById('page-externat').classList.contains('active')) renderExternat();
@@ -2394,6 +2686,7 @@ function lancerListeners(){
     .onSnapshot(function(snap){
       leconsSignalements = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
       leconsSignalements.sort(function(a,b){ return dateMs(b.date)-dateMs(a.date); });
+      cacheLocal('zag_lec_dir', leconsSignalements.slice(0,400));
       if(document.getElementById('page-lecons').classList.contains('active')) renderLecons();
     }));
 
@@ -2401,15 +2694,16 @@ function lancerListeners(){
   _unsubs.push(db.collection('zag_chambres').where('ecoleId','==',ECOLE_ID)
     .onSnapshot(function(snap){
       chambres = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+      cacheLocal('zag_chb_dir', chambres);
       if(document.getElementById('page-internat').classList.contains('active')) renderInternat();
     }));
 }
 
 function cacheLocal(key, data){
-  try{ localStorage.setItem(key, JSON.stringify(data)); }catch(e){}
+  try{ localStorage.setItem(ECOLE_ID+'::'+key, JSON.stringify(data)); }catch(e){}
 }
 function loadLocal(key){
-  try{ return JSON.parse(localStorage.getItem(key)||'[]'); }catch(e){ return []; }
+  try{ return JSON.parse(localStorage.getItem(ECOLE_ID+'::'+key)||'[]'); }catch(e){ return []; }
 }
 
 // ── DASHBOARD ────────────────────────────────────
@@ -2604,6 +2898,7 @@ function dateMs(d){
 }
 
 function updateDashboard(){
+  setTimeout(renderSansLecon, 500);
   document.getElementById('dashTotalEleves').textContent = eleves.length;
   // Rapport mini — appel immédiat car eleves est déjà chargé ici
   if(FIREBASE_OK && document.getElementById('dashRapportMini')) chargerRapportMiniDashboard();
@@ -2689,7 +2984,11 @@ function renderPresenceList(containerId, list){
 }
 
 // ── ÉLÈVES ───────────────────────────────────────
-function renderEleves(){
+var ELEVES_PAGE_SIZE = 25; // Pagination — essentiel à partir de 50+ élèves
+var elevesPageActuelle = 1;
+
+function renderEleves(resetPage){
+  if(resetPage===true) elevesPageActuelle = 1;
   var query = (document.getElementById('eleveSearch').value||'').toLowerCase();
   var grid = document.getElementById('eleveGrid');
   var todStr = todayStr();
@@ -2700,6 +2999,12 @@ function renderEleves(){
           || ((e.prenom_ar||'')+(e.nom_ar||'')).toLowerCase().includes(query);
       })
     : eleves;
+
+  // ── PAGINATION ──
+  var totalPages = Math.max(1, Math.ceil(filtered.length / ELEVES_PAGE_SIZE));
+  if(elevesPageActuelle > totalPages) elevesPageActuelle = totalPages;
+  var filteredFull = filtered;
+  filtered = filtered.slice((elevesPageActuelle-1)*ELEVES_PAGE_SIZE, elevesPageActuelle*ELEVES_PAGE_SIZE);
 
   if(!filtered.length){
     grid.innerHTML = '<div style="text-align:center;color:var(--text3);padding:30px;font-size:.78rem">🕌 '+(LANG==='ar'?'لا يوجد نتائج':'Aucun résultat')+'</div>';
@@ -2744,6 +3049,22 @@ function renderEleves(){
       +'</div>'
       +'</div>';
   }).join('');
+
+  // ── CONTRÔLES PAGINATION ──
+  if(totalPages > 1){
+    grid.innerHTML += '<div style="display:flex;align-items:center;justify-content:center;gap:10px;margin-top:14px;padding:10px">'
+      +'<button onclick="changerPageEleves(-1)" '+(elevesPageActuelle<=1?'disabled':'')+' style="padding:8px 14px;border-radius:10px;background:var(--night2);border:1px solid var(--bd);color:'+(elevesPageActuelle<=1?'var(--text3)':'var(--text1)')+';cursor:pointer;font-size:.75rem">← Préc.</button>'
+      +'<span style="font-size:.72rem;color:var(--text2);font-weight:700">'+elevesPageActuelle+' / '+totalPages+' ('+filteredFull.length+' élèves)</span>'
+      +'<button onclick="changerPageEleves(1)" '+(elevesPageActuelle>=totalPages?'disabled':'')+' style="padding:8px 14px;border-radius:10px;background:var(--night2);border:1px solid var(--bd);color:'+(elevesPageActuelle>=totalPages?'var(--text3)':'var(--text1)')+';cursor:pointer;font-size:.75rem">Suiv. →</button>'
+      +'</div>';
+  }
+}
+
+function changerPageEleves(dir){
+  elevesPageActuelle += dir;
+  renderEleves(false);
+  var g = document.getElementById('eleveGrid');
+  if(g) g.scrollIntoView({behavior:'smooth', block:'start'});
 }
 
 // ── FORMULAIRE ÉLÈVE ─────────────────────────────
@@ -2995,10 +3316,10 @@ async function sauvegarderEleve(){
       showToast(LANG==='ar'?'تم التعديل':'Élève mis à jour');
       // Sauvegarder IEP
       var iepData = {ecoleId:ECOLE_ID, versets:parseInt(document.getElementById('iepVersets').value)||0, juz:document.getElementById('iepJuz').value.trim(), note:document.getElementById('iepNote').value.trim()};
-      if(iepData.versets||iepData.juz) db.collection('zag_objectifs').doc(editId).set(iepData,{merge:true});
+      if(iepData.versets||iepData.juz) db.collection('zag_objectifs').doc(editId).set(iepData,{merge:true}).catch(function(){});
       // Sauvegarder santé
       var santeData = {ecoleId:ECOLE_ID, groupeSanguin:document.getElementById('santeGroupeSanguin').value, urgenceTel:document.getElementById('santeUrgenceTel').value.trim(), allergies:document.getElementById('santeAllergies').value.trim(), maladies:document.getElementById('santeMaladies').value.trim(), medicaments:document.getElementById('santeMedicaments').value.trim()};
-      db.collection('zag_sante').doc(editId).set(santeData,{merge:true});
+      db.collection('zag_sante').doc(editId).set(santeData,{merge:true}).catch(function(){});
       fermerModal('modalEleve');
     }).catch(function(e){ showToast(e.message,'error'); });
   } else {
@@ -3006,9 +3327,17 @@ async function sauvegarderEleve(){
     data.dateInscription = firebase.firestore.Timestamp.now();
     db.collection('zag_eleves').add(data).then(async function(ref){
       data.pinHash = await hashPin(ref.id, pin1);
-      await db.collection('zag_eleves').doc(ref.id).update({pinHash: data.pinHash});
+      await db.collection('zag_eleves').doc(ref.id).update({pinHash: data.pinHash}).catch(function(){});
       showToast(LANG==='ar'?'تم تسجيل الطالب رقم '+data.numero:'Élève inscrit — N° '+data.numero);
       fermerModal('modalEleve');
+      // Proposer d'envoyer le message de bienvenue au parent
+      if(data.parent_tel){
+        setTimeout(function(){
+          if(confirm('Envoyer le message de bienvenue au parent sur WhatsApp ?')){
+            envoyerMessageBienvenue(data);
+          }
+        }, 600);
+      }
     }).catch(function(e){ showToast(e.message,'error'); });
   }
 }
@@ -3066,6 +3395,7 @@ function ouvrirFicheProfilEleve(id){
     +'<div style="display:flex;gap:8px">'
     +'<button onclick="fermerModal(\'modalFicheEleve\');ouvrirFormEleve(\''+id+'\')" style="flex:1;padding:10px;background:rgba(201,168,76,.15);border:1px solid rgba(201,168,76,.3);border-radius:10px;color:var(--gold);font-weight:700;cursor:pointer;font-size:.78rem">✏️ Modifier</button>'
     +'<button onclick="ouvrirBulletinEleve(\''+id+'\');fermerModal(\'modalFicheEleve\')" style="flex:1;padding:10px;background:rgba(255,255,255,.06);border:1px solid var(--bd);border-radius:10px;color:var(--text1);font-weight:700;cursor:pointer;font-size:.78rem">📋 Bulletin</button>'
+    +'<button onclick="ouvrirPermissionsEleve(\''+id+'\')" style="flex:1;min-width:80px;padding:10px;background:rgba(105,240,174,.12);border:1px solid rgba(105,240,174,.3);border-radius:10px;color:#69F0AE;font-weight:700;cursor:pointer;font-size:.78rem">✅ Permission</button>'
     +'</div>';
 
   document.getElementById('modalFicheEleveBody').innerHTML = html;
@@ -3223,7 +3553,7 @@ function sauvegarderEnseignant(){
   if(!FIREBASE_OK){ showToast('Firebase non connecté','error'); return; }
   var op = editId
     ? db.collection('zag_enseignants').doc(editId).update(data)
-    : db.collection('zag_enseignants').add(data);
+    : db.collection('zag_enseignants').add(data).catch(function(){});
   op.then(function(){
     showToast(editId?'Enseignant mis à jour':'Enseignant ajouté');
     fermerModal('modalEnseignant');
@@ -3244,7 +3574,11 @@ document.querySelectorAll('.modal-ov').forEach(function(ov){
 // ── ONLINE/OFFLINE ────────────────────────────────
 window.addEventListener('online', function(){
   document.getElementById('onlineDot').className='badge-online';
-  document.getElementById('onlineStatus').textContent=LANG==='ar'?'متصل':'En ligne';
+  document.getElementById('onlineStatus').textContent=LANG==='ar'?'جارٍ المزامنة…':'Synchronisation…';
+  // Firestore rejoue automatiquement les écritures mises en file hors-ligne.
+  setTimeout(function(){
+    if(navigator.onLine) document.getElementById('onlineStatus').textContent=LANG==='ar'?'متصل':'En ligne';
+  }, 4000);
 });
 window.addEventListener('offline', function(){
   document.getElementById('onlineDot').className='badge-online badge-offline';
@@ -3258,37 +3592,50 @@ document.getElementById('presenceDate').value = todayStr();
 (function(){
   // Charger données locales immédiatement
   var cached = loadLocal('zag_eleves_dir');
-  if(cached.length){ eleves=cached; renderEleves(); updateDashboard(); }
+  if(cached.length){ eleves=cached; }
+  var cE=loadLocal('zag_ens_dir'); if(cE.length) enseignants=cE;
+  var cP=loadLocal('zag_pres_dir'); if(cP.length) presences=cP;
+  var cL=loadLocal('zag_lec_dir'); if(cL.length) leconsSignalements=cL;
+  var cC=loadLocal('zag_chb_dir'); if(cC.length) chambres=cC;
+  if(cached.length){ renderEleves(); updateDashboard(); }
 
-  if(navigator.onLine){
-    var sf = document.createElement('script');
-    sf.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js';
-    sf.onload=function(){
-      var sf2=document.createElement('script');
-      sf2.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js';
-      sf2.onload=function(){
-        var sf3=document.createElement('script');
-        sf3.src='https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js';
-        sf3.onload=initFirebase;
-        document.head.appendChild(sf3);
-      };
-      document.head.appendChild(sf2);
-    };
-    document.head.appendChild(sf);
-
-  } else {
-    document.getElementById('onlineDot').className='badge-online badge-offline';
-    document.getElementById('onlineStatus').textContent='Hors-ligne';
-    // Mode hors-ligne : essayer depuis le cache SW
-    if(typeof firebase !== 'undefined'){
-      initFirebase();
-    } else {
-      setTimeout(function(){
+  // ── Chargement du SDK Firebase (fonctionne en ligne ET hors-ligne) ──
+  // Le service worker (zag-sw.js) met les scripts gstatic en cache lors de la
+  // première visite en ligne ; hors-ligne, ils sont servis depuis ce cache.
+  // Firebase active alors sa persistance IndexedDB : lecture des données en
+  // cache, écritures mises en file, synchronisation automatique au retour du réseau.
+  var _fbTentative = 0;
+  function chargerFirebaseSDK(){
+    if(typeof firebase !== 'undefined' && firebase.firestore){ initFirebase(); return; }
+    _fbTentative++;
+    function echec(){
+      document.getElementById('onlineDot').className='badge-online badge-offline';
+      document.getElementById('onlineStatus').textContent='Hors-ligne';
+      if(_fbTentative===1){
         document.getElementById('authScreen').classList.remove('hidden');
-        document.getElementById('authErr').textContent='Mode hors-ligne — rechargez quand vous serez connecté.';
-      }, 500);
+        document.getElementById('authErr').textContent='Connexion nécessaire pour la 1ère utilisation. L\'application réessaiera automatiquement dès le retour du réseau.';
+      }
+      // Nouvelle tentative automatique au retour du réseau
+      window.addEventListener('online', function retry(){
+        window.removeEventListener('online', retry);
+        setTimeout(chargerFirebaseSDK, 800);
+      });
     }
+    var urls = [
+      'https://www.gstatic.com/firebasejs/9.23.0/firebase-app-compat.js',
+      'https://www.gstatic.com/firebasejs/9.23.0/firebase-firestore-compat.js',
+      'https://www.gstatic.com/firebasejs/9.23.0/firebase-auth-compat.js'
+    ];
+    (function next(i){
+      if(i>=urls.length){ initFirebase(); return; }
+      var sc = document.createElement('script');
+      sc.src = urls[i];
+      sc.onload = function(){ next(i+1); };
+      sc.onerror = echec;
+      document.head.appendChild(sc);
+    })(0);
   }
+  chargerFirebaseSDK();
 })();
 
 // ══════════════════════════════════════════════════
@@ -3446,6 +3793,7 @@ function renderFinEleves(){
 }
 
 // ── FICHE FINANCES ÉLÈVE ─────────────────────────
+function ouvrirFinancesModalVide(tarif){ renderFinMoisGrid({}, tarif); document.getElementById('modalFinances').classList.add('open'); }
 function ouvrirFinancesEleve(id){
   var e = eleves.find(function(x){ return x.id===id; });
   if(!e) return;
@@ -3588,6 +3936,14 @@ function envoyerRecuWhatsApp(){
 // ── FORMULE MOYENNE MENSUELLE ─────────────────────
 // ══════════════════════════════════════════════════
 function calculerMoyenneMensuelle(eleveId, mois, annee){
+  // Jours exclus : repos/feries école + permissions individuelles de cet élève
+  var joursExclusEcole = (calData||[]).filter(function(d){
+    return d.type==='repos'||d.type==='permission'||d.type==='ferie';
+  }).map(function(d){ return d.date; });
+
+  var joursExclusEleve = (window._permissionsCache && window._permissionsCache[eleveId]) || [];
+  var joursExclus = joursExclusEcole.concat(joursExclusEleve);
+
   var moisStr = annee+'-'+String(mois).padStart(2,'0');
   var joursEcole = new Set(
     presences.filter(function(p){ return p.type==='arrivee' && normaliseDateStr(p.date).startsWith(moisStr); })
@@ -3608,6 +3964,13 @@ function calculerMoyenneMensuelle(eleveId, mois, annee){
   var moySum=notePres*0.4+notePonc*0.3, moyDenom=0.7;
   if(noteMait!==null){ moySum+=noteMait*0.3; moyDenom+=0.3; }
   var moyenne = moyDenom>0 ? Math.round(moySum/moyDenom*10)/10 : null;
+  // RÈGLE PÉDAGOGIQUE : la maîtrise du Coran est prioritaire
+  // Si 100% non maîtrisé → moyenne plafonnée à 10/20
+  // Si plus de 50% non maîtrisé → plafond à 12/20
+  if(moyenne!==null && leconsMois.length>0){
+    if(pctNonMaitrise===100) moyenne = Math.min(moyenne, 10);
+    else if(pctNonMaitrise>=50) moyenne = Math.min(moyenne, 12);
+  }
   return {notePres:notePres,notePonc:notePonc,noteMait:noteMait,moyenne:moyenne,pctAbsence:pctAbsence,pctRetard:pctRetard,pctNonMaitrise:pctNonMaitrise,nbJoursEcole:nbJoursEcole,nbPresent:nbPresent,nbRetards:nbRetards,nbLecons:leconsMois.length};
 }
 
@@ -3689,7 +4052,7 @@ function rapportAssiduiteExternes(){
   window.open('https://wa.me/?text='+encodeURIComponent('🏫 *Rapport Assiduité Externat*\n'+NOM_MOIS[mois-1]+' '+annee+'\n\n'+lignes),'_blank');
 }
 
-function genererRapportMensuel(){
+function genererRapportFinancierComplet(){
   if(!FIREBASE_OK){ showToast('Firebase non connecté','error'); return; }
   var moisN = new Date().getMonth()+1;
   var anneeN = new Date().getFullYear();
@@ -3903,9 +4266,9 @@ function imprimerBulletinPDF(){
     +'<div class="bp-title">Bulletin scolaire</div>'
     +'<div class="bp-eleve"><strong>'+escHtml(nom)+'</strong>'+(mois?' &mdash; '+escHtml(mois):'')+'</div>'
     +'<div class="bp-grid">'
-    +'<div class="bp-stat"><div class="bp-num">'+escHtml(notePres)+'</div><div class="bp-lbl">Présence /20</div></div>'
-    +'<div class="bp-stat"><div class="bp-num">'+escHtml(notePonc)+'</div><div class="bp-lbl">Ponctualité /20</div></div>'
-    +'<div class="bp-stat"><div class="bp-num">'+escHtml(noteMait)+'</div><div class="bp-lbl">Maîtrise /20</div></div>'
+    +'<div class="bp-stat"><div class="bp-num">'+escHtml(notePres)+'</div><div class="bp-lbl">Récitation /20</div></div>'
+    +'<div class="bp-stat"><div class="bp-num">'+escHtml(notePonc)+'</div><div class="bp-lbl">Comportement /20</div></div>'
+    +'<div class="bp-stat"><div class="bp-num">'+escHtml(noteMait)+'</div><div class="bp-lbl">Ponctualité /20</div></div>'
     +'</div>'
     +'<div class="bp-mention">'
     +'<div style="font-size:8.5pt;color:#888;margin-bottom:4px">MOYENNE GÉNÉRALE</div>'
@@ -4059,41 +4422,96 @@ function renderDemandes(){
 // ── VISITES DU PORTAIL PARENT ─────────────────────
 function renderVisites(){
   if(!FIREBASE_OK) return;
-  db.collection('zag_visites_portail').where('ecoleId','==',ECOLE_ID).limit(50).get().then(function(snap){
-    if(snap.empty){ document.getElementById('visitesList').innerHTML='<div style="color:var(--text3);text-align:center;padding:16px;font-size:.78rem">Aucune visite enregistrée</div>'; return; }
+  var container = document.getElementById('visitesList');
+  if(!container) return;
+  container.innerHTML = '<div style="color:var(--text3);text-align:center;padding:12px;font-size:.75rem">Chargement visites…</div>';
+
+  db.collection('zag_visites_portail').where('ecoleId','==',ECOLE_ID)
+    .limit(200).get().then(function(snap){
+    if(snap.empty){ container.innerHTML='<div style="color:var(--text3);text-align:center;padding:16px;font-size:.78rem">Aucune visite enregistrée</div>'; return; }
+
     var docs = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
     docs.sort(function(a,b){ var ta=(a.visitedAt&&a.visitedAt.seconds)||0; var tb=(b.visitedAt&&b.visitedAt.seconds)||0; return tb-ta; });
-    // Grouper par élève
-    var parEleve = {};
+
+    // Grouper par jour pour le suivi prospect
+    var parJour = {};
     docs.forEach(function(v){
-      if(!parEleve[v.eleveId]) {
-        // Chercher le nom dans la liste des élèves si non stocké dans la visite
-        var eleveData = eleves.find(function(e){ return e.id===v.eleveId; });
-        var nom = v.eleveNom || (eleveData ? (eleveData.prenom||'')+' '+(eleveData.nom||'') : '—');
-        parEleve[v.eleveId] = {nom:nom.trim()||'—', visites:[]};
-      }
-      parEleve[v.eleveId].visites.push(v);
+      var dateKey = v.visitedAt ? new Date(v.visitedAt.seconds*1000).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : '—';
+      if(!parJour[dateKey]) parJour[dateKey] = [];
+      parJour[dateKey].push(v);
     });
-    var html = '';
-    Object.keys(parEleve).forEach(function(eid){
-      var g = parEleve[eid];
-      var derniere = g.visites[0];
-      var dateAff = derniere.visitedAt ? new Date(derniere.visitedAt.seconds*1000).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',hour:'2-digit',minute:'2-digit'}) : '—';
-      html += '<div style="padding:8px 0;border-bottom:1px solid var(--bd);font-size:.75rem;display:flex;justify-content:space-between;align-items:center">'
-        +'<div>'
-        +'<div style="font-weight:700;color:var(--text1)">'+escHtml(g.nom)+'</div>'
-        +'<div style="font-size:.62rem;color:var(--text3)">Dernière visite : '+dateAff+'</div>'
-        +(derniere.messageSent?'<div style="font-size:.62rem;color:#69F0AE">✅ Message envoyé depuis le portail</div>':'')
-        +'</div>'
-        +'<span style="background:var(--gold-dim);color:var(--gold);font-size:.62rem;font-weight:800;padding:3px 8px;border-radius:10px">'+g.visites.length+' visite'+(g.visites.length>1?'s':'')+'</span>'
-        +'</div>';
+
+    // Stats globales
+    var totalVisites = docs.length;
+    var elevesUniques = new Set(docs.map(function(v){return v.eleveId;})).size;
+
+    var html = '<div style="display:flex;gap:10px;margin-bottom:12px">'
+      +'<div style="flex:1;background:rgba(201,168,76,.08);border:1px solid rgba(201,168,76,.15);border-radius:10px;padding:8px;text-align:center">'
+      +'<div style="font-size:1.1rem;font-weight:900;color:var(--gold)">'+totalVisites+'</div>'
+      +'<div style="font-size:.6rem;color:var(--text3)">Total visites</div></div>'
+      +'<div style="flex:1;background:rgba(100,181,246,.08);border:1px solid rgba(100,181,246,.15);border-radius:10px;padding:8px;text-align:center">'
+      +'<div style="font-size:1.1rem;font-weight:900;color:#64B5F6">'+elevesUniques+'</div>'
+      +'<div style="font-size:.6rem;color:var(--text3)">Profils consultés</div></div>'
+      +'<div style="flex:1;background:rgba(105,240,174,.08);border:1px solid rgba(105,240,174,.15);border-radius:10px;padding:8px;text-align:center">'
+      +'<div style="font-size:1.1rem;font-weight:900;color:#69F0AE">'+Object.keys(parJour).length+'</div>'
+      +'<div style="font-size:.6rem;color:var(--text3)">Jours actifs</div></div>'
+      +'</div>';
+
+    // Liste par jour (derniers jours en premier)
+    Object.keys(parJour).forEach(function(jour){
+      var visitesJour = parJour[jour];
+      html += '<div style="margin-bottom:10px">'
+        +'<div style="font-size:.68rem;font-weight:700;color:var(--gold);padding:4px 0;border-bottom:1px solid rgba(201,168,76,.2);margin-bottom:6px">📅 '+jour+' ('+visitesJour.length+' visite'+( visitesJour.length>1?'s':'')+')</div>';
+
+      // Grouper par élève dans ce jour
+      var parEleveJour = {};
+      visitesJour.forEach(function(v){
+        var eid = v.eleveId||'inconnu';
+        if(!parEleveJour[eid]) parEleveJour[eid] = {nom:v.eleveNom||'—',count:0,lastTime:null};
+        parEleveJour[eid].count++;
+        if(!parEleveJour[eid].lastTime) parEleveJour[eid].lastTime = v.visitedAt;
+      });
+
+      Object.keys(parEleveJour).forEach(function(eid){
+        var g = parEleveJour[eid];
+        var eleve = eleves.find(function(e){return e.id===eid;});
+        var nomAff = g.nom==='—' && eleve ? ((eleve.prenom||'')+' '+(eleve.nom||'')).trim() : g.nom;
+        var tel = eleve && eleve.parent_tel ? eleve.parent_tel.replace(/\D/g,'') : '';
+        var heure = g.lastTime ? new Date(g.lastTime.seconds*1000).toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'}) : '';
+
+        // Bouton WA prospect (pour contacter le parent visiteur)
+        var waBtn = '';
+        if(tel){
+          var telWa = tel.startsWith('224')?tel:'224'+tel;
+          window._prospectWa = window._prospectWa||{};
+          var wk = 'pr_'+eid+'_'+jour.replace(/[\s,]/g,'_');
+          window._prospectWa[wk] = {tel:telWa, nom:nomAff, eleveId:eid};
+          waBtn = '<button onclick="contacterProspect(\''+wk+'\')" style="background:#25D366;border:none;color:#fff;padding:4px 8px;border-radius:6px;font-size:.58rem;cursor:pointer;flex-shrink:0">📱 Contacter</button>';
+        }
+
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,.04)">'
+          +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:.78rem;font-weight:700;color:var(--text1)">'+escHtml(nomAff)+'</div>'
+          +'<div style="font-size:.62rem;color:var(--text3)">'+g.count+' visite'+(g.count>1?'s':'')+(heure?' · '+heure:'')+'</div>'
+          +'</div>'
+          +waBtn
+          +'</div>';
+      });
+      html += '</div>';
     });
-    document.getElementById('visitesList').innerHTML = html;
-  }).catch(function(e){ document.getElementById('visitesList').innerHTML='<div style="color:var(--text3)">'+e.message+'</div>'; });
+
+    container.innerHTML = html;
+  }).catch(function(){ container.innerHTML='<div style="color:var(--text3);text-align:center;padding:16px">Données indisponibles</div>'; });
 }
 
-// ── SÉANCES ENSEIGNANT (visibles dans les leçons) ─
-var seancesEnseignant = [];
+function contacterProspect(key){
+  var d = window._prospectWa && window._prospectWa[key];
+  if(!d) return;
+  var msg = 'Assalamu Alaykum ! Nous avons vu votre intérêt pour le profil de '+d.nom+' sur le portail du Centre ZAG Al-Hikma. Nous serions ravis de vous renseigner sur nos services et inscriptions. بارك الله فيكم.';
+  window.open('https://wa.me/'+d.tel+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+
 function lancerListenerSeances(){
   if(!FIREBASE_OK) return;
   _unsubs.push(db.collection('zag_seances').where('ecoleId','==',ECOLE_ID).limit(100).onSnapshot(function(snap){
@@ -4534,6 +4952,16 @@ function sauvegarderRepas(){
 }
 
 // ── PARAMÈTRES ÉCOLE ─────────────────────────────
+function chargerCalDataSilencieux(){
+  // Charger les données calendrier en arrière-plan pour que le calcul bulletin
+  // puisse exclure les jours de repos/permission sans avoir à ouvrir l'onglet
+  if(!FIREBASE_OK || !db) return;
+  db.collection('zag_calendrier').where('ecoleId','==',ECOLE_ID).limit(100).get()
+    .then(function(snap){
+      calData = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+    }).catch(function(){});
+}
+
 function chargerParametres(){
   if(!FIREBASE_OK) return;
   db.collection('zag_parametres').doc(ECOLE_ID).get().then(function(doc){
@@ -4580,12 +5008,15 @@ function renderCalendrier(){
     }
     var docs = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
     docs.sort(function(a,b){ return (a.date||'').localeCompare(b.date||''); });
+    // Mettre à jour calData global pour que calculerMoyenneMensuelle puisse exclure les jours repos/permission
+    calData = docs;
     var html = '';
     docs.forEach(function(d){
       var did = d.id;
       var dateAff = d.date ? new Date(d.date).toLocaleDateString('fr-FR',{day:'2-digit',month:'short',year:'numeric'}) : '—';
-      html += '<div class="cal-item">'
-        +'<div class="cal-date-badge">'+dateAff+'</div>'
+            var excluBulletin = (d.type==='repos'||d.type==='permission'||d.type==='ferie');
+      html += '<div class="cal-item"'+(excluBulletin?' style="border-left:3px solid #69F0AE;padding-left:6px"':'')+'>'
+        +'<div class="cal-date-badge">'+dateAff+(excluBulletin?'<br><span style="font-size:.5rem;color:#69F0AE;font-weight:700">✓ exclu bulletin</span>':'')+'</div>'
         +'<div class="cal-type-icon">'+(TYPE_ICONS[d.type]||'📌')+'</div>'
         +'<div style="flex:1;min-width:0">'
         +'<div class="cal-title">'+escHtml(d.titre||'—')+'</div>'
@@ -5288,6 +5719,211 @@ function cloturerJournee(){
   if(confirm('Envoyer le bilan de clôture sur WhatsApp ?')){
     window.open('https://wa.me/224626207646?text='+encodeURIComponent(msg),'_blank');
   }
+}
+
+// ══════════════════════════════════════════════════════════════
+// PERMISSIONS INDIVIDUELLES PAR ÉLÈVE
+// ══════════════════════════════════════════════════════════════
+var _currentPermEleveId = null;
+
+function ouvrirPermissionsEleve(eleveId){
+  _currentPermEleveId = eleveId;
+  var eleve = eleves.find(function(e){ return e.id===eleveId; });
+  var nom = eleve ? ((eleve.prenom||'')+' '+(eleve.nom||'')).trim() : '—';
+  document.getElementById('permEleveNom').textContent = nom;
+  document.getElementById('permDateDebut').value = todayStr();
+  document.getElementById('permDateFin').value = '';
+  document.getElementById('permMotif').value = '';
+  chargerPermissionsEleve(eleveId);
+  document.getElementById('modalPermissions').classList.add('open');
+}
+
+function chargerPermissionsEleve(eleveId){
+  var container = document.getElementById('permissionsList');
+  if(!FIREBASE_OK || !db){ container.innerHTML='<div style="color:var(--text3);text-align:center;padding:16px">Firebase non disponible</div>'; return; }
+  db.collection('zag_permissions')
+    .where('ecoleId','==',ECOLE_ID)
+    .where('eleveId','==',eleveId)
+    .limit(50).get()
+    .then(function(snap){
+      if(snap.empty){
+        container.innerHTML='<div style="color:var(--text3);text-align:center;padding:16px;font-size:.75rem">Aucune permission accordée</div>';
+        return;
+      }
+      var docs = snap.docs.map(function(d){ return Object.assign({id:d.id},d.data()); });
+      docs.sort(function(a,b){ return (b.dateDebut||'').localeCompare(a.dateDebut||''); });
+      var html = '<div style="font-size:.68rem;font-weight:700;color:var(--text2);margin-bottom:8px">'+docs.length+' permission(s) enregistrée(s)</div>';
+      docs.forEach(function(p){
+        var periode = p.dateDebut+(p.dateFin && p.dateFin!==p.dateDebut?' → '+p.dateFin:'');
+        html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--bd)">'
+          +'<div style="flex:1;min-width:0">'
+          +'<div style="font-size:.78rem;font-weight:700;color:#69F0AE">'+escHtml(periode)+'</div>'
+          +(p.motif?'<div style="font-size:.65rem;color:var(--text3)">'+escHtml(p.motif)+'</div>':'')
+          +(p.accordePar?'<div style="font-size:.6rem;color:var(--text3)">Par : '+escHtml(p.accordePar)+'</div>':'')
+          +'</div>'
+          +'<button onclick="supprimerPermission(\''+p.id+'\',\''+eleveId+'\')" style="background:rgba(239,83,80,.15);border:1px solid var(--red2);color:var(--red2);padding:4px 8px;border-radius:6px;font-size:.62rem;cursor:pointer">🗑</button>'
+          +'</div>';
+      });
+      container.innerHTML = html;
+    }).catch(function(e){
+      container.innerHTML='<div style="color:var(--red2);font-size:.72rem;padding:12px">Erreur: '+e.message+'</div>';
+    });
+}
+
+function accorderPermission(){
+  if(!_currentPermEleveId){ showToast('Aucun élève sélectionné','error'); return; }
+  var dateDebut = document.getElementById('permDateDebut').value;
+  var dateFin = document.getElementById('permDateFin').value || dateDebut;
+  var motif = document.getElementById('permMotif').value.trim();
+  if(!dateDebut){ showToast('Sélectionnez une date','error'); return; }
+  if(dateFin < dateDebut){ showToast('La date fin doit être après la date début','error'); return; }
+
+  // Générer toutes les dates de la période
+  var dates = [];
+  var cur = new Date(dateDebut);
+  var end = new Date(dateFin);
+  while(cur <= end){
+    dates.push(cur.toISOString().split('T')[0]);
+    cur.setDate(cur.getDate()+1);
+  }
+
+  var data = {
+    ecoleId: ECOLE_ID,
+    eleveId: _currentPermEleveId,
+    dateDebut: dateDebut,
+    dateFin: dateFin,
+    dates: dates, // toutes les dates couvertes
+    motif: motif || 'Permission accordée',
+    accordePar: AUTH_USER ? (AUTH_USER.displayName||AUTH_USER.email||'Directeur') : 'Directeur',
+    createdAt: new Date().toISOString()
+  };
+
+  if(!db){ showToast('Firebase non disponible','error'); return; }
+  db.collection('zag_permissions').add(data)
+    .then(function(){
+      showToast('✅ Permission accordée du '+dateDebut+(dateFin!==dateDebut?' au '+dateFin:''));
+      document.getElementById('permDateDebut').value = todayStr();
+      document.getElementById('permDateFin').value = '';
+      document.getElementById('permMotif').value = '';
+      chargerPermissionsEleve(_currentPermEleveId);
+    }).catch(function(e){ showToast('Erreur: '+e.message,'error'); });
+}
+
+function supprimerPermission(permId, eleveId){
+  if(!confirm('Supprimer cette permission ?')) return;
+  db.collection('zag_permissions').doc(permId).delete()
+    .then(function(){
+      showToast('Permission supprimée');
+      chargerPermissionsEleve(eleveId);
+    }).catch(function(e){ showToast('Erreur: '+e.message,'error'); });
+}
+
+// Charger les permissions dans le calcul bulletin
+function getPermissionsEleve(eleveId, mois, annee){
+  // Utilise le cache _permissionsCache si disponible
+  return window._permissionsCache && window._permissionsCache[eleveId]
+    ? window._permissionsCache[eleveId]
+    : [];
+}
+
+// Charger toutes les permissions au démarrage (cache)
+function chargerPermissionsCache(){
+  if(!FIREBASE_OK || !db) return;
+  db.collection('zag_permissions').where('ecoleId','==',ECOLE_ID).limit(500).get()
+    .then(function(snap){
+      window._permissionsCache = {};
+      snap.docs.forEach(function(doc){
+        var d = doc.data();
+        if(!window._permissionsCache[d.eleveId]) window._permissionsCache[d.eleveId] = [];
+        window._permissionsCache[d.eleveId] = window._permissionsCache[d.eleveId].concat(d.dates||[d.dateDebut]);
+      });
+    }).catch(function(){});
+}
+
+// ══ MESSAGE DE BIENVENUE À L'INSCRIPTION ══
+function envoyerMessageBienvenue(eleveData){
+  var tel = (eleveData.parent_tel||'').replace(/\D/g,'');
+  if(!tel) { showToast('Pas de numéro parent','error'); return; }
+  if(!tel.startsWith('224') && tel.length<=9) tel = '224'+tel;
+  var prenom = eleveData.prenom||'votre enfant';
+  var portailUrl = 'https://zaggroup.github.io/gestionpieces/zag-parent.html?id='+(eleveData.id||'');
+
+  var msg = 'Assalamu Alaykum wa rahmatullahi wa barakatuh 🌙\n\n'
+    +'Bienvenue dans la famille du *Centre ZAG Al-Hikma* !\n\n'
+    +'Nous sommes honorés de la confiance que vous nous accordez en nous confiant '+prenom+' (N°'+(eleveData.numero||'—')+').\n\n'
+    +'📖 Notre mission : accompagner chaque enfant dans la mémorisation du Saint Coran et son éducation, avec rigueur et bienveillance.\n\n'
+    +'✅ Vous pouvez suivre sa progression en temps réel (présences, leçons, bulletin) via son portail personnel :\n'+portailUrl+'\n\n'
+    +'📱 Pour toute question, nous restons disponibles sur ce numéro.\n\n'
+    +'Qu\'Allah bénisse le parcours de votre enfant. آمين\n\n'
+    +'_Centre ZAG Al-Hikma — Kindia_\n'
+    +'_نُربِّي العقول ونُهذِّب القلوب_';
+
+  window.open('https://wa.me/'+tel+'?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ══ ÉLÈVES SANS LEÇON DU JOUR + HISTORIQUE ══
+function renderSansLecon(){
+  var container = document.getElementById('sansLeconList');
+  if(!container) return;
+  var todStr = todayStr();
+
+  // Élèves présents aujourd'hui
+  var todPresences = presences.filter(function(p){
+    return p.date && normaliseDateStr(p.date)===todStr;
+  });
+
+  // Leçons signalées aujourd'hui (tous statuts)
+  var leconsAuj = leconsSignalements.filter(function(l){
+    return normaliseDateStr(l.date)===todStr;
+  });
+
+  var sansLecon = [];
+  eleves.forEach(function(e){
+    var present = estPresent(e, todPresences);
+    var aLecon = leconsAuj.some(function(l){ return l.eleveId===e.id; });
+    var aPermission = window._permissionsCache && window._permissionsCache[e.id] &&
+      window._permissionsCache[e.id].indexOf(todStr)>=0;
+    if(!aLecon && !aPermission){
+      sansLecon.push({eleve:e, present:present, permission:aPermission});
+    }
+  });
+
+  if(!sansLecon.length){
+    container.innerHTML = '<div style="color:#69F0AE;text-align:center;padding:12px;font-size:.75rem">✅ Tous les élèves ont une leçon ou une permission aujourd\'hui</div>';
+    return;
+  }
+
+  var html = '<div style="font-size:.65rem;color:var(--text3);margin-bottom:8px">'+sansLecon.length+' élève(s) sans leçon signalée aujourd\'hui</div>';
+  sansLecon.forEach(function(item){
+    var e = item.eleve;
+    // Historique : compter les jours sans leçon sur les 7 derniers jours
+    var joursSansLecon = 0;
+    for(var i=1;i<=7;i++){
+      var d = new Date(); d.setDate(d.getDate()-i);
+      var ds = d.toISOString().split('T')[0];
+      if(ds < DATE_DEBUT_SCOLARITE) break;
+      var eut = leconsSignalements.some(function(l){ return l.eleveId===e.id && normaliseDateStr(l.date)===ds; });
+      var permis = window._permissionsCache && window._permissionsCache[e.id] && window._permissionsCache[e.id].indexOf(ds)>=0;
+      if(!eut && !permis) joursSansLecon++;
+    }
+    var photo = e.photo
+      ? '<img loading="lazy" src="'+escHtml(e.photo)+'" style="width:34px;height:34px;border-radius:50%;object-fit:cover;flex-shrink:0">'
+      : '<div style="width:34px;height:34px;border-radius:50%;background:var(--gold-dim);display:flex;align-items:center;justify-content:center;flex-shrink:0;font-size:.7rem;font-weight:800;color:var(--gold)">'+(e.prenom||'?')[0]+'</div>';
+    var statusBadge = item.present
+      ? '<span style="font-size:.55rem;color:#69F0AE;background:rgba(105,240,174,.1);padding:2px 6px;border-radius:6px;flex-shrink:0">Présent</span>'
+      : '<span style="font-size:.55rem;color:var(--red2);background:rgba(239,83,80,.1);padding:2px 6px;border-radius:6px;flex-shrink:0">Absent</span>';
+    html += '<div style="display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid rgba(255,255,255,.05)">'
+      +'<div style="cursor:pointer;display:flex;align-items:center;gap:8px;flex:1;min-width:0" onclick="ouvrirFicheProfilEleve(\''+e.id+'\')">'
+      +photo
+      +'<div style="flex:1;min-width:0">'
+      +'<div style="font-size:.78rem;font-weight:700;color:var(--text1)">'+escHtml((e.prenom||'')+' '+(e.nom||''))+'</div>'
+      +'<div style="font-size:.6rem;color:'+(joursSansLecon>=3?'var(--red2)':'var(--text3)')+'">'+joursSansLecon+' jour(s) sans leçon cette semaine</div>'
+      +'</div></div>'
+      +statusBadge
+      +'<button onclick="event.stopPropagation();ouvrirPermissionsEleve(\''+e.id+'\')" style="background:rgba(105,240,174,.12);border:1px solid rgba(105,240,174,.3);color:#69F0AE;padding:4px 7px;border-radius:6px;font-size:.55rem;cursor:pointer;flex-shrink:0">✅ Permis.</button>'
+      +'</div>';
+  });
+  container.innerHTML = html;
 }
 
 </script>
